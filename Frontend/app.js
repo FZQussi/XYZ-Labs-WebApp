@@ -1,66 +1,112 @@
-let scene, camera, renderer, model;
+const apiBase = 'http://localhost:3001/products';
 
-function init() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f0f0);
+const productForm = document.getElementById('productForm');
+const productTableBody = document.getElementById('productTableBody');
+const cancelEditBtn = document.getElementById('cancelEdit');
 
-    camera = new THREE.PerspectiveCamera(75, 800 / 600, 0.1, 1000);
-    camera.position.z = 100;
+// Função para listar todos os produtos
+async function loadProducts() {
+  try {
+    const res = await fetch(apiBase);
+    const products = await res.json();
+    productTableBody.innerHTML = '';
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(800, 600);
-    document.getElementById('viewer').appendChild(renderer.domElement);
-
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(0, 1, 1).normalize();
-    scene.add(light);
-
-    animate();
+    products.forEach(p => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.name}</td>
+        <td>${p.description}</td>
+        <td>${p.price}</td>
+        <td>${p.material_id || '-'}</td>
+        <td>${p.color_id || '-'}</td>
+        <td>
+          <button onclick="editProduct(${p.id})">Editar</button>
+          <button onclick="deleteProduct(${p.id})">Apagar</button>
+        </td>
+      `;
+      productTableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Erro ao carregar produtos:', err);
+  }
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    if (model) model.rotation.y += 0.01;
-    renderer.render(scene, camera);
-}
+// Criar ou atualizar produto
+productForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-function loadModel(file) {
-    if (model) {
-        scene.remove(model);
-        model.geometry?.dispose();
+  const productId = document.getElementById('productId').value;
+  const productData = {
+    name: document.getElementById('name').value,
+    description: document.getElementById('description').value,
+    price: parseFloat(document.getElementById('price').value),
+    material_id: document.getElementById('material').value || null,
+    color_id: document.getElementById('color').value || null
+  };
+
+  try {
+    let res;
+    if (productId) {
+      res = await fetch(`${apiBase}/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+      });
+    } else {
+      res = await fetch(apiBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+      });
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const contents = e.target.result;
+    if (!res.ok) throw new Error('Erro ao salvar produto');
 
-        if (file.name.endsWith('.stl')) {
-            const loader = new THREE.STLLoader();
-            const geometry = loader.parse(contents);
-            const material = new THREE.MeshStandardMaterial({ color: 0x607d8b });
-            model = new THREE.Mesh(geometry, material);
-            scene.add(model);
-        } else if (file.name.endsWith('.3mf')) {
-            const loader = new THREE.ThreeMFLoader();
-            loader.parse(contents, function(result) {
-                model = result;
-                scene.add(model);
-            });
-        }
-    };
-
-    if (file.name.endsWith('.stl')) {
-        reader.readAsArrayBuffer(file);
-    } else if (file.name.endsWith('.3mf')) {
-        reader.readAsArrayBuffer(file);
-    }
-}
-
-// Evento de upload
-document.getElementById('upload').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) loadModel(file);
+    productForm.reset();
+    document.getElementById('productId').value = '';
+    loadProducts();
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao salvar produto');
+  }
 });
 
-// Inicializa a cena
-init();
+// Editar produto
+async function editProduct(id) {
+  try {
+    const res = await fetch(`${apiBase}/${id}`);
+    const product = await res.json();
+    document.getElementById('productId').value = product.id;
+    document.getElementById('name').value = product.name;
+    document.getElementById('description').value = product.description;
+    document.getElementById('price').value = product.price;
+    document.getElementById('material').value = product.material_id || '';
+    document.getElementById('color').value = product.color_id || '';
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao buscar produto');
+  }
+}
+
+// Cancelar edição
+cancelEditBtn.addEventListener('click', () => {
+  productForm.reset();
+  document.getElementById('productId').value = '';
+});
+
+// Apagar produto
+async function deleteProduct(id) {
+  if (!confirm('Tem certeza que quer apagar este produto?')) return;
+
+  try {
+    await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
+    loadProducts();
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao apagar produto');
+  }
+}
+
+// Inicializar
+loadProducts();

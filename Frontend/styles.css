@@ -1,13 +1,37 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
 }
 
-#viewer {
-    width: 800px;
-    height: 600px;
-    margin: 20px auto;
-    border: 1px solid #ccc;
+h1, h2 {
+  text-align: center;
+}
+
+form input, form select {
+  display: block;
+  margin: 10px 0;
+  padding: 8px;
+  width: 100%;
+}
+
+button {
+  margin: 5px 5px 0 0;
+  padding: 8px 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
 }
