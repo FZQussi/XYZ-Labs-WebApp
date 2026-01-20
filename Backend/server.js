@@ -1,12 +1,10 @@
 // backend/server.js
 const express = require('express');
-const cors = require('cors'); // permite comunicação com o frontend
+const cors = require('cors'); 
 require('dotenv').config();
 
-const app = express();
-const port = process.env.PORT || 3001;
-
-// Importa funções de produtos do db
+const { getMaterials } = require('./materials');
+const { getColors } = require('./colors');
 const { 
   getProducts, 
   getProductById, 
@@ -15,13 +13,35 @@ const {
   deleteProduct 
 } = require('./products');
 
+const app = express();
+const port = process.env.PORT || 3001;
+
 // Middlewares
-app.use(cors());           // habilita CORS
-app.use(express.json());   // para receber JSON no body
+app.use(cors());
+app.use(express.json());
+
+// ================== ROTAS DE MATERIAIS E CORES ==================
+app.get('/materials', async (req, res) => {
+  try {
+    const materials = await getMaterials();
+    res.json(materials);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao obter materiais' });
+  }
+});
+
+app.get('/colors', async (req, res) => {
+  try {
+    const colors = await getColors();
+    res.json(colors);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao obter cores' });
+  }
+});
 
 // ================== ROTAS DE PRODUTOS ==================
-
-// Listar todos os produtos
 app.get('/products', async (req, res) => {
   try {
     const products = await getProducts();
@@ -32,13 +52,10 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Obter um produto pelo ID
 app.get('/products/:id', async (req, res) => {
   try {
     const product = await getProductById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ error: 'Produto não encontrado' });
-    }
+    if (!product) return res.status(404).json({ error: 'Produto não encontrado' });
     res.json(product);
   } catch (err) {
     console.error(err);
@@ -46,7 +63,6 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
-// Criar um novo produto
 app.post('/products', async (req, res) => {
   try {
     const newProduct = await createProduct(req.body);
@@ -57,13 +73,10 @@ app.post('/products', async (req, res) => {
   }
 });
 
-// Atualizar um produto existente
 app.put('/products/:id', async (req, res) => {
   try {
     const updatedProduct = await updateProduct(req.params.id, req.body);
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Produto não encontrado' });
-    }
+    if (!updatedProduct) return res.status(404).json({ error: 'Produto não encontrado' });
     res.json(updatedProduct);
   } catch (err) {
     console.error(err);
@@ -71,26 +84,22 @@ app.put('/products/:id', async (req, res) => {
   }
 });
 
-// Apagar um produto
 app.delete('/products/:id', async (req, res) => {
   try {
     const result = await deleteProduct(req.params.id);
-    if (!result) {
-      return res.status(404).json({ error: 'Produto não encontrado' });
-    }
-    res.json({ message: 'Produto apagado com sucesso' });
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao apagar produto' });
   }
 });
 
-// ========================================================
+// Rota de teste
+app.get('/', (req, res) => {
+  res.send('Servidor backend está a funcionar!');
+});
 
 // Inicia o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
-});
-app.get('/', (req, res) => {
-  res.send('Servidor backend está a funcionar!');
 });

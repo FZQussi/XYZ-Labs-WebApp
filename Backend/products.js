@@ -1,14 +1,44 @@
 const client = require('./db');
 
-// Obter todos os produtos
+// Obter todos os produtos com nome de material e cor
 async function getProducts() {
-  const res = await client.query('SELECT * FROM products ORDER BY id');
+  const res = await client.query(`
+    SELECT 
+      p.id, 
+      p.name, 
+      p.description, 
+      p.price, 
+      p.material_id,
+      m.name AS material_name,
+      p.color_id,
+      c.name AS color_name,
+      p.created_at
+    FROM products p
+    LEFT JOIN materials m ON p.material_id = m.id
+    LEFT JOIN colors c ON p.color_id = c.id
+    ORDER BY p.id
+  `);
   return res.rows;
 }
 
-// Obter produto pelo id
+// Obter produto pelo id (também com material e cor)
 async function getProductById(id) {
-  const res = await client.query('SELECT * FROM products WHERE id = $1', [id]);
+  const res = await client.query(`
+    SELECT 
+      p.id, 
+      p.name, 
+      p.description, 
+      p.price, 
+      p.material_id,
+      m.name AS material_name,
+      p.color_id,
+      c.name AS color_name,
+      p.created_at
+    FROM products p
+    LEFT JOIN materials m ON p.material_id = m.id
+    LEFT JOIN colors c ON p.color_id = c.id
+    WHERE p.id = $1
+  `, [id]);
   return res.rows[0];
 }
 
