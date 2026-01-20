@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestão de Produtos 3D</title>
-  <link rel="stylesheet" href="style.css" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,43 +14,34 @@
 
     h1, h2 {
       text-align: center;
-      color: #333;
     }
 
     section {
-      background-color: #fff;
+      background: #fff;
       padding: 20px;
       margin: 20px auto;
+      max-width: 1000px;
       border-radius: 8px;
-      max-width: 900px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     form {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px;
-      justify-content: space-between;
     }
 
-    form input, form select {
-      flex: 1 1 200px;
+    input, button {
       padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
 
-    form button {
-      padding: 8px 16px;
-      border: none;
-      background-color: #4CAF50;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
+    .options {
+      grid-column: 1 / -1;
     }
 
-    form button#cancelEdit {
-      background-color: #f44336;
+    .options label {
+      margin-right: 10px;
+      display: inline-block;
     }
 
     table {
@@ -59,75 +50,60 @@
       margin-top: 20px;
     }
 
-    table th, table td {
-      padding: 10px;
+    th, td {
       border: 1px solid #ddd;
+      padding: 8px;
       text-align: center;
     }
 
-    table th {
-      background-color: #4CAF50;
+    th {
+      background: #4CAF50;
       color: white;
-    }
-
-    table tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    button {
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h1>Gestão de Produtos 3D</h1>
+<h1>Gestão de Produtos 3D</h1>
 
-  <!-- FORMULÁRIO -->
-  <section id="form-section">
-    <h2>Criar / Editar Produto</h2>
-    <form id="productForm">
-      <input type="hidden" id="productId" />
+<section>
+  <h2>Criar / Editar Produto</h2>
 
-      <input type="text" id="name" placeholder="Nome do produto" required />
-      <input type="text" id="description" placeholder="Descrição" required />
-      <input type="number" step="0.01" id="price" placeholder="Preço" required />
+<form id="productForm" enctype="multipart/form-data">
+  <input type="hidden" id="productId">
 
-      <select id="material">
-        <option value="">Selecione o material</option>
-      </select>
+  <input id="name" placeholder="Nome" required>
+  <input id="description" placeholder="Descrição" required>
+  <input id="price" type="number" step="0.01" placeholder="Preço" required>
 
-      <select id="color">
-        <option value="">Selecione a cor</option>
-      </select>
+  <div class="options">
+    <label for="modelFile"><strong>Ficheiro 3D (.glb):</strong></label>
+    <input type="file" id="modelFile" accept=".glb" required>
+  </div>
 
-      <button type="submit">Salvar Produto</button>
-      <button type="button" id="cancelEdit">Cancelar</button>
-    </form>
-  </section>
+  <button type="submit">Guardar</button>
+  <button type="button" id="cancelEdit">Cancelar</button>
+</form>
 
-    <!-- TABELA DE PRODUTOS -->
-    <section id="list-section">
-      <h2>Produtos</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Preço</th>
-            <th>Material</th>
-            <th>Cor</th>
-            <th>Criado em</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="productTableBody"></tbody>
-      </table>
-    </section>
 
-  <script src="app.js"></script>
+
+</section>
+
+<section>
+  <h2>Produtos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="productTableBody"></tbody>
+  </table>
+</section>
+
+<script src="products.js"></script>
 </body>
 </html>
-
-

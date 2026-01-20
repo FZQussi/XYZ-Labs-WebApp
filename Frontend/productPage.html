@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XYZ Labs - Produto 3D</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      max-width: 1000px;
+      width: 100%;
+      margin: 40px auto;
+      gap: 20px;
+    }
+
+    model-viewer {
+      width: 500px;
+      height: 500px;
+      background-color: #eaeaea;
+      border-radius: 10px;
+    }
+
+    .product-info {
+      max-width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .product-info h2 {
+      margin-bottom: 10px;
+      color: #4CAF50;
+    }
+
+    .product-info p {
+      margin: 8px 0;
+    }
+
+    .color-picker {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .color-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+    }
+
+    .color-btn:hover {
+      border-color: #000;
+    }
+
+    footer {
+      width: 100%;
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 40px;
+    }
+  </style>
+
+  <!-- Model Viewer -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+
+<body>
+
+<header>
+  <h1>XYZ Labs - Produto 3D</h1>
+</header>
+
+<main>
+
+  <!-- VISUALIZADOR 3D -->
+  <model-viewer 
+    id="productModel"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="1">
+  </model-viewer>
+
+  <!-- INFO DO PRODUTO -->
+  <div class="product-info">
+    <h2 id="productName"></h2>
+
+    <p><strong>Descrição:</strong>
+      <span id="productDescription"></span>
+    </p>
+
+    <p><strong>Preço:</strong> €<span id="productPrice"></span></p>
+
+    <strong>Escolher cor:</strong>
+    <div id="colorPicker" class="color-picker"></div>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2026 XYZ Labs. Todos os direitos reservados.
+</footer>
+
+<script>
+  const API_PRODUCTS = 'http://localhost:3001/products';
+  const API_COLORS = 'http://localhost:3001/colors';
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+
+  const viewer = document.getElementById('productModel');
+  const colorPicker = document.getElementById('colorPicker');
+
+  // =============================
+  // CARREGAR PRODUTO
+  // =============================
+  async function loadProduct() {
+    try {
+      const res = await fetch(`${API_PRODUCTS}/${productId}`);
+      const product = await res.json();
+
+      // Mostrar ficheiro .glb
+      viewer.src = `models/${product.model_file}`;
+
+      document.getElementById('productName').textContent = product.name;
+      document.getElementById('productDescription').textContent = product.description;
+      document.getElementById('productPrice').textContent = Number(product.price).toFixed(2);
+    } catch (err) {
+      console.error('Erro ao carregar produto:', err);
+      alert('Erro ao carregar produto.');
+    }
+  }
+
+  // =============================
+  // CARREGAR CORES
+  // =============================
+  async function loadColors() {
+    try {
+      const res = await fetch(API_COLORS);
+      const colors = await res.json();
+
+      colorPicker.innerHTML = '';
+
+      colors.forEach(color => {
+        const btn = document.createElement('div');
+        btn.className = 'color-btn';
+        btn.style.background = color.hex;
+        btn.title = color.name;
+
+        btn.onclick = () => applyColor(color.hex, color.name);
+
+        colorPicker.appendChild(btn);
+      });
+    } catch (err) {
+      console.error('Erro ao carregar cores:', err);
+    }
+  }
+
+  // =============================
+  // APLICAR COR AO MODELO 3D
+  // =============================
+  function applyColor(hex, name) {
+    const rgb = hexToRgb(hex);
+
+    // Garante que o modelo está carregado antes de aplicar cor
+    if (viewer.model) {
+      viewer.model.materials.forEach(mat => {
+        mat.pbrMetallicRoughness.setBaseColorFactor([
+          rgb.r / 255,
+          rgb.g / 255,
+          rgb.b / 255,
+          1
+        ]);
+      });
+    }
+
+    // Atualiza a info da cor
+    document.getElementById('productColor').textContent = name;
+  }
+
+  function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16)
+    };
+  }
+
+  loadProduct();
+  loadColors();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "xyz-labs-webapp",
+  "version": "1.0.0",
+  "description": "The start of my jorney on the making of my webstore",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FZQussi/XYZ-Labs-WebApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FZQussi/XYZ-Labs-WebApp/issues"
+  },
+  "homepage": "https://github.com/FZQussi/XYZ-Labs-WebApp#readme"
+}

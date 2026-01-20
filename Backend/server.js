@@ -2,6 +2,9 @@
 const express = require('express');
 const cors = require('cors'); 
 require('dotenv').config();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const { getMaterials } = require('./materials');
 const { getColors } = require('./colors');
@@ -16,9 +19,24 @@ const {
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Middlewares
+// ======== CONFIG MULTER PARA UPLOAD DE GLB ========
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '../Frontend/models');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    // Mantém o nome original do ficheiro
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage });
+
+// ======== MIDDLEWARES ========
 app.use(cors());
 app.use(express.json());
+app.use('/models', express.static(path.join(__dirname, '../Frontend/models'))); // para servir os GLBs
 
 // ================== ROTAS DE MATERIAIS E CORES ==================
 app.get('/materials', async (req, res) => {
@@ -63,9 +81,22 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
-app.post('/products', async (req, res) => {
+// ================== CRIAR PRODUTO COM UPLOAD ==================
+app.post('/products', upload.single('modelFile'), async (req, res) => {
   try {
-    const newProduct = await createProduct(req.body);
+    const { name, description, price } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Ficheiro .glb obrigatório' });
+    }
+
+    const newProduct = await createProduct({
+      name,
+      description,
+      price: parseFloat(price),
+      model_file: req.file.filename // guardamos o nome do ficheiro na DB
+    });
+
     res.status(201).json(newProduct);
   } catch (err) {
     console.error(err);
@@ -73,9 +104,21 @@ app.post('/products', async (req, res) => {
   }
 });
 
-app.put('/products/:id', async (req, res) => {
+
+
+// ================== ATUALIZAR PRODUTO COM UPLOAD ==================
+app.put('/products/:id', upload.single('modelFile'), async (req, res) => {
   try {
-    const updatedProduct = await updateProduct(req.params.id, req.body);
+    const { name, description, price } = req.body;
+    const modelFile = req.file ? req.file.filename : undefined; // se não enviar, mantém o anterior
+
+    const updatedProduct = await updateProduct(req.params.id, {
+      name,
+      description,
+      price: parseFloat(price),
+      model_file: modelFile
+    });
+
     if (!updatedProduct) return res.status(404).json({ error: 'Produto não encontrado' });
     res.json(updatedProduct);
   } catch (err) {
@@ -84,6 +127,9 @@ app.put('/products/:id', async (req, res) => {
   }
 });
 
+
+
+// ================== DELETE PRODUTO ==================
 app.delete('/products/:id', async (req, res) => {
   try {
     const result = await deleteProduct(req.params.id);
@@ -94,12 +140,12 @@ app.delete('/products/:id', async (req, res) => {
   }
 });
 
-// Rota de teste
+// ================== ROTA DE TESTE ==================
 app.get('/', (req, res) => {
   res.send('Servidor backend está a funcionar!');
 });
 
-// Inicia o servidor
+// ================== INICIA SERVIDOR ==================
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });

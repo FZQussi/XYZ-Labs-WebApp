@@ -6,19 +6,15 @@ const client = require('./db');
 async function getProducts() {
   const res = await client.query(`
     SELECT 
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.created_at,
-      p.material_id,
-      m.name AS material_name,
-      p.color_id,
-      c.name AS color_name
-    FROM products p
-    LEFT JOIN materials m ON p.material_id = m.id
-    LEFT JOIN colors c ON p.color_id = c.id
-    ORDER BY p.id
+      id,
+      name,
+      description,
+      price,
+      model_file,
+      created_at,
+      updated_at
+    FROM products
+    ORDER BY id
   `);
   return res.rows;
 }
@@ -29,19 +25,15 @@ async function getProducts() {
 async function getProductById(id) {
   const res = await client.query(`
     SELECT 
-      p.id, 
-      p.name, 
-      p.description, 
-      p.price, 
-      p.material_id,
-      m.name AS material_name,
-      p.color_id,
-      c.name AS color_name,
-      p.created_at
-    FROM products p
-    LEFT JOIN materials m ON p.material_id = m.id
-    LEFT JOIN colors c ON p.color_id = c.id
-    WHERE p.id = $1
+      id, 
+      name, 
+      description, 
+      price, 
+      model_file,
+      created_at,
+      updated_at
+    FROM products
+    WHERE id = $1
   `, [id]);
   return res.rows[0];
 }
@@ -49,30 +41,33 @@ async function getProductById(id) {
 // ==========================
 // CRIAR PRODUTO
 // ==========================
-async function createProduct({ name, description, price, material_id, color_id }) {
+async function createProduct({ name, description, price, model_file }) {
   const res = await client.query(
-    `INSERT INTO products (name, description, price, material_id, color_id, created_at)
-     VALUES ($1, $2, $3, $4, $5, NOW())
+    `INSERT INTO products (name, description, price, model_file, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, NOW(), NOW())
      RETURNING id`,
-    [name, description, price, material_id || null, color_id || null]
+    [name, description, price, model_file]
   );
 
-  // Buscar o produto recém-criado com JOIN
+  // Retorna o produto recém-criado
   return getProductById(res.rows[0].id);
 }
 
 // ==========================
 // ATUALIZAR PRODUTO
 // ==========================
-async function updateProduct(id, { name, description, price, material_id, color_id }) {
+async function updateProduct(id, { name, description, price, model_file }) {
+  // Se não houver novo ficheiro, mantém o anterior
+  const resCurrent = await getProductById(id);
+  const fileToUse = model_file || resCurrent.model_file;
+
   await client.query(
     `UPDATE products 
-     SET name=$1, description=$2, price=$3, material_id=$4, color_id=$5 
-     WHERE id=$6`,
-    [name, description, price, material_id || null, color_id || null, id]
+     SET name=$1, description=$2, price=$3, model_file=$4, updated_at=NOW()
+     WHERE id=$5`,
+    [name, description, price, fileToUse, id]
   );
 
-  // Buscar o produto atualizado com JOIN
   return getProductById(id);
 }
 
