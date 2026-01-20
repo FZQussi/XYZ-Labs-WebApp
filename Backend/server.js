@@ -6,6 +6,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Importa rotas de autenticação
+const authRoutes = require('./auth');
+
 const { getMaterials } = require('./materials');
 const { getColors } = require('./colors');
 const { 
@@ -27,8 +30,7 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    // Mantém o nome original do ficheiro
-    cb(null, file.originalname);
+    cb(null, file.originalname); // mantém o nome original do ficheiro
   }
 });
 const upload = multer({ storage });
@@ -37,6 +39,9 @@ const upload = multer({ storage });
 app.use(cors());
 app.use(express.json());
 app.use('/models', express.static(path.join(__dirname, '../Frontend/models'))); // para servir os GLBs
+
+// ======== ROTAS DE AUTENTICAÇÃO ========
+app.use('/auth', authRoutes); // <--- agora está correto
 
 // ================== ROTAS DE MATERIAIS E CORES ==================
 app.get('/materials', async (req, res) => {
@@ -94,7 +99,7 @@ app.post('/products', upload.single('modelFile'), async (req, res) => {
       name,
       description,
       price: parseFloat(price),
-      model_file: req.file.filename // guardamos o nome do ficheiro na DB
+      model_file: req.file.filename
     });
 
     res.status(201).json(newProduct);
@@ -104,13 +109,11 @@ app.post('/products', upload.single('modelFile'), async (req, res) => {
   }
 });
 
-
-
 // ================== ATUALIZAR PRODUTO COM UPLOAD ==================
 app.put('/products/:id', upload.single('modelFile'), async (req, res) => {
   try {
     const { name, description, price } = req.body;
-    const modelFile = req.file ? req.file.filename : undefined; // se não enviar, mantém o anterior
+    const modelFile = req.file ? req.file.filename : undefined;
 
     const updatedProduct = await updateProduct(req.params.id, {
       name,
@@ -126,8 +129,6 @@ app.put('/products/:id', upload.single('modelFile'), async (req, res) => {
     res.status(500).json({ error: 'Erro ao atualizar produto' });
   }
 });
-
-
 
 // ================== DELETE PRODUTO ==================
 app.delete('/products/:id', async (req, res) => {

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registo - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/register.css">
+</head>
+<script src="../scripts/register.js"></script>
+
+<body>
+
+  <div class="register-container">
+
+    <div class="register-card">
+      <img src="logo.png" alt="XYZ Labs Logo" class="register-logo">
+
+      <h2>Criar Conta</h2>
+
+      <form id="registerForm">
+        <div class="input-group">
+          <label for="name">Nome</label>
+          <input type="text" id="name" required placeholder="O teu nome">
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="exemplo@email.com">
+        </div>
+
+        <div class="input-group">
+          <label for="password">Palavra-passe</label>
+          <input type="password" id="password" required placeholder="********">
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirmar palavra-passe</label>
+          <input type="password" id="confirmPassword" required placeholder="********">
+        </div>
+
+        <button type="submit">Registar</button>
+      </form>
+
+      <p class="login-link">
+        Já tens conta?
+        <a href="login.html">Iniciar sessão</a>
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', e => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        alert('As palavras-passe não coincidem');
+        return;
+      }
+
+      // Exemplo simples (depois ligamos ao backend)
+      alert('Conta criada com sucesso!');
+      window.location.href = 'login.html';
+    });
+  </script>
+
+</body>
+</html>
