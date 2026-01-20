@@ -1,18 +1,20 @@
 const client = require('./db');
 
-// Obter todos os produtos com nome de material e cor
+// ==========================
+// OBTER TODOS OS PRODUTOS
+// ==========================
 async function getProducts() {
   const res = await client.query(`
     SELECT 
-      p.id, 
-      p.name, 
-      p.description, 
-      p.price, 
+      p.id,
+      p.name,
+      p.description,
+      p.price,
+      p.created_at,
       p.material_id,
       m.name AS material_name,
       p.color_id,
-      c.name AS color_name,
-      p.created_at
+      c.name AS color_name
     FROM products p
     LEFT JOIN materials m ON p.material_id = m.id
     LEFT JOIN colors c ON p.color_id = c.id
@@ -21,7 +23,9 @@ async function getProducts() {
   return res.rows;
 }
 
-// Obter produto pelo id (também com material e cor)
+// ==========================
+// OBTER PRODUTO PELO ID
+// ==========================
 async function getProductById(id) {
   const res = await client.query(`
     SELECT 
@@ -42,30 +46,39 @@ async function getProductById(id) {
   return res.rows[0];
 }
 
-// Criar novo produto
+// ==========================
+// CRIAR PRODUTO
+// ==========================
 async function createProduct({ name, description, price, material_id, color_id }) {
   const res = await client.query(
     `INSERT INTO products (name, description, price, material_id, color_id, created_at)
      VALUES ($1, $2, $3, $4, $5, NOW())
-     RETURNING *`,
+     RETURNING id`,
     [name, description, price, material_id || null, color_id || null]
   );
-  return res.rows[0];
+
+  // Buscar o produto recém-criado com JOIN
+  return getProductById(res.rows[0].id);
 }
 
-// Atualizar produto existente
+// ==========================
+// ATUALIZAR PRODUTO
+// ==========================
 async function updateProduct(id, { name, description, price, material_id, color_id }) {
-  const res = await client.query(
+  await client.query(
     `UPDATE products 
      SET name=$1, description=$2, price=$3, material_id=$4, color_id=$5 
-     WHERE id=$6 
-     RETURNING *`,
+     WHERE id=$6`,
     [name, description, price, material_id || null, color_id || null, id]
   );
-  return res.rows[0];
+
+  // Buscar o produto atualizado com JOIN
+  return getProductById(id);
 }
 
-// Remover produto
+// ==========================
+// REMOVER PRODUTO
+// ==========================
 async function deleteProduct(id) {
   await client.query('DELETE FROM products WHERE id=$1', [id]);
   return { message: `Produto ${id} removido.` };

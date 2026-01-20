@@ -44,7 +44,7 @@ app.get('/colors', async (req, res) => {
 // ================== ROTAS DE PRODUTOS ==================
 app.get('/products', async (req, res) => {
   try {
-    const products = await getProducts();
+    const products = await getProducts(); // deve trazer material_name e color_name
     res.json(products);
   } catch (err) {
     console.error(err);

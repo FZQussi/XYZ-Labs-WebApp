@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestão de Produtos 3D</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f7f7f7;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    section {
+      background-color: #fff;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 8px;
+      max-width: 900px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    form input, form select {
+      flex: 1 1 200px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    form button {
+      padding: 8px 16px;
+      border: none;
+      background-color: #4CAF50;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    form button#cancelEdit {
+      background-color: #f44336;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    table th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gestão de Produtos 3D</h1>
+
+  <!-- FORMULÁRIO -->
+  <section id="form-section">
+    <h2>Criar / Editar Produto</h2>
+    <form id="productForm">
+      <input type="hidden" id="productId" />
+
+      <input type="text" id="name" placeholder="Nome do produto" required />
+      <input type="text" id="description" placeholder="Descrição" required />
+      <input type="number" step="0.01" id="price" placeholder="Preço" required />
+
+      <select id="material">
+        <option value="">Selecione o material</option>
+      </select>
+
+      <select id="color">
+        <option value="">Selecione a cor</option>
+      </select>
+
+      <button type="submit">Salvar Produto</button>
+      <button type="button" id="cancelEdit">Cancelar</button>
+    </form>
+  </section>
+
+    <!-- TABELA DE PRODUTOS -->
+    <section id="list-section">
+      <h2>Produtos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Preço</th>
+            <th>Material</th>
+            <th>Cor</th>
+            <th>Criado em</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody"></tbody>
+      </table>
+    </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+
