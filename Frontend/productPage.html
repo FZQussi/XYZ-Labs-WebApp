@@ -37,7 +37,7 @@
     model-viewer {
       width: 500px;
       height: 500px;
-      background-color: #eaeaea;
+      background-color: #e0e0e0; /* fundo cinza claro */
       border-radius: 10px;
     }
 
@@ -56,25 +56,6 @@
 
     .product-info p {
       margin: 8px 0;
-    }
-
-    .color-picker {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .color-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 2px solid #ccc;
-      cursor: pointer;
-    }
-
-    .color-btn:hover {
-      border-color: #000;
     }
 
     footer {
@@ -111,15 +92,8 @@
   <!-- INFO DO PRODUTO -->
   <div class="product-info">
     <h2 id="productName"></h2>
-
-    <p><strong>Descrição:</strong>
-      <span id="productDescription"></span>
-    </p>
-
+    <p><strong>Descrição:</strong> <span id="productDescription"></span></p>
     <p><strong>Preço:</strong> €<span id="productPrice"></span></p>
-
-    <strong>Escolher cor:</strong>
-    <div id="colorPicker" class="color-picker"></div>
   </div>
 
 </main>
@@ -130,65 +104,31 @@
 
 <script>
   const API_PRODUCTS = 'http://localhost:3001/products';
-  const API_COLORS = 'http://localhost:3001/colors';
   const params = new URLSearchParams(window.location.search);
   const productId = params.get('id');
-
   const viewer = document.getElementById('productModel');
-  const colorPicker = document.getElementById('colorPicker');
 
   // =============================
   // CARREGAR PRODUTO
   // =============================
   async function loadProduct() {
-    try {
-      const res = await fetch(`${API_PRODUCTS}/${productId}`);
-      const product = await res.json();
+    const res = await fetch(`${API_PRODUCTS}/${productId}`);
+    const product = await res.json();
 
-      // Mostrar ficheiro .glb
-      viewer.src = `models/${product.model_file}`;
+    // mostrar ficheiro .glb
+    viewer.src = `models/${product.model_file}`;
 
-      document.getElementById('productName').textContent = product.name;
-      document.getElementById('productDescription').textContent = product.description;
-      document.getElementById('productPrice').textContent = Number(product.price).toFixed(2);
-    } catch (err) {
-      console.error('Erro ao carregar produto:', err);
-      alert('Erro ao carregar produto.');
-    }
+    document.getElementById('productName').textContent = product.name;
+    document.getElementById('productDescription').textContent = product.description;
+    document.getElementById('productPrice').textContent = Number(product.price).toFixed(2);
   }
 
   // =============================
-  // CARREGAR CORES
+  // DEFINIR COR AZUL CLARA
   // =============================
-  async function loadColors() {
-    try {
-      const res = await fetch(API_COLORS);
-      const colors = await res.json();
+  viewer.addEventListener('load', () => {
+    const rgb = { r: 0, g: 130, b: 250 }; // azul claro
 
-      colorPicker.innerHTML = '';
-
-      colors.forEach(color => {
-        const btn = document.createElement('div');
-        btn.className = 'color-btn';
-        btn.style.background = color.hex;
-        btn.title = color.name;
-
-        btn.onclick = () => applyColor(color.hex, color.name);
-
-        colorPicker.appendChild(btn);
-      });
-    } catch (err) {
-      console.error('Erro ao carregar cores:', err);
-    }
-  }
-
-  // =============================
-  // APLICAR COR AO MODELO 3D
-  // =============================
-  function applyColor(hex, name) {
-    const rgb = hexToRgb(hex);
-
-    // Garante que o modelo está carregado antes de aplicar cor
     if (viewer.model) {
       viewer.model.materials.forEach(mat => {
         mat.pbrMetallicRoughness.setBaseColorFactor([
@@ -199,22 +139,9 @@
         ]);
       });
     }
-
-    // Atualiza a info da cor
-    document.getElementById('productColor').textContent = name;
-  }
-
-  function hexToRgb(hex) {
-    hex = hex.replace('#', '');
-    return {
-      r: parseInt(hex.substring(0, 2), 16),
-      g: parseInt(hex.substring(2, 4), 16),
-      b: parseInt(hex.substring(4, 6), 16)
-    };
-  }
+  });
 
   loadProduct();
-  loadColors();
 </script>
 
 </body>

@@ -1,37 +1,54 @@
-const params = new URLSearchParams(window.location.search);
-const productId = params.get('id');
-
-const API_PRODUCTS = 'http://localhost:3001/products';
-const API_COLORS = 'http://localhost:3001/colors';
-
 const viewer = document.getElementById('productModel');
-const colorOptions = document.getElementById('colorOptions');
+const colorPicker = document.getElementById('colorPicker');
 
+let selectedColor = null; // cor selecionada
+let modelLoaded = false;
+
+// =============================
+// CARREGAR PRODUTO
+// =============================
 async function loadProduct() {
   const res = await fetch(`${API_PRODUCTS}/${productId}`);
   const product = await res.json();
 
-  viewer.src = `models/product-${product.id}.glb`;
+  viewer.src = `models/${product.model_file}`;
 
   document.getElementById('productName').textContent = product.name;
-  document.getElementById('productPrice').textContent =
-    Number(product.price).toFixed(2);
+  document.getElementById('productDescription').textContent = product.description;
+  document.getElementById('productPrice').textContent = Number(product.price).toFixed(2);
 }
 
+// =============================
+// CARREGAR CORES
+// =============================
 async function loadColors() {
   const res = await fetch(API_COLORS);
   const colors = await res.json();
 
-  colors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.style.background = c.hex;
-    btn.onclick = () => applyColor(c.hex, c.name);
-    colorOptions.appendChild(btn);
+  colorPicker.innerHTML = '';
+
+  colors.forEach(color => {
+    const btn = document.createElement('div');
+    btn.className = 'color-btn';
+    btn.style.background = color.hex;
+    btn.title = color.name;
+
+    btn.onclick = () => {
+      selectedColor = color;   // guarda a cor selecionada
+      applyColor();
+    };
+
+    colorPicker.appendChild(btn);
   });
 }
 
-function applyColor(hex, name) {
-  const rgb = hexToRgb(hex);
+// =============================
+// APLICAR COR AO MODELO
+// =============================
+function applyColor() {
+  if (!modelLoaded || !selectedColor) return;
+
+  const rgb = hexToRgb(selectedColor.hex);
 
   viewer.model.materials.forEach(mat => {
     mat.pbrMetallicRoughness.setBaseColorFactor([
@@ -42,17 +59,29 @@ function applyColor(hex, name) {
     ]);
   });
 
-  document.getElementById('productColor').textContent = name;
+  document.getElementById('productColor').textContent = selectedColor.name;
 }
 
+// =============================
+// HELPER HEX -> RGB
+// =============================
 function hexToRgb(hex) {
   hex = hex.replace('#','');
   return {
-    r: parseInt(hex.substr(0,2),16),
-    g: parseInt(hex.substr(2,2),16),
-    b: parseInt(hex.substr(4,2),16)
+    r: parseInt(hex.substring(0,2),16),
+    g: parseInt(hex.substring(2,4),16),
+    b: parseInt(hex.substring(4,6),16)
   };
 }
 
+// =============================
+// ESPERA O MODELO CARREGAR
+// =============================
+viewer.addEventListener('load', () => {
+  modelLoaded = true;
+  applyColor(); // aplica a cor se já houver selecionada
+});
+
+// Inicializa
 loadProduct();
 loadColors();

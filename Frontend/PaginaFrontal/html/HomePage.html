@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XYZ Labs - Homepage</title>
+  <link rel="stylesheet" href="../css/homePage.css">
+</head>
+<body>
+
+<header class="header-container">
+  <!-- Logo + Navegação -->
+  <div class="header-left">
+    <img src="logo.png" alt="XYZ Labs Logo">
+    <h1>XYZ Labs</h1>
+
+    <nav class="header-nav">
+      <ul>
+        <li><a href="homePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Área do usuário -->
+  <div class="header-right">
+    <span class="user-area">Olá, Utilizador!</span>
+    <button onclick="location.href='login.html'">Login</button>
+    <button onclick="location.href='cart.html'">Carrinho</button>
+  </div>
+</header>
+
+
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main>
+    <h1>Explore os nossos produtos 3D</h1>
+    <p>Na XYZ Labs, oferecemos uma vasta gama de produtos 3D personalizáveis. Navegue pelos produtos, explore os materiais e cores disponíveis e descubra as nossas soluções inovadoras.</p>
+
+    <!-- CONTAINER DE PRODUTOS -->
+    <div class="product-container">
+
+      <!-- PRODUCT CARD HARD-CODED -->
+      <div class="product-card">
+        <div class="product-images">
+          <img src="produto1-1.jpg" alt="Produto 1 - Imagem 1">
+          <img src="produto1-2.jpg" alt="Produto 1 - Imagem 2">
+          <img src="produto1-3.jpg" alt="Produto 1 - Imagem 3">
+        </div>
+        <div class="product-info">
+          <h3>Exemplo Produto 3D</h3>
+          <p>Material: PLA</p>
+          <p>Cor: Vermelho</p>
+          <p class="price">€25.00</p>
+          <button onclick="location.href='productPage.html'">Ver Produto</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer>
+    &copy; 2026 XYZ Labs. Todos os direitos reservados. | <a href="homePage.html">Home</a>
+  </footer>
+
+</body>
+</html>
