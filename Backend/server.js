@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Importa rotas de autenticação
-const authRoutes = require('./auth');
+const { router: authRoutes } = require('./auth');
 
 const { getMaterials } = require('./materials');
 const { getColors } = require('./colors');

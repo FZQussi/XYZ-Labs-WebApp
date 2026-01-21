@@ -5,24 +5,54 @@ const jwt = require('jsonwebtoken');
 const client = require('./db');
 
 const router = express.Router();
-const SECRET = process.env.JWT_SECRET || 'xyzlabs-secret'; // define no .env
+const SECRET = process.env.JWT_SECRET;
 
 // ============================
-// REGISTO DE UTILIZADOR
+// MIDDLEWARE: VALIDAR TOKEN
+// ============================
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader)
+    return res.status(401).json({ error: 'Token em falta' });
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, SECRET);
+    req.user = decoded; // disponível nas rotas seguintes
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+}
+
+// ============================
+// MIDDLEWARE: APENAS ADMIN
+// ============================
+function adminOnly(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Acesso restrito a administradores' });
+  }
+  next();
+}
+
+// ============================
+// REGISTO
 // ============================
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
-    }
+    if (!name || !email || !password)
+      return res.status(400).json({ error: 'Campos obrigatórios em falta' });
 
-    // Verifica se email já existe
-    const existing = await client.query('SELECT id FROM users WHERE email=$1', [email]);
-    if (existing.rows.length > 0) {
+    const existing = await client.query(
+      'SELECT id FROM users WHERE email=$1',
+      [email]
+    );
+
+    if (existing.rows.length > 0)
       return res.status(400).json({ error: 'Email já registado' });
-    }
 
     const password_hash = await bcrypt.hash(password, 10);
 
@@ -41,7 +71,7 @@ router.post('/register', async (req, res) => {
 });
 
 // ============================
-// LOGIN DE UTILIZADOR
+// LOGIN
 // ============================
 router.post('/login', async (req, res) => {
   try {
@@ -52,29 +82,50 @@ router.post('/login', async (req, res) => {
       [email]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(400).json({ error: 'Credenciais inválidas' });
-    }
+    if (result.rows.length === 0)
+      return res.status(401).json({ error: 'Credenciais inválidas' });
 
     const user = result.rows[0];
 
     const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) {
-      return res.status(400).json({ error: 'Credenciais inválidas' });
-    }
+    if (!match)
+      return res.status(401).json({ error: 'Credenciais inválidas' });
 
-    // Gera token JWT
     const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email, role: user.role },
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
       SECRET,
       { expiresIn: '1d' }
     );
 
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro no login' });
   }
 });
 
-module.exports = router;
+// ============================
+// VALIDAR TOKEN (frontend usa)
+// ============================
+router.get('/validate', authMiddleware, (req, res) => {
+  res.json({ valid: true, user: req.user });
+});
+
+module.exports = {
+  router,
+  authMiddleware,
+  adminOnly
+};

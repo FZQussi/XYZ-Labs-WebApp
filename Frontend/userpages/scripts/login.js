@@ -19,15 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
+if (res.ok) {
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('user', JSON.stringify(data.user));
 
-      if (res.ok) {
-        // Guardar token no localStorage (ou sessionStorage)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+  alert(`Bem-vindo, ${data.user.name}!`);
+  window.location.href = '../../PaginaFrontal/html/HomePage.html';
+}
 
-        alert(`Bem-vindo, ${data.user.name}!`);
-        window.location.href = 'homePage.html'; // redireciona para a homepage
-      } else {
+ else {
         alert('Erro: ' + data.error);
       }
     } catch (err) {
