@@ -70,15 +70,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const userMenuBtn = document.getElementById('userMenuBtn');
   const cartBtn = document.getElementById('cartBtn');
   const closeMenu = document.getElementById('closeMenu');
+  const signInBtn = document.getElementById('signInBtn');
+  const signUpBtn = document.getElementById('signUpBtn');
 
-  // Verifica se user está logado
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
 
-  if (token && user) {
+  // 🔹 Não logado
+  if (!token || !user) {
+    authButtons.style.display = 'flex';
+    userIcons.style.display = 'none';
+  } else {
     authButtons.style.display = 'none';
     userIcons.style.display = 'flex';
- 
+    userName.textContent = user.name;
+  }
+
+  // 👉 Sign In
+  if (signInBtn) {
+    signInBtn.addEventListener('click', () => {
+      window.location.href = '../../userpages/html/login.html';
+    });
+  }
+
+  // 👉 Sign Up
+  if (signUpBtn) {
+    signUpBtn.addEventListener('click', () => {
+      window.location.href = '../../userpages/html/register.html';
+    });
   }
 
   // Menu lateral
@@ -87,34 +106,47 @@ document.addEventListener('DOMContentLoaded', () => {
     sideMenu.classList.add('open');
   }
 
-  userMenuBtn.addEventListener('click', () => {
-     const content = `
-      <h3>Olá, ${user.name}</h3>
-      <ul>
-        <li><a href="profile.html">Perfil</a></li>
-        <li><a href="orders.html">Encomendas</a></li>
-        <li><a href="#" id="logoutBtn">Logout</a></li>
-      </ul>
-      
-    `;
-    openMenu(content);
+  if (userMenuBtn) {
+    userMenuBtn.addEventListener('click', () => {
+      let adminLink = '';
 
-    document.getElementById('logout').addEventListener('click', () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      location.reload();
+      if (user.role === 'admin') {
+        adminLink = `<li><a href="../../admin/html/dashboard.html">Dashboard</a></li>`;
+      }
+
+      const content = `
+        <h3>Olá, ${user.name}</h3>
+        <ul>
+          ${adminLink}
+          <li><a href="profile.html">Perfil</a></li>
+          <li><a href="orders.html">Encomendas</a></li>
+          <li><a href="#" id="logoutLink">Logout</a></li>
+        </ul>
+      `;
+
+      openMenu(content);
+
+      document.getElementById('logoutLink').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        location.reload();
+      });
     });
-  });
+  }
 
-  cartBtn.addEventListener('click', () => {
-    const content = `
-      <h3>Meu Carrinho</h3>
-      <p>Carrinho ainda vazio</p>
-    `;
-    openMenu(content);
-  });
+  if (cartBtn) {
+    cartBtn.addEventListener('click', () => {
+      openMenu(`
+        <h3>Meu Carrinho</h3>
+        <p>Carrinho ainda vazio</p>
+      `);
+    });
+  }
 
-  closeMenu.addEventListener('click', () => {
-    sideMenu.classList.remove('open');
-  });
+  if (closeMenu) {
+    closeMenu.addEventListener('click', () => {
+      sideMenu.classList.remove('open');
+    });
+  }
 });
+

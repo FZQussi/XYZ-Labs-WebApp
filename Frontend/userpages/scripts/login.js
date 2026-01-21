@@ -1,5 +1,3 @@
-// Frontend/js/login.js
-
 const API = 'http://localhost:3001/auth/login';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,23 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
+    console.log('Tentativa de login:', { email, password });
+
     try {
       const res = await fetch(API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+        body: JSON.stringify({ identifier: email, password })
+      }); 
 
       const data = await res.json();
-if (res.ok) {
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('user', JSON.stringify(data.user));
+      console.log('Resposta do backend:', data);
 
-  alert(`Bem-vindo, ${data.user.name}!`);
-  window.location.href = '../../PaginaFrontal/html/HomePage.html';
-}
+      if (res.ok) {
+        console.log('Login OK, salvando token e user');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
 
- else {
+        alert(`Bem-vindo, ${data.user.name}!`);
+        window.location.href = '../../PaginaFrontal/html/HomePage.html';
+      } else {
+        console.warn('Erro no login:', data.error);
         alert('Erro: ' + data.error);
       }
     } catch (err) {
