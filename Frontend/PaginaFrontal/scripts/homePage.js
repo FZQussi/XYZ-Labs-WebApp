@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 🔹 Se não há token → visitante
   if (!token) {
-    userArea.textContent = 'Olá, visitante';
+   
     loginBtn.style.display = 'inline-block';
     logoutBtn.style.display = 'none';
     return;
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   } catch (err) {
     console.error('Erro ao validar sessão:', err);
-    userArea.textContent = 'Olá, visitante';
+   
   }
 
   // 🔹 Logout
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     authButtons.style.display = 'none';
     userIcons.style.display = 'flex';
-    userName.textContent = user.name;
+    
   }
 
   // 👉 Sign In
