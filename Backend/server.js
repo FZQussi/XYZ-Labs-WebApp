@@ -150,3 +150,21 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
+
+// backend/server.js (ou num módulo admin.js)
+const path = require('path');
+const { authMiddleware, adminOnly } = require('./auth');
+
+// Página Dashboard (HTML)
+app.get('/admin/dashboard', authMiddleware, adminOnly, (req, res) => {
+  res.sendFile(path.join(__dirname, '../Frontend/Dashboard/html/dashboard.html'));
+});
+
+// API exemplo de dados protegidos
+app.get('/admin/data', authMiddleware, adminOnly, (req, res) => {
+  res.json({
+    message: `Bem-vindo, ${req.user.name}. Isto é conteúdo protegido de admin.`,
+    usersCount: 42 // exemplo de dado protegido
+  });
+});
+

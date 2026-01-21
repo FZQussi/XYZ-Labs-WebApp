@@ -21,6 +21,7 @@ function isStrongPassword(password) {
   );
 }
 
+
 // ============================
 // MIDDLEWARE: VALIDAR TOKEN
 // ============================
@@ -158,7 +159,14 @@ router.post('/login', async (req, res) => {
 router.get('/validate', authMiddleware, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
-
+router.get('/profile', authMiddleware, (req, res) => {
+  console.log('Acedendo /profile com user:', req.user);
+  res.json({ message: `Olá ${req.user.name}, esta é a tua página!` });
+});
+router.get('/admin/dashboard', authMiddleware, adminOnly, (req, res) => {
+  console.log('Acedendo /admin/dashboard com user:', req.user);
+  res.json({ message: 'Bem-vindo ao Dashboard de Admin!' });
+});
 module.exports = {
   router,
   authMiddleware,

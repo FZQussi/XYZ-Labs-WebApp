@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let adminLink = '';
 
       if (user.role === 'admin') {
-        adminLink = `<li><a href="../../admin/html/dashboard.html">Dashboard</a></li>`;
+        adminLink = `<li><a href="../../Dashboard/html/dashboard.html">Dashboard</a></li>`;
       }
 
       const content = `
