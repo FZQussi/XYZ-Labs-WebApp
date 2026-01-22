@@ -7,10 +7,12 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   window.location.href = '/Frontend/userpages/html/login.html';
 });
 
-// Verifica token e role
+// Inicializa dashboard
 async function initDashboard() {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  console.log('User carregado do localStorage:', user);
 
   if (!token || user.role !== 'admin') {
     alert('Acesso não autorizado');
@@ -18,25 +20,18 @@ async function initDashboard() {
     return;
   }
 
-  // Mostra mensagem de boas-vindas
   document.getElementById('welcomeMsg').textContent = `Olá, ${user.name}`;
-
-  // Puxa dados protegidos do backend
-  try {
-    const res = await fetch(`${API_BASE}/admin/data`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) {
-      alert('Não foi possível carregar dados do admin');
-      return;
-    }
-
-    const data = await res.json();
-    document.getElementById('adminData').textContent = JSON.stringify(data, null, 2);
-  } catch (err) {
-    console.error('Erro ao carregar dados admin:', err);
-  }
 }
 
 initDashboard();
+
+// Tabs
+const tabs = document.querySelectorAll('[data-tab]');
+const sections = document.querySelectorAll('.tab');
+
+tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    sections.forEach(s => s.classList.add('hidden'));
+    document.getElementById(btn.dataset.tab).classList.remove('hidden');
+  });
+});

@@ -6,8 +6,6 @@
   <title>Registo - XYZ Labs</title>
   <link rel="stylesheet" href="../css/register.css">
 </head>
-<script src="../scripts/register.js"></script>
-
 <body>
 
   <div class="register-container">
@@ -26,19 +24,31 @@
         <div class="input-group">
           <label for="email">Email</label>
           <input type="email" id="email" required placeholder="exemplo@email.com">
+          <div class="error-message" id="emailError"></div>
         </div>
 
         <div class="input-group">
           <label for="password">Palavra-passe</label>
           <input type="password" id="password" required placeholder="********">
+          <ul class="password-reqs">
+            <li id="lengthReq">≥ 12 caracteres</li>
+            <li id="uppercaseReq">Uma letra maiúscula</li>
+            <li id="lowercaseReq">Uma letra minúscula</li>
+            <li id="numberReq">Um número</li>
+            <li id="specialReq">Um carácter especial</li>
+          </ul>
         </div>
 
         <div class="input-group">
           <label for="confirmPassword">Confirmar palavra-passe</label>
           <input type="password" id="confirmPassword" required placeholder="********">
+          <div class="error-message" id="confirmError"></div>
         </div>
 
-        <button type="submit">Registar</button>
+        <button type="submit" id="submitBtn">
+          Criar Conta
+          <span class="loading-spinner hidden" id="loadingSpinner"></span>
+        </button>
       </form>
 
       <p class="login-link">
@@ -46,28 +56,16 @@
         <a href="login.html">Iniciar sessão</a>
       </p>
     </div>
-
   </div>
 
-  <script>
-    document.getElementById('registerForm').addEventListener('submit', e => {
-      e.preventDefault();
+  <!-- Modal central -->
+  <div id="feedbackModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <p id="modalMessage"></p>
+    </div>
+  </div>
 
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-
-      if (password !== confirmPassword) {
-        alert('As palavras-passe não coincidem');
-        return;
-      }
-
-      // Exemplo simples (depois ligamos ao backend)
-      alert('Conta criada com sucesso!');
-      window.location.href = 'login.html';
-    });
-  </script>
-
+  <script src="../scripts/register.js"></script>
 </body>
 </html>

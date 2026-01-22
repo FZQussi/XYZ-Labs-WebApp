@@ -7,17 +7,56 @@
   <link rel="stylesheet" href="../css/dashboard.css">
 </head>
 <body>
-  <header>
-    <h1>Admin Dashboard</h1>
+  <aside class="sidebar">
+    <h2>Admin</h2>
+    <button data-tab="users">Utilizadores</button>
+    <button data-tab="products">Produtos</button>
     <button id="logoutBtn">Logout</button>
-  </header>
+  </aside>
 
   <main>
-    <h2>Conteúdo Protegido</h2>
-    <p id="welcomeMsg"></p>
-    <pre id="adminData"></pre>
+    <div id="welcomeMsg" class="welcome"></div>
+
+    <!-- ABA DE UTILIZADORES -->
+    <section id="users" class="tab hidden">
+      <h2>Gestão de Utilizadores</h2>
+      <div id="usersList"></div>
+    </section>
+
+    <!-- ABA DE PRODUTOS -->
+    <section id="products" class="tab hidden">
+      <h2>Gestão de Produtos</h2>
+      <button id="addProductBtn">+ Novo Produto</button>
+      <div id="productsList"></div>
+    </section>
   </main>
 
+  <!-- Modal para adicionar/editar produto (opcional por agora) -->
+  <!--
+  <div id="productModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalTitle">Novo Produto</h3>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <label>Nome:</label>
+        <input type="text" id="productName" required>
+        <label>Preço (€):</label>
+        <input type="number" id="productPrice" step="0.01" required>
+        <label>Descrição:</label>
+        <textarea id="productDescription" required></textarea>
+        <label>Subcategoria ID:</label>
+        <input type="number" id="productSubcategory" required>
+        <label>Ficheiro .glb:</label>
+        <input type="file" id="productFile" accept=".glb">
+        <button type="submit">Salvar</button>
+      </form>
+    </div>
+  </div>
+  -->
+
   <script src="../scripts/dashboard.js"></script>
+  <script src="../scripts/users.js"></script>
+  <script src="../scripts/products.js"></script>
 </body>
 </html>
