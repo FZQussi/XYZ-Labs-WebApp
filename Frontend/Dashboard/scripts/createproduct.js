@@ -82,6 +82,7 @@
     formData.append('name', createName.value);
     formData.append('price', createPrice.value);
     formData.append('description', createDesc.value);
+    formData.append('category_id', createCategorySelect.value || null);
     formData.append('subcategory_id', createSubcatSelect.value || null);
     formData.append('stock', createStock.value || 0);
     if (createFile.files[0]) formData.append('modelFile', createFile.files[0]);

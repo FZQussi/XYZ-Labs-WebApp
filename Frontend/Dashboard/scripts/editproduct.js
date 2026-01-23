@@ -100,6 +100,7 @@
     formData.append('name', editName.value);
     formData.append('price', editPrice.value);
     formData.append('description', editDesc.value);
+    formData.append('category_id', editCategorySelect.value || null);
     formData.append('subcategory_id', editSubcatSelect.value || null);
     formData.append('stock', editStock.value || 0);
     if (editFile.files[0]) formData.append('modelFile', editFile.files[0]);
