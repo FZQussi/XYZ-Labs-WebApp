@@ -13,9 +13,17 @@ const subcategoriesRoutes = require('./routes/subcategories.routes');
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(cors());
+// ===== CORS =====
+app.use(cors({
+  origin: 'http://localhost:3000', // substitua pelo endereço do seu frontend
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  credentials: true
+}));
+
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, '../Frontend/images')));
 app.use('/models', express.static(path.join(__dirname, '../Frontend/models')));
+
 app.use('/categories', categoriesRoutes);
 app.use('/subcategories', subcategoriesRoutes);
 app.use('/auth', authRoutes);

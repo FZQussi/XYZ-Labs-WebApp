@@ -1,3 +1,4 @@
+//createproduct.js
 (() => {
   const API_BASE = 'http://localhost:3001';
   const token = localStorage.getItem('token');
@@ -75,9 +76,11 @@
   });
 
   createCloseBtn.addEventListener('click', hideModal);
+createForm.addEventListener('submit', async e => {
+  e.preventDefault();
 
-  createForm.addEventListener('submit', async e => {
-    e.preventDefault();
+  try {
+    // === 1️⃣ Criar produto com dados e modelo 3D ===
     const formData = new FormData();
     formData.append('name', createName.value);
     formData.append('price', createPrice.value);
@@ -85,24 +88,49 @@
     formData.append('category_id', createCategorySelect.value || null);
     formData.append('subcategory_id', createSubcatSelect.value || null);
     formData.append('stock', createStock.value || 0);
-    if (createFile.files[0]) formData.append('modelFile', createFile.files[0]);
 
-    try {
-      const res = await fetch(`${API_BASE}/products`, {
+    if (createModelFile.files[0]) {
+      formData.append('modelFile', createModelFile.files[0]);
+    }
+
+    const resProduct = await fetch(`${API_BASE}/products`, {
+      method: 'POST',
+      headers: authHeaders(), // Apenas auth, não usar 'Content-Type', o browser define
+      body: formData
+    });
+
+    if (!resProduct.ok) throw new Error('Erro ao criar produto');
+
+    const newProduct = await resProduct.json();
+    const productId = newProduct.id;
+    console.log('Produto criado com sucesso!', newProduct);
+
+    // === 2️⃣ Enviar imagens se houver ===
+    if (createImages.files.length) {
+      const imageData = new FormData();
+      for (let i = 0; i < Math.min(4, createImages.files.length); i++) {
+        imageData.append('images', createImages.files[i]);
+      }
+
+      const resImages = await fetch(`${API_BASE}/products/${productId}/images`, {
         method: 'POST',
         headers: authHeaders(),
-        body: formData
+        body: imageData
       });
 
-      if (!res.ok) throw new Error('Erro ao criar produto');
-      console.log('Produto criado com sucesso!');
-      hideModal();
-      window.reloadProducts(); // recarrega lista no products.js
-    } catch (err) {
-      console.error('Erro ao criar produto:', err);
-      alert('Erro ao criar produto');
+      if (!resImages.ok) throw new Error('Erro ao enviar imagens');
+      const uploadedImages = await resImages.json();
+      console.log('Imagens enviadas com sucesso:', uploadedImages);
     }
-  });
+
+    hideModal();
+    window.reloadProducts(); // recarrega lista no products.js
+
+  } catch (err) {
+    console.error('Erro ao criar produto:', err);
+    alert('Erro ao criar produto');
+  }
+});
 
   // ===== INIT =====
   document.addEventListener('DOMContentLoaded', loadCategoriesAndSubcategories);

@@ -1,0 +1,90 @@
+/* Modal principal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  width: 800px;
+  max-width: 95%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Botão fechar */
+.modal-content .close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Grid interno: infos vs mídia */
+.product-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.product-info p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.product-info strong {
+  color: #333;
+}
+
+/* Área de mídia: modelo + imagens */
+.product-media {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.product-images {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.product-images img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  background-color: #f0f0f0; /* placeholder caso não exista */
+  display: block;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 700px) {
+  .product-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-images {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-images img {
+    height: 100px;
+  }
+}

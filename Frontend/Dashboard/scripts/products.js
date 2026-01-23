@@ -5,60 +5,75 @@
 
   const productsList = document.getElementById('productsList');
 
-  // Modal elements
-  const createModal = document.getElementById('createProductModal');
-  const editModal = document.getElementById('editProductModal');
-
   // ===== AUTENTICAÇÃO =====
   function authHeaders() {
     return { Authorization: `Bearer ${token}` };
   }
 
-  // ===== FUNÇÕES MODAL =====
-  function showModal(modal) { modal.classList.remove('hidden'); }
-  function hideModal(modal) { modal.classList.add('hidden'); }
-
   // ===== LOAD PRODUCTS =====
   async function loadProducts() {
-    productsList.innerHTML = 'A carregar produtos...';
+    productsList.innerHTML = '<div style="padding:10px">A carregar produtos...</div>';
+
     try {
-      const res = await fetch(`${API_BASE}/products`, { headers: authHeaders() });
+      const res = await fetch(`${API_BASE}/products`, {
+        headers: authHeaders()
+      });
+
       if (!res.ok) throw new Error('Erro ao carregar produtos');
 
-      const data = await res.json();
-      console.log('Produtos recebidos:', data);
+      const products = await res.json();
+      console.log('Produtos recebidos:', products);
 
       productsList.innerHTML = '';
-      if (!data.length) {
-        productsList.innerHTML = '<p>Sem produtos.</p>';
+
+      if (!products.length) {
+        productsList.innerHTML = '<div style="padding:10px">Sem produtos.</div>';
         return;
       }
 
-      data.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'product-item';
-        div.innerHTML = `
-          <div>
-            <strong>${p.name}</strong><br>
-            €${p.price} · Stock: ${p.stock ?? 0}
+      products.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'product-item';
+
+        row.innerHTML = `
+          <span class="product-name">${p.name}</span>
+          <span>€${Number(p.price).toFixed(2)}</span>
+          <span>${p.stock ?? 0}</span>
+          <span class="status ${p.is_active ? 'active' : 'inactive'}">
+            ${p.is_active ? 'Ativo' : 'Inativo'}
+          </span>
+          <div class="actions">
+            <button class="secondary-btn view-btn">Ver</button>
+            <button class="primary-btn edit-btn">Editar</button>
           </div>
-          <button class="action-btn">Editar</button>
         `;
-        div.querySelector('button').addEventListener('click', () => {
-          // Dispara evento custom para o módulo editProduct.js
-          document.dispatchEvent(new CustomEvent('openEditProductModal', { detail: p }));
+
+        // ===== BOTÃO VER =====
+        row.querySelector('.view-btn').addEventListener('click', () => {
+          document.dispatchEvent(
+            new CustomEvent('openViewProductModal', { detail: p })
+          );
         });
-        productsList.appendChild(div);
+
+        // ===== BOTÃO EDITAR =====
+        row.querySelector('.edit-btn').addEventListener('click', () => {
+          document.dispatchEvent(
+            new CustomEvent('openEditProductModal', { detail: p })
+          );
+        });
+
+        productsList.appendChild(row);
       });
     } catch (err) {
       console.error('Erro ao carregar produtos:', err);
-      productsList.innerHTML = 'Erro ao carregar produtos.';
+      productsList.innerHTML =
+        '<div style="padding:10px;color:red">Erro ao carregar produtos.</div>';
     }
   }
 
   // ===== INIT =====
   document.addEventListener('DOMContentLoaded', loadProducts);
 
-  // Permite recarregar produtos de outros módulos
+  // Permite reload a partir de outros módulos
   window.reloadProducts = loadProducts;
 })();

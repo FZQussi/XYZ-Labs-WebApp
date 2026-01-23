@@ -4,7 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - XYZ Labs</title>
-  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<link rel="stylesheet" href="../css/users.css">
+<link rel="stylesheet" href="../css/products.css">
+<link rel="stylesheet" href="../css/forms.css">
+<link rel="stylesheet" href="../css/modals.css">
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
 </head>
 <body>
   <aside class="sidebar">
@@ -114,9 +122,13 @@
       </div>
 
       <div class="form-group">
-        <label>Ficheiro 3D (.glb)</label>
-        <input type="file" id="createFile" accept=".glb">
-      </div>
+  <label>Ficheiros 3D e Imagens</label>
+  <input type="file" id="createModelFile" name="modelFile" accept=".glb">
+<input type="file" id="createImages" name="images" accept="image/*" multiple>
+
+  <small>Podes adicionar até 4 imagens.</small>
+</div>
+
 
       <button type="submit" class="primary-btn">
         Criar Produto
@@ -188,7 +200,52 @@
     </form>
   </div>
 </div>
+<!-- ===== MODAL: DETALHES PRODUTO ===== -->
+<div id="viewProductModal" class="modal hidden">
+  <div class="modal-content modal-large">
+    <span class="close" data-close="view">&times;</span>
 
+    <h3 id="viewName"></h3>
+
+    <div class="product-details-grid">
+      <!-- Lado esquerdo: informações -->
+      <div class="product-info">
+        <p><strong>Preço:</strong> €<span id="viewPrice"></span></p>
+        <p><strong>Stock:</strong> <span id="viewStock"></span></p>
+        <p><strong>Estado:</strong> <span id="viewStatus"></span></p>
+        <p><strong>Descrição:</strong> <span id="viewDescription"></span></p>
+        <p><strong>Categoria:</strong> <span id="viewCategory"></span></p>
+        <p><strong>Subcategoria:</strong> <span id="viewSubcategory"></span></p>
+      </div>
+
+      <!-- Lado direito: modelo 3D + imagens -->
+      <div class="product-media">
+        <model-viewer
+          id="viewModel"
+          src="..."
+          alt="Modelo 3D"
+          auto-rotate
+          camera-controls
+          shadow-intensity="1"
+          style="width:100%; height:300px; background-color:#4c4c4c; border-radius:8px;"
+        ></model-viewer>
+
+        <div class="product-images">
+          <img id="productImg1" src="" alt="Imagem 1" />
+          <img id="productImg2" src="" alt="Imagem 2" />
+          <img id="productImg3" src="" alt="Imagem 3" />
+          <img id="productImg4" src="" alt="Imagem 4" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
 
   </main>
 
@@ -200,6 +257,6 @@
   <script src="../scripts/subcategories.js"></script>
   <script src="../scripts/createproduct.js"></script>
   <script src="../scripts/editproduct.js"></script>
-
+    <script src="../scripts/viewproduct.js"></script>
 </body>
 </html>
