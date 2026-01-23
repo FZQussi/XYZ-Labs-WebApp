@@ -1,0 +1,20 @@
+backend/
+├── server.js
+├── db.js
+├── auth.js
+├── admin.js
+├── routes/
+│   ├── products.routes.js
+│   ├── users.routes.js
+│   ├── categories.routes.js
+│   ├── subcategories.routes.js
+│   └── public.routes.js
+├── controllers/
+│   ├── products.controller.js
+│   ├── users.controller.js
+│   └── admin.controller.js
+├── middlewares/
+│   ├── auth.middleware.js
+│   └── admin.middleware.js
+└── utils/
+    └── upload.js

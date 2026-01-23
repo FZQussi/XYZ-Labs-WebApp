@@ -1,84 +1,171 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  display: flex;
-  height: 100vh;
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  background-color: #f4f6f8;
+}
+
+/* ===== SIDEBAR ===== */
 .sidebar {
-  width: 220px;
-  background-color: #2c3e50;
+  width: 240px;
+  background-color: #1f2933;
   color: white;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 24px 16px;
 }
 
 .sidebar h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin: 0 0 30px;
+  font-size: 22px;
+  text-align: center;
 }
 
 .sidebar button {
-  margin: 5px 0;
-  padding: 10px;
-  background-color: #34495e;
+  margin-bottom: 10px;
+  padding: 12px;
+  background-color: transparent;
   border: none;
-  color: white;
+  color: #d1d5db;
+  text-align: left;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 4px;
+  font-size: 15px;
 }
 
 .sidebar button:hover {
+  background-color: #374151;
+  color: #fff;
+}
+
+.sidebar button.active {
   background-color: #1abc9c;
-}
-
-main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.tab {
-  display: block;
-}
-
-.hidden {
-  display: none;
-}
-
-.welcome {
-  margin-bottom: 20px;
-  font-size: 18px;
+  color: #fff;
   font-weight: bold;
 }
 
-#usersList, #productsList {
-  margin-top: 15px;
+#logoutBtn {
+  margin-top: auto;
+  background-color: #ef4444;
+  color: white;
 }
 
-.user-item, .product-item {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+#logoutBtn:hover {
+  background-color: #dc2626;
+}
+
+/* ===== MAIN ===== */
+main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.welcome {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* ===== TABS ===== */
+.tab.hidden {
+  display: none;
+}
+
+/* ===== SECTIONS ===== */
+section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+section h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+/* ===== PRODUCTS LAYOUT ===== */
+.products-toolbar {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-button.action-btn {
-  padding: 5px 10px;
+.products-toolbar input,
+.products-toolbar select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.products-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table-header,
+.table-body .product-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 12px 10px;
+  align-items: center;
+}
+
+.table-header {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+
+.table-body .product-item:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.table-body .product-item button {
+  padding: 6px 12px;
   border: none;
-  background-color: #1abc9c;
+  background-color: #2563eb;
   color: white;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-button.action-btn:hover {
-  background-color: #16a085;
+.table-body .product-item button:hover {
+  background-color: #1d4ed8;
 }
 
-/* Modal */
+/* ===== PAGINAÇÃO ===== */
+.pagination {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background-color: #f3f4f6;
+}
+
+/* ===== MODAL ===== */
 .modal {
   position: fixed;
   top: 0;
@@ -92,13 +179,24 @@ button.action-btn:hover {
   z-index: 1000;
 }
 
+.modal.hidden {
+  display: none;
+}
+
 .modal-content {
   background-color: white;
-  padding: 20px;
-  border-radius: 6px;
+  padding: 25px 30px;
+  border-radius: 8px;
   width: 400px;
   max-width: 90%;
   position: relative;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
 }
 
 .modal-content .close {
@@ -107,4 +205,75 @@ button.action-btn:hover {
   right: 15px;
   font-size: 22px;
   cursor: pointer;
+}
+
+/* ===== FORMULÁRIOS MODAL ===== */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* BOTÕES MODAL */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.primary-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.danger-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger-btn:hover {
+  background-color: #dc2626;
+}
+
+.secondary-btn {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background-color: #4b5563;
 }
