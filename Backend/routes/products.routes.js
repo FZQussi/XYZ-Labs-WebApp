@@ -10,18 +10,27 @@ const router = express.Router();
 router.get('/', controller.getProducts);
 router.get('/:id', controller.getProductById);
 
-// CREATE / UPDATE produtos (somente dados + modelo 3D)
+// CREATE produto
 router.post('/', auth, admin, uploadModels.single('modelFile'), controller.createProduct);
+
+// UPDATE produto (dados + modelo 3D)
 router.put('/:id', auth, admin, uploadModels.single('modelFile'), controller.updateProduct);
-
-// UPLOAD IMAGENS (até 4)
-router.post('/:id/images', auth, admin, uploadImages.array('images', 4), controller.uploadProductImages);
-
-// GET imagens
-router.get('/:id/images', controller.getProductImages);
 
 // DELETE produto
 router.delete('/:id', auth, admin, controller.deleteProduct);
 
-module.exports = router;
+// === GESTÃO DE IMAGENS ===
 
+// GET imagens
+router.get('/:id/images', controller.getProductImages);
+
+// ADICIONAR imagens (até 4 novas)
+router.post('/:id/images', auth, admin, uploadImages.array('images', 4), controller.uploadProductImages);
+
+// SUBSTITUIR todas as imagens
+router.put('/:id/images', auth, admin, uploadImages.array('images', 4), controller.replaceProductImages);
+
+// ELIMINAR uma imagem específica
+router.delete('/:id/images', auth, admin, controller.deleteProductImage);
+
+module.exports = router;

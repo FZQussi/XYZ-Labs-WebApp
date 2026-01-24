@@ -1,20 +1,26 @@
 const express = require('express');
 const auth = require('../middlewares/auth.middleware');
 const admin = require('../middlewares/admin.middleware');
-const client = require('../db');
+const controller = require('../controllers/users.controller');
 
 const router = express.Router();
 
-router.get('/', auth, admin, async (req, res) => {
-  const result = await client.query(
-    'SELECT id,name,email,role,created_at FROM users'
-  );
-  res.json(result.rows);
-});
+// GET estatísticas (antes das rotas com :id)
+router.get('/stats/overview', auth, admin, controller.getUserStats);
 
-router.delete('/:id', auth, admin, async (req, res) => {
-  await client.query('DELETE FROM users WHERE id=$1', [req.params.id]);
-  res.json({ success: true });
-});
+// GET todos os utilizadores
+router.get('/', auth, admin, controller.getAllUsers);
+
+// GET utilizador por ID
+router.get('/:id', auth, admin, controller.getUserById);
+
+// CREATE novo utilizador
+router.post('/', auth, admin, controller.createUser);
+
+// UPDATE utilizador
+router.put('/:id', auth, admin, controller.updateUser);
+
+// DELETE utilizador
+router.delete('/:id', auth, admin, controller.deleteUser);
 
 module.exports = router;

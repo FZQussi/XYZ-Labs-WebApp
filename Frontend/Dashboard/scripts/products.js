@@ -43,7 +43,7 @@
             ${p.is_active ? 'Ativo' : 'Inativo'}
           </span>
           <div class="actions">
-            <button class="secondary-btn view-btn">Ver</button>
+            <button class="secondary-btn view-btn">Detalhes</button>
             <button class="primary-btn edit-btn">Editar</button>
           </div>
         `;
