@@ -4,21 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>XYZ Labs - Homepage</title>
-  <link rel="stylesheet" href="../css/homePage.css">
+  <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
 
 <header class="header-container">
   <div class="header-left">
     <!-- Logo -->
-    <div class="logo-container">
-      <svg class="logo" width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" fill="white"/>
-        <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
-              font-family="Segoe UI, sans-serif" font-size="24" fill="black">XYZ</text>
-      </svg>
-      <span class="logo-text">Labs</span>
+        <div class="logo-container">
+      <a href="homePage.html" class="logo-link">
+        <img src="/Frontend/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
     </div>
+
+
 
     <!-- Navegação -->
     <nav class="header-nav">
@@ -33,6 +32,20 @@
   </div>
 
   <div class="header-right">
+      <div class="header-right">
+
+  <!-- SEARCH BAR -->
+  <div class="header-search">
+    
+    <span class="search-icon">
+      <img src="/Frontend/search-svgrepo-com.svg" alt="lupa" >
+    </span>
+    <input 
+      type="text" 
+      placeholder="Pesquisar"
+      aria-label="Pesquisar"
+    >
+  </div>
     <!-- Botões quando não logado -->
     <div id="authButtons">
       <button id="signInBtn">Sign In</button>
@@ -43,10 +56,10 @@
     <div id="userIcons" style="display:none">
       <span id="userName"></span>
       <button id="userMenuBtn" class="icon-btn">
-        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="User" width="34" height="34">
+        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="User">
       </button>
       <button id="cartBtn" class="icon-btn">
-        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho" width="34" height="34">
+        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho" >
       </button>
     </div>
   </div>

@@ -1,0 +1,164 @@
+/* ======== HEADER ======== */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: #000;
+  color: white;
+
+  padding: clamp(0.75rem, 1vw, 1.4rem)
+           clamp(1.2rem, 3vw, 3rem);
+
+  flex-wrap: wrap;
+}
+
+/* ======== HEADER LEFT ======== */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.8rem, 2vw, 2rem);
+}
+
+/* ======== LOGO ======== */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo {
+  width: clamp(150px, 5vw, 200px);
+  height: auto;
+  object-fit: contain;
+}
+
+/* ======== NAV ======== */
+.header-nav ul {
+  display: flex;
+  list-style: none;
+  gap: clamp(0.1rem, 2vw, 0.5rem);
+
+  margin: 0;
+  padding: 0;
+}
+
+.header-nav ul li a {
+  color: #cdcdcd;
+  text-decoration: none;
+
+  padding: clamp(0.3rem, 0.05vw, 0.6rem)
+         clamp(0.6rem, 0.09vw, 1rem);
+
+
+  font-size: clamp(1.2rem, 1.1vw, 1.25rem);
+  font-weight: 500;
+
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.header-nav ul li a:hover {
+  color: #ffffff;
+  text-shadow:
+    0 0 2px rgba(255,255,255,0.6),
+    0 0 3px rgba(255,255,255,0.4);
+}
+
+/* ======== HEADER RIGHT ======== */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* BOTÕES */
+.header-right button {
+  margin-left: clamp(0.4rem, 1vw, 0.8rem);
+
+  padding: clamp(0.3rem, 0.6vw, 0.6rem)
+           clamp(0.6rem, 1vw, 1rem);
+
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ======== ÍCONES ======== */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  padding: clamp(0.9rem, 1.6vw, 0.9rem);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.2);
+}
+
+.icon-btn img {
+  width: clamp(30px, 1.5vw, 80px);
+  height: clamp(30px, 1.5vw, 80px);
+}
+/* ===== SEARCH BAR ===== */
+.header-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  background-color: #000;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+
+  padding: clamp(0.3rem, 0.4vw, 0.5rem)
+           clamp(0.6rem, 0.8vw, 0.9rem);
+
+  margin-right: clamp(0.8rem, 1.5vw, 1.5rem);
+}
+
+/* Ícone SVG */
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.search-icon img {
+  width: clamp(14px, 1.2vw, 18px);
+  height: clamp(14px, 1.2vw, 18px);
+  opacity: 0.8;
+}
+
+/* Input */
+.header-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #ffffff;
+  font-size: clamp(0.95rem, 1vw, 1.1rem);
+
+  width: clamp(120px, 12vw, 200px);
+}
+
+/* Placeholder */
+.header-search input::placeholder {
+  color: #9e9e9e;
+}
+
+/* Focus */
+.header-search:focus-within {
+  border-color: #ffffff;
+}
+

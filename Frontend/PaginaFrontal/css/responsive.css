@@ -1,0 +1,15 @@
+/* ======== RESPONSIVO ======== */
+@media (max-width: 768px) {
+  .header-nav ul {
+    flex-direction: column;
+    display: none;
+  }
+
+  .product-card {
+    width: 90%;
+  }
+
+  .hero {
+    height: 300px;
+  }
+}
