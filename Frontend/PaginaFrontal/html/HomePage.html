@@ -8,23 +8,28 @@
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="header-container">
   <div class="header-left">
-    <!-- Logo -->
-        <div class="logo-container">
-      <a href="homePage.html" class="logo-link">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
         <img src="/Frontend/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
       </a>
     </div>
 
-
+    <!-- Menu Hamburger (Mobile) -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
     <!-- Navegação -->
-    <nav class="header-nav">
+    <nav class="header-nav" id="headerNav">
       <ul>
+        <li><a href="HomePage.html" class="active">Home</a></li>
         <li><a href="products.html">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
-        <li><a href="colors.html">Cores</a></li>
         <li><a href="about.html">Sobre</a></li>
         <li><a href="contact.html">Contacto</a></li>
       </ul>
@@ -32,130 +37,149 @@
   </div>
 
   <div class="header-right">
-      <div class="header-right">
+    <!-- Search Bar -->
+    <div class="header-search">
+      <span class="search-icon">
+        <img src="/Frontend/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
 
-  <!-- SEARCH BAR -->
-  <div class="header-search">
-    
-    <span class="search-icon">
-      <img src="/Frontend/search-svgrepo-com.svg" alt="lupa" >
-    </span>
-    <input 
-      type="text" 
-      placeholder="Pesquisar"
-      aria-label="Pesquisar"
-    >
-  </div>
     <!-- Botões quando não logado -->
     <div id="authButtons">
-      <button id="signInBtn">Sign In</button>
-      <button id="signUpBtn">Sign Up</button>
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
     </div>
 
     <!-- Ícones quando logado -->
     <div id="userIcons" style="display:none">
-      <span id="userName"></span>
-      <button id="userMenuBtn" class="icon-btn">
-        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="User">
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="Utilizador">
       </button>
-      <button id="cartBtn" class="icon-btn">
-        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho" >
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
       </button>
     </div>
   </div>
 </header>
 
-<!-- Menu lateral (user/cart) -->
+<!-- Menu Lateral (User/Cart) -->
 <div id="sideMenu" class="side-menu">
-  <button class="closeBtn" id="closeMenu">×</button>
+  <button class="closeBtn" id="closeMenu" aria-label="Fechar">×</button>
   <div id="sideContent"></div>
 </div>
 
+<!-- Overlay para menu mobile -->
+<div class="overlay" id="overlay"></div>
+
 <!-- HERO / BANNER -->
 <section class="hero">
-  <img src="/Frontend/images/examplebanner.jpg" alt="Hero Banner">
-  <h1>Crie o seu produto 3D personalizado</h1>
-  <p>Explore materiais, cores e designs únicos. Transforme a sua ideia em realidade!</p>
-  <button onclick="location.href='../../catalog/html/catalog.html'">Explorar Produtos</button>
+  <img src="/Frontend/images/examplebanner.jpg" alt="Banner XYZ Labs">
+  <div class="hero-content">
+    <h1>Crie o seu produto 3D personalizado</h1>
+    <p>Explore materiais, cores e designs únicos. Transforme a sua ideia em realidade!</p>
+    <button class="btn-hero" onclick="location.href='products.html'">
+      Explorar Produtos
+    </button>
+  </div>
 </section>
 
 <!-- PRODUTOS EM DESTAQUE -->
 <section class="featured-products">
-  <h2>Produtos em Destaque</h2>
-  <div class="product-container">
-    <!-- Produto fictício -->
-    <div class="product-card">
-      <img src="/Frontend/images/exampleproduct.webp" alt="Produto 1">
-      <h3>Produto 3D A</h3>
-      <p>Material: PLA</p>
-      <p>Cor: Azul</p>
-      <p class="price">€30.00</p>
-      <button onclick="location.href='productPage.html'">Ver Produto</button>
+  <div class="container">
+    <h2>Produtos em Destaque</h2>
+    <div class="products-grid" id="featuredProducts">
+      <!-- Produtos carregados via JavaScript -->
+      <div class="loading">A carregar produtos...</div>
     </div>
-
-    <div class="product-card">
-      <img src="/Frontend/images/exampleproduct.webp" alt="Produto 2">
-      <h3>Produto 3D B</h3>
-      <p>Material: ABS</p>
-      <p>Cor: Vermelho</p>
-      <p class="price">€45.00</p>
-      <button onclick="location.href='productPage.html'">Ver Produto</button>
-    </div>
-
-    <div class="product-card">
-      <img src="/Frontend/images/exampleproduct.webp" alt="Produto 3">
-      <h3>Produto 3D C</h3>
-      <p>Material: PETG</p>
-      <p>Cor: Preto</p>
-      <p class="price">€50.00</p>
-      <button onclick="location.href='productPage.html'">Ver Produto</button>
+    <div class="view-all-container">
+      <a href="products.html" class="btn-view-all">Ver Todos os Produtos</a>
     </div>
   </div>
 </section>
 
 <!-- VANTAGENS / SERVIÇOS -->
 <section class="services">
-  <h2>Porquê escolher a XYZ Labs?</h2>
-  <div class="service-cards">
-    <div class="service-card">
-      <img src="icon-speed.png" alt="Rapidez">
-      <h3>Impressão Rápida</h3>
-      <p>Receba os seus produtos em tempo recorde.</p>
-    </div>
-    <div class="service-card">
-      <img src="icon-custom.png" alt="Personalização">
-      <h3>Personalização Total</h3>
-      <p>Escolha cores, materiais e design único.</p>
-    </div>
-    <div class="service-card">
-      <img src="icon-quality.png" alt="Qualidade">
-      <h3>Qualidade Premium</h3>
-      <p>Produtos duráveis e de alta precisão.</p>
+  <div class="container">
+    <h2>Porquê escolher a XYZ Labs?</h2>
+    <div class="service-cards">
+      <div class="service-card">
+        <div class="service-icon">⚡</div>
+        <h3>Impressão Rápida</h3>
+        <p>Receba os seus produtos em tempo recorde com tecnologia de ponta.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🎨</div>
+        <h3>Personalização Total</h3>
+        <p>Escolha cores, materiais e design único para cada projeto.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">✨</div>
+        <h3>Qualidade Premium</h3>
+        <p>Produtos duráveis e de alta precisão com acabamento profissional.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- NEWSLETTER -->
 <section class="newsletter">
-  <h2>Subscreva a nossa Newsletter</h2>
-  <p>Receba novidades, promoções e lançamentos 3D diretamente no seu email.</p>
-  <form id="newsletterForm">
-    <input type="email" placeholder="Digite o seu email" required>
-    <button type="submit">Subscrever</button>
-  </form>
+  <div class="container">
+    <h2>📧 Subscreva a nossa Newsletter</h2>
+    <p>Receba novidades, promoções e lançamentos 3D diretamente no seu email.</p>
+    <form id="newsletterForm">
+      <div class="newsletter-input-group">
+        <input type="email" placeholder="Digite o seu email" required id="newsletterEmail">
+        <button type="submit" class="btn-newsletter">Subscrever</button>
+      </div>
+    </form>
+  </div>
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
-  <div class="footer-links">
-    <a href="homePage.html">Home</a>
-    <a href="products.html">Produtos</a>
-    <a href="about.html">Sobre</a>
-    <a href="contact.html">Contacto</a>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>XYZ Labs</h3>
+        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Links Rápidos</h4>
+        <ul>
+          <li><a href="HomePage.html">Home</a></li>
+          <li><a href="products.html">Produtos</a></li>
+          <li><a href="about.html">Sobre</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Termos e Condições</a></li>
+          <li><a href="#">Política de Privacidade</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p>📧 info@xyzlabs.pt</p>
+        <p>📞 +351 XXX XXX XXX</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
   </div>
 </footer>
 
+<script src="../scripts/cart.js"></script>
 <script src="../scripts/homePage.js"></script>
+<script src="../scripts/homepage-products.js"></script>
 </body>
 </html>

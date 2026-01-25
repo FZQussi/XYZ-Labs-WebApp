@@ -9,7 +9,8 @@ const productRoutes = require('./routes/products.routes');
 const userRoutes = require('./routes/users.routes');
 const categoriesRoutes = require('./routes/categories.routes');
 const subcategoriesRoutes = require('./routes/subcategories.routes');
-
+const orderRoutes = require('./routes/orders.routes');
+const contactRoutes = require('./routes/contact.routes');
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -61,7 +62,8 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
-
+app.use('/orders', orderRoutes);
+app.use('/contact', contactRoutes);
 // ===== ROTA TESTE =====
 app.get('/', (_, res) => {
   res.send('Backend a funcionar 🚀');

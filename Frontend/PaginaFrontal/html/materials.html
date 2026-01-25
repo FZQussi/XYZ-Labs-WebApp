@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materiais - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
+        <img src="/Frontend/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header-nav" id="headerNav">
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html" class="active">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <div class="header-search">
+      <span class="search-icon">
+        <img src="/Frontend/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar materiais..." id="searchInput">
+    </div>
+
+    <div id="authButtons">
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
+    </div>
+
+    <div id="userIcons" style="display:none">
+      <button id="userMenuBtn" class="icon-btn">
+        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+      <button id="cartBtn" class="icon-btn cart-btn">
+        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>Materiais</span>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="materials-page">
+  <div class="container">
+    
+    <section class="page-hero">
+      <h1>🧱 Materiais de Impressão 3D</h1>
+      <p>Descubra a nossa vasta gama de materiais premium para dar vida aos seus projetos</p>
+    </section>
+
+    <!-- Filtro de Categorias -->
+    <div class="materials-filter">
+      <button class="filter-btn active" data-category="all">Todos</button>
+      <button class="filter-btn" data-category="pla">PLA</button>
+      <button class="filter-btn" data-category="abs">ABS</button>
+      <button class="filter-btn" data-category="petg">PETG</button>
+      <button class="filter-btn" data-category="specialty">Especiais</button>
+      <button class="filter-btn" data-category="flexible">Flexíveis</button>
+    </div>
+
+    <!-- Grid de Materiais -->
+    <div class="materials-grid">
+      
+      <!-- PLA Standard -->
+      <div class="material-card" data-category="pla">
+        <div class="material-header">
+          <h3>PLA Standard</h3>
+          <span class="material-badge popular">Popular</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #81c784, #4caf50);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">Material ecológico e fácil de imprimir, ideal para a maioria dos projetos.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 60%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Flexibilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 30%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 50%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 190-220°C</li>
+              <li>♻️ Biodegradável</li>
+              <li>💰 €20-25/kg</li>
+              <li>✅ Ideal para: Protótipos, decoração, objetos do dia-a-dia</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+      <!-- ABS -->
+      <div class="material-card" data-category="abs">
+        <div class="material-header">
+          <h3>ABS (Acrilonitrila Butadieno Estireno)</h3>
+          <span class="material-badge strong">Resistente</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #64b5f6, #2196f3);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">Material forte e durável, resistente a altas temperaturas e impactos.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 85%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Flexibilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 40%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 90%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 220-250°C</li>
+              <li>🔥 Resistente ao calor</li>
+              <li>💰 €25-30/kg</li>
+              <li>✅ Ideal para: Peças mecânicas, caixas, componentes funcionais</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+      <!-- PETG -->
+      <div class="material-card" data-category="petg">
+        <div class="material-header">
+          <h3>PETG</h3>
+          <span class="material-badge versatile">Versátil</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #ba68c8, #9c27b0);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">Combina o melhor do PLA e ABS: fácil de imprimir e muito resistente.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 80%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Flexibilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 55%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 85%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 220-250°C</li>
+              <li>💧 Resistente à humidade</li>
+              <li>💰 €28-35/kg</li>
+              <li>✅ Ideal para: Embalagens, peças técnicas, uso exterior</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+      <!-- TPU (Flexível) -->
+      <div class="material-card" data-category="flexible">
+        <div class="material-header">
+          <h3>TPU (Poliuretano Termoplástico)</h3>
+          <span class="material-badge flexible">Flexível</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #ffb74d, #ff9800);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">Material flexível e elástico, perfeito para peças que necessitam de deformação.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 70%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Flexibilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 95%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 75%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 210-230°C</li>
+              <li>🤸 Super flexível</li>
+              <li>💰 €35-45/kg</li>
+              <li>✅ Ideal para: Capas de telemóvel, juntas, peças de vestuário</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+      <!-- Wood PLA -->
+      <div class="material-card" data-category="specialty">
+        <div class="material-header">
+          <h3>Wood PLA (Madeira)</h3>
+          <span class="material-badge special">Especial</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #a1887f, #795548);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">PLA misturado com fibras de madeira para aspeto e cheiro naturais.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 50%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Estética:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 45%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 190-210°C</li>
+              <li>🌳 Aspeto de madeira natural</li>
+              <li>💰 €30-40/kg</li>
+              <li>✅ Ideal para: Decoração, esculturas, objetos artísticos</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+      <!-- Carbon Fiber -->
+      <div class="material-card" data-category="specialty">
+        <div class="material-header">
+          <h3>Carbon Fiber (Fibra de Carbono)</h3>
+          <span class="material-badge premium">Premium</span>
+        </div>
+        <div class="material-image">
+          <div class="material-sample" style="background: linear-gradient(135deg, #424242, #212121);"></div>
+        </div>
+        <div class="material-info">
+          <p class="material-desc">PLA reforçado com fibra de carbono para resistência máxima.</p>
+          
+          <div class="material-properties">
+            <div class="property">
+              <span class="prop-label">Resistência:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Leveza:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 85%;"></div></div>
+            </div>
+            <div class="property">
+              <span class="prop-label">Durabilidade:</span>
+              <div class="prop-bar"><div class="prop-fill" style="width: 95%;"></div></div>
+            </div>
+          </div>
+
+          <div class="material-specs">
+            <h4>Especificações:</h4>
+            <ul>
+              <li>🌡️ Temperatura: 200-220°C</li>
+              <li>💪 Extremamente resistente</li>
+              <li>💰 €50-70/kg</li>
+              <li>✅ Ideal para: Drones, peças aeroespaciais, engrenagens</li>
+            </ul>
+          </div>
+
+          <button class="btn-material-select">Escolher Material</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Comparação -->
+    <section class="comparison-section">
+      <h2>📊 Comparação de Materiais</h2>
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Resistência</th>
+              <th>Flexibilidade</th>
+              <th>Temperatura Max</th>
+              <th>Preço/kg</th>
+              <th>Aplicações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>PLA</strong></td>
+              <td>⭐⭐⭐</td>
+              <td>⭐⭐</td>
+              <td>60°C</td>
+              <td>€20-25</td>
+              <td>Geral, Decoração</td>
+            </tr>
+            <tr>
+              <td><strong>ABS</strong></td>
+              <td>⭐⭐⭐⭐⭐</td>
+              <td>⭐⭐⭐</td>
+              <td>100°C</td>
+              <td>€25-30</td>
+              <td>Mecânico, Funcional</td>
+            </tr>
+            <tr>
+              <td><strong>PETG</strong></td>
+              <td>⭐⭐⭐⭐</td>
+              <td>⭐⭐⭐⭐</td>
+              <td>80°C</td>
+              <td>€28-35</td>
+              <td>Exterior, Técnico</td>
+            </tr>
+            <tr>
+              <td><strong>TPU</strong></td>
+              <td>⭐⭐⭐</td>
+              <td>⭐⭐⭐⭐⭐</td>
+              <td>70°C</td>
+              <td>€35-45</td>
+              <td>Capas, Flexível</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <h2>Precisa de Ajuda a Escolher?</h2>
+      <p>A nossa equipa está disponível para ajudar a selecionar o material perfeito para o seu projeto</p>
+      <a href="contact.html" class="btn-cta-primary">Fale Connosco</a>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/homePage.js"></script>
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/materials.js"></script>
+</body>
+</html>

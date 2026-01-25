@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fazer Encomenda - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html">
+        <img src="/Frontend/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / 
+    <a href="products.html">Produtos</a> / 
+    <span>Encomenda</span>
+  </div>
+</div>
+
+<main class="checkout-page">
+  <div class="container">
+    
+    <h1>📦 Finalizar Encomenda</h1>
+
+    <div class="checkout-grid">
+      
+      <!-- Formulário de Contacto -->
+      <div class="checkout-form-section">
+        <h2>Os Seus Dados</h2>
+        
+        <form id="checkoutForm">
+          
+          <div class="form-group">
+            <label for="customerName">Nome Completo *</label>
+            <input type="text" id="customerName" required 
+                   placeholder="João Silva">
+          </div>
+
+          <div class="form-group">
+            <label for="customerEmail">Email *</label>
+            <input type="email" id="customerEmail" required 
+                   placeholder="joao@exemplo.pt">
+          </div>
+
+          <div class="form-group">
+            <label for="customerPhone">Telefone</label>
+            <input type="tel" id="customerPhone" 
+                   placeholder="+351 XXX XXX XXX">
+          </div>
+
+          <div class="form-group">
+            <label for="orderNotes">Notas do Pedido (opcional)</label>
+            <textarea id="orderNotes" rows="4" 
+                      placeholder="Especificações adicionais, cores personalizadas, prazos..."></textarea>
+          </div>
+
+          <div class="form-notice">
+            <p>ℹ️ Após submeter, entraremos em contacto por email para confirmar detalhes e orçamento final.</p>
+          </div>
+
+          <button type="submit" class="btn-submit-order" id="submitOrderBtn">
+            📧 Enviar Pedido
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Resumo da Encomenda -->
+      <div class="order-summary-section">
+        <h2>Resumo da Encomenda</h2>
+        
+        <div class="order-items" id="orderItems">
+          <!-- Carregado via JS -->
+        </div>
+
+        <div class="order-totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <strong id="orderSubtotal">€0.00</strong>
+          </div>
+          <div class="total-row total-final">
+            <span>Total Estimado:</span>
+            <strong id="orderTotal">€0.00</strong>
+          </div>
+          <p class="total-note">* Valor final confirmado por email</p>
+        </div>
+
+        <button class="btn-edit-cart" onclick="window.location.href='products.html'">
+          ✏️ Editar Carrinho
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- Modal de Sucesso -->
+<div id="successModal" class="modal hidden">
+  <div class="modal-content success-modal">
+    <div class="success-icon">✅</div>
+    <h2>Pedido Enviado com Sucesso!</h2>
+    <p>Recebemos o seu pedido <strong>#<span id="orderNumber"></span></strong></p>
+    <p>Entraremos em contacto por email em breve para confirmar todos os detalhes.</p>
+    <button class="btn-primary" onclick="window.location.href='HomePage.html'">
+      Voltar à Homepage
+    </button>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/checkout.js"></script>
+</body>
+</html>

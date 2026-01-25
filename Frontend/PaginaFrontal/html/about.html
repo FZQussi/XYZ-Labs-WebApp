@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre Nós - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
+        <img src="/Frontend/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header-nav" id="headerNav">
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html" class="active">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <div class="header-search">
+      <span class="search-icon">
+        <img src="/Frontend/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
+
+    <div id="authButtons">
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
+    </div>
+
+    <div id="userIcons" style="display:none">
+      <button id="userMenuBtn" class="icon-btn">
+        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+      <button id="cartBtn" class="icon-btn cart-btn">
+        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>Sobre Nós</span>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="about-page">
+  <div class="container">
+    
+    <!-- Hero Section -->
+    <section class="about-hero">
+      <h1>Sobre a XYZ Labs</h1>
+      <p class="subtitle">Inovação em Impressão 3D desde 2020</p>
+    </section>
+
+    <!-- Nossa História -->
+    <section class="about-section">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>📖 A Nossa História</h2>
+          <p>A XYZ Labs nasceu da paixão pela tecnologia de impressão 3D e do desejo de tornar esta tecnologia acessível a todos. Fundada em 2020, começámos como um pequeno projeto universitário e rapidamente crescemos para nos tornarmos uma referência em impressão 3D personalizada em Portugal.</p>
+          
+          <p>Hoje, combinamos tecnologia de ponta com artesanato digital para criar produtos únicos que transformam ideias em realidade. Desde protótipos funcionais a peças decorativas personalizadas, a nossa missão é dar vida aos seus projetos com qualidade premium.</p>
+        </div>
+        <div class="about-image">
+          <img src="/Frontend/images/about-story.jpg" alt="Nossa História">
+        </div>
+      </div>
+    </section>
+
+    <!-- Missão e Visão -->
+    <section class="mission-vision">
+      <div class="mission-vision-grid">
+        <div class="mission-card">
+          <div class="card-icon">🎯</div>
+          <h3>Missão</h3>
+          <p>Democratizar a impressão 3D, oferecendo produtos personalizados de alta qualidade a preços acessíveis, com um serviço ao cliente excecional.</p>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-icon">🚀</div>
+          <h3>Visão</h3>
+          <p>Ser a referência europeia em impressão 3D personalizada, reconhecida pela inovação, qualidade e sustentabilidade.</p>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-icon">💎</div>
+          <h3>Valores</h3>
+          <p>Inovação constante, qualidade sem compromissos, sustentabilidade ambiental e transparência com os nossos clientes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tecnologia -->
+    <section class="about-section">
+      <div class="about-content reverse">
+        <div class="about-image">
+          <img src="/Frontend/images/about-tech.jpg" alt="Tecnologia">
+        </div>
+        <div class="about-text">
+          <h2>🔬 Tecnologia de Ponta</h2>
+          <p>Utilizamos as mais avançadas impressoras 3D do mercado, com tecnologias FDM, SLA e SLS. Isto permite-nos trabalhar com uma vasta gama de materiais e criar peças com diferentes propriedades mecânicas e acabamentos.</p>
+          
+          <ul class="tech-list">
+            <li>✓ Impressoras de alta precisão (resolução até 50 microns)</li>
+            <li>✓ Mais de 30 materiais diferentes disponíveis</li>
+            <li>✓ Software de modelação 3D profissional</li>
+            <li>✓ Controlo de qualidade rigoroso</li>
+            <li>✓ Pós-processamento especializado</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Equipa -->
+    <section class="team-section">
+      <h2>👥 A Nossa Equipa</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="/Frontend/images/team-1.jpg" alt="Fundador">
+          </div>
+          <h3>João Silva</h3>
+          <p class="member-role">Fundador & CEO</p>
+          <p class="member-bio">Engenheiro mecânico apaixonado por impressão 3D com 10 anos de experiência.</p>
+        </div>
+
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="/Frontend/images/team-2.jpg" alt="CTO">
+          </div>
+          <h3>Maria Santos</h3>
+          <p class="member-role">CTO</p>
+          <p class="member-bio">Especialista em tecnologias aditivas e materiais avançados.</p>
+        </div>
+
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="/Frontend/images/team-3.jpg" alt="Designer">
+          </div>
+          <h3>Pedro Costa</h3>
+          <p class="member-role">Design Lead</p>
+          <p class="member-bio">Designer de produto com foco em modelação 3D e prototipagem rápida.</p>
+        </div>
+
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="/Frontend/images/team-4.jpg" alt="Operações">
+          </div>
+          <h3>Ana Rodrigues</h3>
+          <p class="member-role">Operações</p>
+          <p class="member-bio">Gestora de produção garantindo entregas rápidas e qualidade premium.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Números -->
+    <section class="stats-section">
+      <h2>📊 XYZ Labs em Números</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">5000+</div>
+          <div class="stat-label">Projetos Entregues</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Clientes Satisfeitos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">30+</div>
+          <div class="stat-label">Materiais Disponíveis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98%</div>
+          <div class="stat-label">Taxa de Satisfação</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sustentabilidade -->
+    <section class="sustainability-section">
+      <h2>🌱 Compromisso com a Sustentabilidade</h2>
+      <div class="sustainability-content">
+        <p>Na XYZ Labs, acreditamos que a inovação tecnológica deve andar de mãos dadas com a responsabilidade ambiental. Por isso:</p>
+        
+        <div class="sustainability-grid">
+          <div class="sustainability-item">
+            <div class="sus-icon">♻️</div>
+            <h4>Materiais Recicláveis</h4>
+            <p>Priorizamos materiais biodegradáveis e recicláveis como PLA derivado de fontes renováveis.</p>
+          </div>
+
+          <div class="sustainability-item">
+            <div class="sus-icon">🔋</div>
+            <h4>Energia Renovável</h4>
+            <p>100% da nossa produção é alimentada por energia solar.</p>
+          </div>
+
+          <div class="sustainability-item">
+            <div class="sus-icon">📦</div>
+            <h4>Embalagens Eco-Friendly</h4>
+            <p>Utilizamos apenas embalagens recicláveis e minimizamos desperdícios.</p>
+          </div>
+
+          <div class="sustainability-item">
+            <div class="sus-icon">🌍</div>
+            <h4>Produção Local</h4>
+            <p>Produção 100% nacional, reduzindo a pegada de carbono.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <h2>Pronto para Começar?</h2>
+      <p>Transforme as suas ideias em realidade com a XYZ Labs</p>
+      <div class="cta-buttons">
+        <a href="products.html" class="btn-cta-primary">Explorar Produtos</a>
+        <a href="contact.html" class="btn-cta-secondary">Fale Connosco</a>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>XYZ Labs</h3>
+        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Links Rápidos</h4>
+        <ul>
+          <li><a href="HomePage.html">Home</a></li>
+          <li><a href="products.html">Produtos</a></li>
+          <li><a href="about.html">Sobre</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p>📧 info@xyzlabs.pt</p>
+        <p>📞 +351 XXX XXX XXX</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/homePage.js"></script>
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/homepage-products.js"></script>
+</body>
+</html>
