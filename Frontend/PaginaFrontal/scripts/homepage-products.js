@@ -11,7 +11,7 @@ async function loadFeaturedProducts() {
     const allProducts = await res.json();
     
     // Mostrar apenas os 6 mais recentes
-    const featuredProducts = allProducts.slice(0, 6);
+    const featuredProducts = allProducts.slice(0, 8);
     
     if (!featuredProducts.length) {
       container.innerHTML = '<p class="no-products">Nenhum produto disponível</p>';
