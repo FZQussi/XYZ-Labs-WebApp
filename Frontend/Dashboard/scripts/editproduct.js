@@ -177,7 +177,7 @@
     editName.value = currentProduct.name;
     editPrice.value = currentProduct.price;
     editDesc.value = currentProduct.description;
-    editStock.value = currentProduct.stock ?? 0;
+   editStock.checked = currentProduct.stock === true;
 
     // Categoria/Subcategoria
     const subcat = subcategories.find(sc => sc.id == currentProduct.subcategory_id);
@@ -230,7 +230,7 @@
     formData.append('price', editPrice.value);
     formData.append('description', editDesc.value);
     formData.append('subcategory_id', editSubcatSelect.value || null);
-    formData.append('stock', editStock.value || 0);
+    formData.append('stock', editStock.checked);
 
     try {
       const res = await fetch(`${API_BASE}/products/${editId.value}`, {

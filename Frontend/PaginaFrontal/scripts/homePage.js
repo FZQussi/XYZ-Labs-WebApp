@@ -150,3 +150,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+
+  if (!searchInput) return;
+
+  function goToProductsSearch() {
+    const query = searchInput.value.trim();
+    if (!query) return;
+
+    // Redireciona com query string
+    window.location.href =
+      `/Frontend/PaginaFrontal/html/products.html?search=${encodeURIComponent(query)}`;
+  }
+
+  // 🔎 Enter
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      goToProductsSearch();
+    }
+  });
+
+  // 🔎 Clique no ícone
+  if (searchBtn) {
+    searchBtn.addEventListener('click', goToProductsSearch);
+  }
+});

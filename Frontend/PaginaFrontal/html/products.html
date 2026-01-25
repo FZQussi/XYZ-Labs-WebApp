@@ -28,19 +28,14 @@
         <li><a href="HomePage.html">Home</a></li>
         <li><a href="products.html" class="active">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
         <li><a href="about.html">Sobre</a></li>
         <li><a href="contact.html">Contacto</a></li>
       </ul>
     </nav>
   </div>
 
-  <div class="header-right">
-    <div class="header-search">
-      <span class="search-icon">
-        <img src="/Frontend/search-svgrepo-com.svg" alt="pesquisar">
-      </span>
-      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
-    </div>
+ 
 
     <div id="authButtons">
       <button id="signInBtn" class="btn-secondary">Sign In</button>
@@ -49,10 +44,10 @@
 
     <div id="userIcons" style="display:none">
       <button id="userMenuBtn" class="icon-btn">
-        <img src="/Frontend/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
       </button>
       <button id="cartBtn" class="icon-btn cart-btn">
-        <img src="/Frontend/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
         <span class="cart-badge" id="cartBadge">0</span>
       </button>
     </div>
@@ -79,6 +74,16 @@
     
     <!-- Filtros e Ordenação -->
     <aside class="filters-sidebar" id="filtersSidebar">
+        <div class="filter-group">
+  <h4>Pesquisar</h4>
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Pesquisar produtos..."
+    class="filter-search"
+  >
+</div>
+
       <div class="filters-header">
         <h3>Filtros</h3>
         <button class="btn-clear-filters" id="clearFilters">Limpar</button>

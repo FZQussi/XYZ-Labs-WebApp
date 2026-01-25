@@ -57,17 +57,44 @@ exports.getProductById = async (req, res) => {
 };
 
 // ===== CREATE PRODUCT =====
+
 exports.createProduct = async (req, res) => {
   try {
-    const { name, description, price, subcategory_id, stock } = req.body;
+    const { name, description, price, subcategory_id } = req.body;
     const model_file = req.file?.filename || null;
 
-    const result = await client.query(`
+    // ✅ converter stock para boolean
+    const stock = req.body.stock === 'true' || req.body.stock === true;
+
+    let category_id = null;
+
+    // 🔗 Obter category_id a partir da subcategoria
+    if (subcategory_id) {
+      const catResult = await client.query(
+        'SELECT category_id FROM subcategories WHERE id = $1',
+        [subcategory_id]
+      );
+      category_id = catResult.rows[0]?.category_id || null;
+    }
+
+    const result = await client.query(
+      `
       INSERT INTO products
-        (name, description, price, model_file, subcategory_id, stock, images)
-      VALUES ($1,$2,$3,$4,$5,$6,$7)
+        (name, description, price, model_file, subcategory_id, category_id, stock, images)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
       RETURNING *
-    `, [name, description, price, model_file, subcategory_id || null, stock ?? 0, []]);
+      `,
+      [
+        name,
+        description,
+        price,
+        model_file,
+        subcategory_id || null,
+        category_id,
+        stock,        // ✅ boolean
+        []
+      ]
+    );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -76,6 +103,7 @@ exports.createProduct = async (req, res) => {
   }
 };
 
+
 // ===== UPDATE PRODUCT =====
 exports.updateProduct = async (req, res) => {
   try {
@@ -83,6 +111,11 @@ exports.updateProduct = async (req, res) => {
     const fields = [];
     const values = [];
     let i = 1;
+
+    // 🔄 Normalizar stock se existir
+    if ('stock' in req.body) {
+      req.body.stock = req.body.stock === 'true' || req.body.stock === true;
+    }
 
     // Buscar produto atual para obter modelo antigo
     const currentProduct = await client.query(
@@ -93,7 +126,7 @@ exports.updateProduct = async (req, res) => {
 
     // Campos do body
     for (const key in req.body) {
-      if (key !== 'images') { // Imagens são tratadas separadamente
+      if (key !== 'images') {
         fields.push(`${key} = $${i++}`);
         values.push(req.body[key]);
       }
@@ -101,7 +134,6 @@ exports.updateProduct = async (req, res) => {
 
     // Novo modelo 3D
     if (req.file) {
-      // Eliminar modelo antigo se existir
       if (oldModelFile) {
         deleteFile(oldModelFile, 'models');
       }
@@ -116,12 +148,15 @@ exports.updateProduct = async (req, res) => {
 
     values.push(productId);
 
-    const result = await client.query(`
+    const result = await client.query(
+      `
       UPDATE products
       SET ${fields.join(', ')}, updated_at = NOW()
       WHERE id = $${i}
       RETURNING *
-    `, values);
+      `,
+      values
+    );
 
     res.json(result.rows[0]);
   } catch (err) {
@@ -129,6 +164,7 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json({ error: 'Erro ao atualizar produto' });
   }
 };
+
 
 // ===== DELETE PRODUCT =====
 exports.deleteProduct = async (req, res) => {

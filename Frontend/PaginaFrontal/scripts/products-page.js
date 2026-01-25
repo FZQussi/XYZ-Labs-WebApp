@@ -247,11 +247,24 @@ function toggleFilters() {
 function truncateText(text, maxLength) {
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
+function applySearchFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const search = params.get('search');
 
+  if (!search) return;
+
+  const searchInput = document.getElementById('searchInput');
+  if (!searchInput) return;
+
+  searchInput.value = search;
+  applyFilters();
+}
 // ===== EVENT LISTENERS =====
-document.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
-  loadCategories();
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadProducts();      // ⬅️ garante produtos carregados
+  await loadCategories();    // ⬅️ categorias também
+
+  applySearchFromURL();      // ✅ agora funciona sempre
 
   document.getElementById('sortBy').addEventListener('change', sortProducts);
   document.getElementById('minPrice').addEventListener('change', applyFilters);
@@ -260,3 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('clearFilters').addEventListener('click', clearFilters);
   document.getElementById('toggleFilters').addEventListener('click', toggleFilters);
 });
+
+
+

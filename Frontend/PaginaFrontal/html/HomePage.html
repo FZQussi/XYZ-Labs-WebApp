@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>XYZ Labs - Homepage</title>
-  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/HomePage.css">
 </head>
 <body>
 
@@ -30,6 +30,7 @@
         <li><a href="HomePage.html" class="active">Home</a></li>
         <li><a href="products.html">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
         <li><a href="about.html">Sobre</a></li>
         <li><a href="contact.html">Contacto</a></li>
       </ul>
@@ -38,12 +39,17 @@
 
   <div class="header-right">
     <!-- Search Bar -->
-    <div class="header-search">
-      <span class="search-icon">
-        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
-      </span>
-      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
-    </div>
+  <div class="header-search">
+  <span class="search-icon" id="searchBtn">
+    <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+  </span>
+  <input
+    type="text"
+    placeholder="Pesquisar produtos..."
+    id="searchInput"
+  >
+</div>
+
 
     <!-- Botões quando não logado -->
     <div id="authButtons">
@@ -79,11 +85,20 @@
   <div class="hero-content">
     <h1>Crie o seu produto 3D personalizado</h1>
     <p>Explore materiais, cores e designs únicos. Transforme a sua ideia em realidade!</p>
-    <button class="btn-hero" onclick="location.href='products.html'">
-      Explorar Produtos
-    </button>
+    
+    <div class="hero-buttons">
+      <button class="btn-hero" onclick="location.href='products.html'">
+        Explorar Produtos
+      </button>
+
+      <button class="btn-hero secondary" onclick="location.href='create-product.html'">
+        Começar a Criar
+      </button>
+    </div>
   </div>
 </section>
+
+
 
 <!-- PRODUTOS EM DESTAQUE -->
 <section class="featured-products">

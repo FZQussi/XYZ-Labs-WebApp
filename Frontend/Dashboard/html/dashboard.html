@@ -312,10 +312,13 @@
 
 
 
-      <div class="form-group">
-        <label>Stock</label>
-        <input type="number" id="createStock" min="0">
-      </div>
+      <div class="form-group checkbox-group">
+  <label>
+    <input type="checkbox" id="createStock">
+    Produto disponível
+  </label>
+</div>
+
 
       <div class="form-group">
   <label>Ficheiros 3D e Imagens</label>
@@ -395,9 +398,10 @@
           </div>
 
           <div class="form-group">
-            <label>Stock</label>
-            <input type="number" id="editStock" min="0">
-          </div>
+  <label>Stock Disponível</label>
+  <input type="checkbox" id="editStock">
+</div>
+
 
           <div class="modal-actions">
             <button type="submit" class="primary-btn">

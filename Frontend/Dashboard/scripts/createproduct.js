@@ -87,7 +87,8 @@ createForm.addEventListener('submit', async e => {
     formData.append('description', createDesc.value);
     formData.append('category_id', createCategorySelect.value || null);
     formData.append('subcategory_id', createSubcatSelect.value || null);
-    formData.append('stock', createStock.value || 0);
+    formData.append('stock', createStock.checked);
+
 
     if (createModelFile.files[0]) {
       formData.append('modelFile', createModelFile.files[0]);
