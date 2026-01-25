@@ -2,41 +2,96 @@ const params = new URLSearchParams(window.location.search);
 const productId = params.get('id');
 
 async function loadProduct() {
-  const res = await fetch(`http://localhost:3001/products/${productId}`);
-  const p = await res.json();
+  try {
+    const res = await fetch(`http://localhost:3001/products/${productId}`);
+    if (!res.ok) throw new Error('Erro ao carregar o produto');
 
-  document.getElementById('name').textContent = p.name;
-  document.getElementById('price').textContent = p.price;
-  document.getElementById('stock').textContent = p.stock;
-  document.getElementById('description').textContent = p.description;
+    const p = await res.json();
 
-  if (p.model_file) {
-    document.getElementById('model').src =
-      `http://localhost:3001/models/${p.model_file}`;
-  }
+    // ===== INFORMAÇÕES =====
+    document.getElementById('name').textContent = p.name;
+    document.getElementById('price').textContent = Number(p.price).toFixed(2);
+    document.getElementById('stock').textContent = p.stock ?? 0;
+    document.getElementById('description').textContent = p.description;
 
- // ===== IMAGENS =====
-const images = p.images || [];
+    // ===== MODELO 3D =====
+    if (p.model_file) {
+      document.getElementById('model').src = `http://localhost:3001/models/${p.model_file}`;
+    }
 
-for (let i = 1; i <= 4; i++) {
-  const imgEl = document.getElementById(`productImg${i}`);
-  const filename = images[i - 1];
+    // ===== IMAGENS / SLIDER =====
+    const images = p.images || [];
+    const slideImg = document.getElementById('slideImg');
+    const thumbs = [
+      document.getElementById('thumb1'),
+      document.getElementById('thumb2'),
+      document.getElementById('thumb3'),
+      document.getElementById('thumb4'),
+    ];
 
-  if (filename) {
-    imgEl.src = `http://localhost:3001/images/${filename}`;
-    imgEl.style.display = 'block';
-  } else {
-    imgEl.src = '';
-    imgEl.style.display = 'block'; // mantém o espaço (layout fixo)
-    imgEl.classList.add('empty');
+    // Preencher miniaturas
+    thumbs.forEach((thumb, idx) => {
+      const filename = images[idx];
+      if (filename) {
+        thumb.src = `http://localhost:3001/images/${filename}`;
+        thumb.classList.remove('empty');
+      } else {
+        thumb.src = '/Frontend/lib/images/placeholder.png';
+        thumb.classList.add('empty');
+      }
+
+      thumb.addEventListener('click', () => {
+        currentIndex = idx;
+        updateSlide();
+      });
+    });
+
+    // Estado do slider
+    let currentIndex = 0;
+    const firstValid = thumbs.findIndex(t => !t.classList.contains('empty'));
+    if (firstValid >= 0) currentIndex = firstValid;
+
+    function updateSlide() {
+      slideImg.src = thumbs[currentIndex].src;
+      thumbs.forEach(t => t.classList.remove('active'));
+      thumbs[currentIndex].classList.add('active');
+    }
+
+    updateSlide();
+
+    // Botões
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      doSlide(-1);
+    });
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      doSlide(1);
+    });
+
+    function doSlide(dir) {
+      const validThumbs = thumbs.filter(t => !t.classList.contains('empty'));
+      if (!validThumbs.length) return;
+
+      let idx = validThumbs.findIndex(t => t === thumbs[currentIndex]);
+      idx = (idx + dir + validThumbs.length) % validThumbs.length;
+
+      currentIndex = thumbs.indexOf(validThumbs[idx]);
+      updateSlide();
+    }
+
+    // Swipe para mobile
+    let startX = 0;
+    slideImg.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+    });
+    slideImg.addEventListener('touchend', e => {
+      const endX = e.changedTouches[0].clientX;
+      if (endX - startX > 50) doSlide(-1); // swipe right
+      else if (startX - endX > 50) doSlide(1); // swipe left
+    });
+
+  } catch (err) {
+    console.error('Erro ao carregar o produto:', err);
   }
 }
 
-}
-document.querySelectorAll('.thumbs img').forEach(img => {
-  img.addEventListener('click', () => {
-    document.getElementById('mainImage').src = img.src;
-  });
-});
-
-loadProduct();
+document.addEventListener('DOMContentLoaded', loadProduct);
