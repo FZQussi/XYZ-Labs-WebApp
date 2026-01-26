@@ -1,6 +1,6 @@
 :root {
     /* Cores principais */
-     --primary: #222222;
+     --primary: #000000;
     /* Botões e destaques principais (preto escuro) */
      --primary-dark: #ffffff;
     /* Hover ou estados ativos (preto puro) */
@@ -154,6 +154,8 @@
 }
  .btn-checkout:hover {
      background-color: var(--primary-dark);
+     color: var(--dark);
+     outline: 2px solid var(--dark);
      transform: translateY(-2px);
      box-shadow: var(--shadow);
 }
@@ -389,7 +391,7 @@
      color: var(--dark);
 }
  .btn-view:hover {
-     background-color: var(--gray);
+     background-color: var(--dark);
      color: var(--white);
 }
  .btn-add-cart {
@@ -397,7 +399,9 @@
      color: var(--white);
 }
  .btn-add-cart:hover {
-     background-color: var(--primary-dark);
+     background-color: var(--white);
+     color: var(--dark);
+     outline: 2px solid var(--dark) ;
 }
  .loading, .no-products, .error {
      text-align: center;
@@ -464,7 +468,7 @@
  .breadcrumb {
      background-color: var(--white);
      padding: 1rem 0;
-     margin-bottom: 2rem;
+     margin-bottom: 0rem;
 }
  .breadcrumb a {
      color: var(--primary);
@@ -1344,4 +1348,11 @@
   .filters-sidebar.active {
     transform: translateX(0);
   }
+}
+.qty-input {
+  width: 50px;
+  text-align: center;
+  border: 1px solid #000;
+  font-size: 14px;
+  padding: 4px;
 }

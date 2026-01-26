@@ -3,69 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registo - XYZ Labs</title>
+  <title>Criar Conta</title>
   <link rel="stylesheet" href="../css/register.css">
 </head>
 <body>
 
-  <div class="register-container">
+<div class="register-container">
+  <div class="register-card">
 
-    <div class="register-card">
-      <img src="logo.png" alt="XYZ Labs Logo" class="register-logo">
-
-      <h2>Criar Conta</h2>
-
-      <form id="registerForm">
-        <div class="input-group">
-          <label for="name">Nome</label>
-          <input type="text" id="name" required placeholder="O teu nome">
-        </div>
-
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" required placeholder="exemplo@email.com">
-          <div class="error-message" id="emailError"></div>
-        </div>
-
-        <div class="input-group">
-          <label for="password">Palavra-passe</label>
-          <input type="password" id="password" required placeholder="********">
-          <ul class="password-reqs">
-            <li id="lengthReq">≥ 12 caracteres</li>
-            <li id="uppercaseReq">Uma letra maiúscula</li>
-            <li id="lowercaseReq">Uma letra minúscula</li>
-            <li id="numberReq">Um número</li>
-            <li id="specialReq">Um carácter especial</li>
-          </ul>
-        </div>
-
-        <div class="input-group">
-          <label for="confirmPassword">Confirmar palavra-passe</label>
-          <input type="password" id="confirmPassword" required placeholder="********">
-          <div class="error-message" id="confirmError"></div>
-        </div>
-
-        <button type="submit" id="submitBtn">
-          Criar Conta
-          <span class="loading-spinner hidden" id="loadingSpinner"></span>
-        </button>
-      </form>
-
-      <p class="login-link">
-        Já tens conta?
-        <a href="login.html">Iniciar sessão</a>
-      </p>
+    <div class="register-header">
+      <div class="logo">
+        <img src="Emblem.svg" alt="XYZ Labs Logo" class="register-logo">
+      </div>
+      <h2>Sign Up</h2>
+      <p>User Registration</p>
     </div>
-  </div>
 
-  <!-- Modal central -->
-  <div id="feedbackModal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
-      <p id="modalMessage"></p>
+    <form id="registerForm" novalidate>
+
+      <div class="form-group">
+        <label class="form-label" for="name">Name</label>
+        <div class="input-wrapper">
+          <input type="text" id="name" placeholder="Your name" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <div class="input-wrapper">
+          <input type="email" id="email" placeholder="exemplo@email.com" required>
+        </div>
+        <span class="error-message" id="emailError"></span>
+      </div>
+
+      <!-- PASSWORD COM NUVEM -->
+      <div class="form-group password-group">
+        <label class="form-label" for="password">Password</label>
+
+        <div class="password-wrapper">
+          <div class="input-wrapper">
+            <input type="password" id="password" placeholder="********" required>
+          </div>
+
+          <div class="password-bubble" id="passwordBubble">
+            <ul class="password-reqs">
+              <li id="lengthReq">≥ 12 caracteres</li>
+              <li id="uppercaseReq">Letra maiúscula</li>
+              <li id="lowercaseReq">Letra minúscula</li>
+              <li id="numberReq">Número</li>
+              <li id="specialReq">Carácter especial</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Confirm Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="confirmPassword" placeholder="********" required>
+        </div>
+        <span class="error-message" id="confirmError"></span>
+      </div>
+
+      <button type="submit" class="register-btn" id="submitBtn">
+        Sign Up
+        <span class="loading-spinner hidden" id="loadingSpinner"></span>
+      </button>
+
+    </form>
+
+    <div class="signup-link">
+      <span>Already have an account?</span>
+      <a href="login.html">Sign in</a>
     </div>
-  </div>
 
-  <script src="../scripts/register.js"></script>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="feedbackModal" class="modal hidden">
+  <div class="modal-content">
+    <button class="close" id="closeModal">&times;</button>
+    <div class="modal-icon" id="modalIcon">!</div>
+    <p class="modal-message" id="modalMessage"></p>
+  </div>
+</div>
+
+
+<script src="../scripts/register.js"></script>
 </body>
 </html>

@@ -9,11 +9,6 @@
     const submitBtn = document.getElementById('submitBtn');
     const loadingSpinner = document.getElementById('loadingSpinner');
 
-    const lengthReq = document.getElementById('lengthReq');
-    const uppercaseReq = document.getElementById('uppercaseReq');
-    const lowercaseReq = document.getElementById('lowercaseReq');
-    const numberReq = document.getElementById('numberReq');
-    const specialReq = document.getElementById('specialReq');
     const confirmError = document.getElementById('confirmError');
     const emailError = document.getElementById('emailError');
 
@@ -21,33 +16,86 @@
     const modalMessage = document.getElementById('modalMessage');
     const closeModal = document.getElementById('closeModal');
 
+    // Cria referência ao balão
+    const passwordBubble = document.createElement('div');
+    passwordBubble.classList.add('password-bubble');
+    passwordBubble.innerHTML = `
+      <ul class="password-reqs">
+        <li data-rule="length">≥ 12 caracteres</li>
+        <li data-rule="uppercase">Letra maiúscula</li>
+        <li data-rule="lowercase">Letra minúscula</li>
+        <li data-rule="number">Número</li>
+        <li data-rule="special">Carácter especial</li>
+      </ul>
+    `;
+    passwordInput.parentElement.classList.add('password-wrapper');
+    passwordInput.parentElement.appendChild(passwordBubble);
+
     closeModal.addEventListener('click', () => {
       modal.classList.add('hidden');
     });
 
-   function showModal(message) {
-  modalMessage.textContent = message;
-  modal.classList.remove('hidden'); // só aqui o modal aparece
+ function showModal(message, type = 'error') {
+  const icon = document.getElementById('modalIcon');
+  const modalEl = document.getElementById('feedbackModal');
+  const messageEl = document.getElementById('modalMessage');
+
+  messageEl.textContent = message;
+
+  if (type === 'success') {
+    icon.textContent = '✔';
+    icon.classList.add('success');
+    icon.classList.remove('error');
+  } else {
+    icon.textContent = '!';
+    icon.classList.add('error');
+    icon.classList.remove('success');
+  }
+
+  modalEl.classList.remove('hidden');
+  modalEl.classList.add('show');
+
+
 }
 
 
     function validatePassword(password) {
-      lengthReq.style.color = password.length >= 12 ? 'green' : 'red';
-      uppercaseReq.style.color = /[A-Z]/.test(password) ? 'green' : 'red';
-      lowercaseReq.style.color = /[a-z]/.test(password) ? 'green' : 'red';
-      numberReq.style.color = /[0-9]/.test(password) ? 'green' : 'red';
-      specialReq.style.color = /[^A-Za-z0-9]/.test(password) ? 'green' : 'red';
+      const rules = {
+        length: password.length >= 12,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+      };
 
-      return (
-        password.length >= 12 &&
-        /[A-Z]/.test(password) &&
-        /[a-z]/.test(password) &&
-        /[0-9]/.test(password) &&
-        /[^A-Za-z0-9]/.test(password)
-      );
+      // Atualiza as cores das regras no balão
+      const items = passwordBubble.querySelectorAll('li');
+      items.forEach(item => {
+        const rule = item.dataset.rule;
+        if (rules[rule]) {
+          item.classList.add('valid');
+          item.classList.remove('invalid');
+        } else {
+          item.classList.add('invalid');
+          item.classList.remove('valid');
+        }
+      });
+
+      return Object.values(rules).every(Boolean);
     }
 
+    // Mostra balão ao focar no campo de password
+    passwordInput.addEventListener('focus', () => {
+      passwordBubble.classList.add('show');
+    });
+
+    // Esconde balão ao desfocar
+    passwordInput.addEventListener('blur', () => {
+      passwordBubble.classList.remove('show');
+    });
+
     passwordInput.addEventListener('input', () => validatePassword(passwordInput.value));
+
     confirmInput.addEventListener('input', () => {
       confirmError.textContent = passwordInput.value !== confirmInput.value ? 'As passwords não coincidem' : '';
     });
@@ -72,7 +120,6 @@
         return;
       }
 
-      // Mostra spinner
       loadingSpinner.classList.remove('hidden');
       submitBtn.disabled = true;
 

@@ -84,5 +84,22 @@ const authMiddleware = require('./middlewares/auth.middleware');
 router.get('/validate', authMiddleware, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
+// CONFIGURAÇÃO DO NODMAILER
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // ou outro serviço de email
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// ROTA PARA ESQUECI A PASSWORD
+const controller = require('./controllers/forgot.controller');
+
+
+router.post('/forgot-password', controller.forgotPassword);
 
 module.exports = router;

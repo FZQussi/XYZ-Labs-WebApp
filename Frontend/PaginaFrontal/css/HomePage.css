@@ -1,6 +1,6 @@
 :root {
     /* Cores principais */
-     --primary: #222222;
+     --primary: #000000;
     /* Botões e destaques principais (preto escuro) */
      --primary-dark: #ffffff;
     /* Hover ou estados ativos (preto puro) */
@@ -152,8 +152,10 @@
      transition: var(--transition);
      margin-bottom: 1rem;
 }
- .btn-checkout:hover {
+.btn-checkout:hover {
      background-color: var(--primary-dark);
+     color: var(--dark);
+     outline: 2px solid var(--dark);
      transform: translateY(-2px);
      box-shadow: var(--shadow);
 }
@@ -387,9 +389,10 @@
  .btn-view {
      background-color: var(--gray-light);
      color: var(--dark);
+     
 }
  .btn-view:hover {
-     background-color: var(--gray);
+     background-color: var(--dark);
      color: var(--white);
 }
  .btn-add-cart {
@@ -398,6 +401,7 @@
 }
  .btn-add-cart:hover {
      background-color: var(--primary-dark);
+     outline: 2px solid var(--dark);
 }
  .loading, .no-products, .error {
      text-align: center;
@@ -413,15 +417,19 @@
  .btn-view-all {
      display: inline-block;
      padding: 1rem 2rem;
-     background-color: var(--primary);
+     background-color: var(--dark);
      color: var(--white);
      border-radius: 8px;
      font-weight: bold;
      transition: var(--transition);
+     stroke-width: 2px;
 }
  .btn-view-all:hover {
-     background-color: var(--primary-dark);
+     background-color: white;
      transform: translateY(-2px);
+     color: var(--dark);
+     outline: 2px solid var(--dark);
+     
 }
 
 /* ========== FOOTER ========== */
@@ -439,7 +447,7 @@
 }
  .footer-section h3, .footer-section h4 {
      margin-bottom: 1rem;
-     color: var(--primary);
+     color: var(--gray);
 }
  .footer-section ul {
      list-style: none;
@@ -533,7 +541,7 @@
          gap: 0.5rem;
     }
      .btn-primary, .btn-secondary {
-         padding: 0.5rem 1rem;
+         padding: .5rem 1rem;
          font-size: 0.9rem;
     }
      .products-grid {
@@ -813,3 +821,10 @@
   }
 }
 
+.qty-input {
+  width: 50px;
+  text-align: center;
+  border: 1px solid #000;
+  font-size: 14px;
+  padding: 4px;
+}

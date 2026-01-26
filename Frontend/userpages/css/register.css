@@ -1,163 +1,390 @@
-/* Reset */
+/* ===== RESET ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ===== BASE ===== */
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #4CAF50, #2e7d32);
-  height: 100vh;
+  background: #f5f5f5;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 12px;
+  overflow-y: auto;
 }
 
-/* Container */
+/* ===== CONTAINER ===== */
 .register-container {
   width: 100%;
   max-width: 420px;
-  padding: 20px;
 }
 
-/* Card */
+/* ===== CARD ===== */
 .register-card {
-  background: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  background: #ffffff;
+  border: 3px solid #000000;
+  padding: clamp(20px, 4vw, 40px);
+  box-shadow: 8px 8px 0 #000000;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  transition: 0.2s ease;
+}
+
+.register-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0 #000000;
+}
+
+/* ===== HEADER ===== */
+.register-header {
   text-align: center;
+  margin-bottom: 28px;
 }
 
-/* Logo */
+.logo {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 8px;
+}
+
 .register-logo {
-  width: 80px;
-  margin-bottom: 15px;
-}
-
-/* Título */
-.register-card h2 {
-  margin-bottom: 20px;
-  color: #4CAF50;
-}
-
-/* Inputs */
-.input-group {
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.input-group label {
-  display: block;
-  font-size: 0.9rem;
-  margin-bottom: 5px;
-  color: #555;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-/* Mensagem de erro */
-.input-error {
-  color: red;
-  font-size: 0.8rem;
-  margin-top: 5px;
-  display: none;
-}
-
-/* Botão */
-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-/* Spinner dentro do botão */
-.loading-spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #555;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  margin-left: 10px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Link */
-.login-link {
-  margin-top: 15px;
-  font-size: 0.9rem;
-}
-
-.login-link a {
-  color: #4CAF50;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-/* Modal central */
-.hidden {
-  display: none !important;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  object-fit: contain;
+}
+
+.register-header h2 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.register-header p {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666666;
+}
+
+/* ===== FORM ===== */
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.input-wrapper {
+  border: 2px solid #000000;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+}
+
+/* ===== PASSWORD BUBBLE ===== */
+.password-wrapper {
+  position: relative;
+}
+
+/* ===== PASSWORD BUBBLE - A CIMA ===== */
+.password-bubble {
+  position: absolute;
+  bottom: 100%; /* posiciona acima do input */
+  left: 50%;     /* centralizado horizontalmente */
+  transform: translateX(-50%) scale(0.95);
+  width: 220px;
+  background: #ffffff;
+  border: 3px solid #000000;
+  padding: 12px;
+  box-shadow: 6px 6px 0 #000000;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s ease;
+  z-index: 10;
+}
+
+/* Quando estiver ativo */
+.password-bubble.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* Seta do balão */
+.password-bubble::before {
+  content: '';
+  position: absolute;
+  top: 100%;  /* seta abaixo do balão, apontando para o input */
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #000000;
+}
+
+.password-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;  /* seta interna */
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #ffffff;
+}
+
+
+/* ===== PASSWORD RULES ===== */
+.password-reqs {
+  list-style: none;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.password-reqs li {
+  margin-bottom: 6px;
+  color: #999999;
+}
+
+.password-reqs li.valid {
+  color: green;
+}
+
+.password-reqs li.invalid {
+  color: red;
+}
+
+/* ===== BUTTON ===== */
+.register-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 16px;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.register-btn:hover {
+  background: #333333;
+}
+
+/* ===== LINKS ===== */
+.signup-link {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.signup-link a {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000000;
+  text-decoration: none;
+}
+
+/* ===== ERRORS ===== */
+.error-message {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+/* ===== MODAL ===== */
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
+}
+
+.modal.hidden { 
+  display: none; 
 }
 
 .modal-content {
   background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  max-width: 400px;
+  border: 3px solid #000;
+  padding: 32px 24px;
+  max-width: 360px;
   width: 90%;
   text-align: center;
-  font-size: 16px;
   position: relative;
+  box-shadow: 6px 6px 0 #000;
+  transform: scale(0.8);
+  opacity: 0;
+  transition: all 0.25s ease;
 }
 
-.modal-content p {
-  margin: 0;
+.modal.show .modal-content {
+  transform: scale(1);
+  opacity: 1;
 }
 
-.modal-content .close {
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  border: 3px solid #000;
+  border-radius: 50%;
+}
+
+.modal-icon.success {
+  background: #000;
+  color: #fff;
+}
+
+.modal-icon.error {
+  background: #dc3545;
+  color: #fff;
+}
+
+.modal-message {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* Close button */
+.close {
   position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 22px;
+  top: 6px;
+  right: 6px;
   cursor: pointer;
+  font-size: 20px;
+  font-weight: 900;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
 }
 
+.close:hover {
+  transform: scale(1.1);
+}
+
+
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+  .register-card {
+    padding: 20px;
+  }
+
+  .register-header h2 {
+    font-size: 1.3rem;
+  }
+}
+@media (hover: none) {
+  .register-card:hover {
+    transform: none;
+    box-shadow: 8px 8px 0 #000;
+  }
+}
+@media (max-height: 720px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .register-container {
+    margin: 20px 0;
+  }
+
+  .logo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .password-reqs {
+    font-size: 10px;
+  }
+}
+@media (max-width: 480px) {
+  .register-card {
+    padding: 18px;
+    box-shadow: 4px 4px 0 #000;
+  }
+
+  .register-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .register-btn {
+    padding: 14px;
+    font-size: 13px;
+  }
+}
+@media (max-width: 768px) {
+  .password-bubble {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin-top: 8px;
+    box-shadow: 4px 4px 0 #000;
+  }
+
+  .password-bubble::before,
+  .password-bubble::after {
+    display: none;
+  }
+}
+
+.divider span {
+    background: #ffffff;
+    color: #000000;
+    padding: 0 16px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+}
+.signup-link {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666666;
+}
+.signup-link a {
+    color: #000000;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.signup-link a:hover {
+    border-bottom-color: #000000;
+}

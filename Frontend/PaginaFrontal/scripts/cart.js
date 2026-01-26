@@ -141,67 +141,94 @@ initializeEventListeners() {
   }
 
   // ===== MOSTRAR CARRINHO =====
-  showCart() {
-    const sideMenu = document.getElementById('sideMenu');
-    const sideContent = document.getElementById('sideContent');
-      if (!sideMenu || !sideContent) {
+ showCart() {
+  const sideMenu = document.getElementById('sideMenu');
+  const sideContent = document.getElementById('sideContent');
+
+  if (!sideMenu || !sideContent) {
     console.warn('SideMenu não existe nesta página');
     return;
   }
-    if (!this.items.length) {
-      sideContent.innerHTML = `
-        <h3>🛒 Meu Carrinho</h3>
-        <div class="empty-cart">
-          <p>O seu carrinho está vazio</p>
-          <a href="products.html" class="btn-primary">Ver Produtos</a>
-        </div>
-      `;
-      sideMenu.classList.add('open');
-      return;
-    }
 
-    const itemsHTML = this.items.map(item => `
-      <div class="cart-item">
-        <div class="cart-item-image">
-          ${item.image 
-            ? `<img src="http://localhost:3001/images/${item.image}" alt="${item.name}">` 
-            : '<div class="no-image">📦</div>'
-          }
-        </div>
-        <div class="cart-item-info">
-          <h4>${item.name}</h4>
-          <p class="cart-item-price">€${Number(item.price).toFixed(2)}</p>
-          <div class="cart-item-quantity">
-            <button class="qty-btn" onclick="cart.updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
-            <span>${item.quantity}</span>
-            <button class="qty-btn" onclick="cart.updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
-          </div>
-        </div>
-        <button class="cart-item-remove" onclick="cart.removeItem(${item.id})">×</button>
-      </div>
-    `).join('');
-
+  if (!this.items.length) {
     sideContent.innerHTML = `
       <h3>🛒 Meu Carrinho</h3>
-      <div class="cart-items">
-        ${itemsHTML}
-      </div>
-      <div class="cart-summary">
-        <div class="cart-total">
-          <span>Total:</span>
-          <strong>€${this.getTotal().toFixed(2)}</strong>
-        </div>
-        <button class="btn-checkout" onclick="cart.checkout()">
-          Fazer Encomenda
-        </button>
-        <button class="btn-clear-cart" onclick="cart.clear(); cart.showCart();">
-          Limpar Carrinho
-        </button>
+      <div class="empty-cart">
+        <p>O seu carrinho está vazio</p>
+        <a href="products.html" class="btn-primary">Ver Produtos</a>
       </div>
     `;
-
     sideMenu.classList.add('open');
+    return;
   }
+
+  const itemsHTML = this.items.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-image">
+        ${item.image 
+          ? `<img src="http://localhost:3001/images/${item.image}" alt="${item.name}">` 
+          : '<div class="no-image">📦</div>'
+        }
+      </div>
+
+      <div class="cart-item-info">
+        <h4>${item.name}</h4>
+        <p class="cart-item-price">€${Number(item.price).toFixed(2)}</p>
+
+        <div class="cart-item-quantity">
+          <button 
+            class="qty-btn"
+            onclick="cart.updateQuantity(${item.id}, ${item.quantity - 1})"
+          >−</button>
+
+          <input
+            type="number"
+            min="1"
+            value="${item.quantity}"
+            class="qty-input"
+            onchange="cart.updateQuantity(${item.id}, this.value)"
+            oninput="this.value = Math.max(1, this.value)"
+          />
+
+          <button 
+            class="qty-btn"
+            onclick="cart.updateQuantity(${item.id}, ${item.quantity + 1})"
+          >+</button>
+        </div>
+      </div>
+
+      <button 
+        class="cart-item-remove"
+        onclick="cart.removeItem(${item.id})"
+      >×</button>
+    </div>
+  `).join('');
+
+  sideContent.innerHTML = `
+    <h3>🛒 Meu Carrinho</h3>
+
+    <div class="cart-items">
+      ${itemsHTML}
+    </div>
+
+    <div class="cart-summary">
+      <div class="cart-total">
+        <span>Total:</span>
+        <strong>€${this.getTotal().toFixed(2)}</strong>
+      </div>
+
+      <button class="btn-checkout" onclick="cart.checkout()">
+        Fazer Encomenda
+      </button>
+
+      <button class="btn-clear-cart" onclick="cart.clear(); cart.showCart();">
+        Limpar Carrinho
+      </button>
+    </div>
+  `;
+
+  sideMenu.classList.add('open');
+}
 
   // ===== IR PARA CHECKOUT =====
   checkout() {
