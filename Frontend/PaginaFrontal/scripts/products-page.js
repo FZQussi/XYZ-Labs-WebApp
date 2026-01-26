@@ -52,33 +52,73 @@ async function loadCategories() {
 function renderCategoryFilters() {
   const container = document.getElementById('categoryFilters');
   
-  container.innerHTML = categories.map(cat => `
-    <label class="filter-checkbox">
-      <input type="checkbox" value="${cat.id}" class="category-filter">
-      <span>${cat.name}</span>
-    </label>
-  `).join('');
+  container.innerHTML = categories.map(cat => {
+    // Log das subcategorias carregadas
+    if (cat.subcategories && cat.subcategories.length) {
+      console.log(`Categoria "${cat.name}" possui subcategorias:`, cat.subcategories.map(s => s.name));
+    }
 
-  // Event listeners
-  document.querySelectorAll('.category-filter').forEach(checkbox => {
-    checkbox.addEventListener('change', applyFilters);
+    return `
+    <div class="filter-checkbox category-container">
+      <label>
+        <input type="checkbox" value="${cat.id}" class="category-filter">
+        <span>${cat.name}</span>
+      </label>
+
+      ${cat.subcategories && cat.subcategories.length ? `
+        <div class="subcategory-container">
+          ${cat.subcategories.map(sub => `
+            <label class="filter-checkbox subcategory-filter">
+              <input type="checkbox" value="${sub.id}" data-parent="${cat.id}">
+              <span>${sub.name}</span>
+            </label>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+    `;
+  }).join('');
+
+  // Mostrar/ocultar subcategorias quando a categoria é marcada
+  document.querySelectorAll('.category-filter').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const container = cb.closest('.category-container');
+      const subContainer = container.querySelector('.subcategory-container');
+      if (subContainer) {
+        subContainer.style.display = cb.checked ? 'flex' : 'none';
+      }
+      applyFilters();
+    });
   });
+
+  // Subcategorias
+  document.querySelectorAll('.subcategory-filter input').forEach(cb => cb.addEventListener('change', applyFilters));
+
+  // Inicialmente esconde todas as subcategorias
+  document.querySelectorAll('.subcategory-container').forEach(sub => sub.style.display = 'none');
 }
+
+
+
 
 // ===== APPLY FILTERS =====
 function applyFilters() {
-  const selectedCategories = Array.from(
-    document.querySelectorAll('.category-filter:checked')
-  ).map(cb => parseInt(cb.value));
+  const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => parseInt(cb.value));
+  const selectedSubcategories = Array.from(document.querySelectorAll('.subcategory-filter input:checked')).map(cb => parseInt(cb.value));
 
   const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
   const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
   const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
   filteredProducts = allProducts.filter(product => {
-    // Filtro de categoria
-    if (selectedCategories.length > 0) {
-      if (!selectedCategories.includes(product.category_id)) return false;
+    // Se subcategorias estão selecionadas, filtra por elas
+    if (selectedSubcategories.length > 0 && !selectedSubcategories.includes(product.subcategory_id)) {
+      return false;
+    }
+
+    // Se não houver subcategorias selecionadas, mas categorias estão selecionadas, filtra por categoria
+    if (selectedSubcategories.length === 0 && selectedCategories.length > 0 && !selectedCategories.includes(product.category_id)) {
+      return false;
     }
 
     // Filtro de preço
@@ -94,6 +134,8 @@ function applyFilters() {
   updateProductsCount();
   renderProducts();
 }
+
+
 
 // ===== SORT PRODUCTS =====
 function sortProducts() {
@@ -290,4 +332,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
+function setupCollapsibleFilters() {
+  const filter = document.querySelector('.filter-collapsible');
+  if (!filter) return;
 
+  const toggle = filter.querySelector('.filter-toggle');
+  const content = filter.querySelector('.filter-options');
+
+  toggle.addEventListener('click', () => {
+    const isOpen = filter.classList.contains('open');
+
+    filter.classList.toggle('open');
+    content.classList.toggle('open', !isOpen);
+    content.classList.toggle('collapsed', isOpen);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadProducts();
+  await loadCategories();
+
+  setupCollapsibleFilters(); // ⬅️ aqui
+
+  applySearchFromURL();
+
+  document.getElementById('sortBy').addEventListener('change', sortProducts);
+  document.getElementById('minPrice').addEventListener('change', applyFilters);
+  document.getElementById('maxPrice').addEventListener('change', applyFilters);
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+  document.getElementById('clearFilters').addEventListener('click', clearFilters);
+  document.getElementById('toggleFilters').addEventListener('click', toggleFilters);
+});

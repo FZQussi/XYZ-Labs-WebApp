@@ -134,14 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (cartBtn) {
-    cartBtn.addEventListener('click', () => {
-      openMenu(`
-        <h3>Meu Carrinho</h3>
-        <p>Carrinho ainda vazio</p>
-      `);
-    });
-  }
+ 
 
   if (closeMenu) {
     closeMenu.addEventListener('click', () => {

@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Produtos - XYZ Labs</title>
-  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/Products.css">
+  <link rel="stylesheet" href="../css/Header.css">
 </head>
 <body>
 
@@ -90,12 +91,19 @@
       </div>
 
       <!-- Categorias -->
-      <div class="filter-group">
-        <h4>Categorias</h4>
-        <div id="categoryFilters" class="filter-options">
-          <!-- Carregado via JS -->
-        </div>
-      </div>
+<div class="filter-group filter-collapsible">
+  <button class="filter-toggle" type="button">
+    <span>Categorias</span>
+    <span class="filter-arrow"></span>
+  </button>
+
+  <div id="categoryFilters" class="filter-options collapsed">
+    <!-- Categorias carregadas via JS -->
+    <!-- Cada categoria terá uma <div class="category-item"> com suas subcategorias -->
+  </div>
+</div>
+
+
 
       <!-- Faixa de Preço -->
       <div class="filter-group">

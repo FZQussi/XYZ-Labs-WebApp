@@ -1,10 +1,21 @@
 // Frontend/PaginaFrontal/scripts/cart.js
 
 class ShoppingCart {
-  constructor() {
-    this.items = this.loadCart();
-    this.updateBadge();
-  }
+ constructor() {
+  this.items = this.loadCart();
+  this.updateBadge();
+  this.initializeEventListeners();
+}
+
+initializeEventListeners() {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'cart') {
+      this.items = this.loadCart();
+      this.updateBadge();
+    }
+  });
+}
+
 
   // ===== CARREGAR CARRINHO =====
   loadCart() {
@@ -13,10 +24,20 @@ class ShoppingCart {
   }
 
   // ===== GUARDAR CARRINHO =====
-  saveCart() {
-    localStorage.setItem('cart', JSON.stringify(this.items));
-    this.updateBadge();
-  }
+ saveCart() {
+  localStorage.setItem('cart', JSON.stringify(this.items));
+  this.updateBadge();
+
+  // 🔥 Evento global para sincronizar UI
+  window.dispatchEvent(new CustomEvent('cartUpdated', {
+    detail: {
+      items: this.items,
+      count: this.getItemCount(),
+      total: this.getTotal()
+    }
+  }));
+}
+
 
   // ===== ADICIONAR PRODUTO =====
   addItem(product, quantity = 1) {
@@ -123,7 +144,10 @@ class ShoppingCart {
   showCart() {
     const sideMenu = document.getElementById('sideMenu');
     const sideContent = document.getElementById('sideContent');
-
+      if (!sideMenu || !sideContent) {
+    console.warn('SideMenu não existe nesta página');
+    return;
+  }
     if (!this.items.length) {
       sideContent.innerHTML = `
         <h3>🛒 Meu Carrinho</h3>
@@ -206,13 +230,20 @@ class ShoppingCart {
   }
 }
 
-// Instância global do carrinho
-const cart = new ShoppingCart();
-
 // Event listener para botão do carrinho
-document.addEventListener('DOMContentLoaded', () => {
-  const cartBtn = document.getElementById('cartBtn');
-  if (cartBtn) {
-    cartBtn.addEventListener('click', () => cart.showCart());
+// Instância global
+window.cart = new ShoppingCart();
+
+// Listener global do botão do carrinho (funciona em todas as páginas)
+document.addEventListener('click', (e) => {
+  const cartButton = e.target.closest('#cartBtn');
+  if (cartButton) {
+    cart.showCart();
+  }
+});
+window.addEventListener('cartUpdated', () => {
+  const sideMenu = document.getElementById('sideMenu');
+  if (sideMenu && sideMenu.classList.contains('open')) {
+    cart.showCart();
   }
 });

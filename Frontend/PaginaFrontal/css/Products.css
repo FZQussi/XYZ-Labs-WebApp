@@ -813,3 +813,535 @@
   }
 }
 
+/* ===== PRODUCTS PAGE LAYOUT ===== */
+.products-page {
+  padding: 40px 0;
+}
+
+.products-page .container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+}
+
+/* ===== FILTERS SIDEBAR ===== */
+.filters-sidebar {
+  background: #ffffff;
+  border: 1px solid #000;
+  padding: 24px;
+  height: fit-content;
+  position: sticky;
+  top: 120px;
+}
+
+/* Header */
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filters-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.btn-clear-filters {
+  background: none;
+  border: 1px solid #000;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ===== FILTER GROUP ===== */
+.filter-group {
+  margin-bottom: 28px;
+}
+
+.filter-group h4 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: #000;
+  letter-spacing: 0.04em;
+}
+
+/* ===== SEARCH INPUT ===== */
+.filter-search {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #000;
+  font-size: 14px;
+  outline: none;
+}
+
+.filter-search:focus {
+  background: #f9f9f9;
+}
+
+/* ===== CATEGORY CHECKBOXES ===== */
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-checkbox input {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #000;
+  position: relative;
+  cursor: pointer;
+}
+
+.filter-checkbox input:checked {
+  background: #000;
+}
+
+.filter-checkbox span {
+  color: #222;
+}
+
+/* ===== PRICE RANGE ===== */
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-range input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #000;
+  font-size: 14px;
+}
+
+.price-range span {
+  font-size: 14px;
+  color: #000;
+}
+
+/* ===== PRODUCTS CONTENT ===== */
+.products-content {
+  width: 100%;
+}
+
+/* ===== TOOLBAR ===== */
+.products-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.products-count {
+  font-size: 14px;
+  color: #444;
+}
+
+/* Toggle filters button */
+.btn-toggle-filters {
+  display: none;
+  background: none;
+  border: 1px solid #000;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Sort */
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-right label {
+  font-size: 14px;
+}
+
+.toolbar-right select {
+  border: 1px solid #000;
+  padding: 6px 10px;
+  font-size: 14px;
+  background: #fff;
+}
+
+/* ===== NO PRODUCTS ===== */
+.no-products {
+  padding: 40px;
+  text-align: center;
+  font-size: 15px;
+  color: #555;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 1024px) {
+  .products-page .container {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;
+    max-width: 90%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .filters-sidebar.active {
+    transform: translateX(0);
+  }
+
+  .btn-toggle-filters {
+    display: inline-block;
+  }
+}
+/* ===== COLLAPSIBLE FILTER ===== */
+.filter-collapsible {
+  border-top: 1px solid #ddd;
+  padding-top: 16px;
+}
+
+.filter-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #000;
+}
+
+/* Arrow */
+.filter-arrow {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transform: rotate(45deg);
+  transition: transform 0.25s ease;
+}
+
+/* Content */
+.filter-options {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+}
+
+/* Closed */
+.filter-options.collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Open */
+.filter-options.open {
+  max-height: 400px; /* suficiente para várias categorias */
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Arrow open */
+.filter-collapsible.open .filter-arrow {
+  transform: rotate(-135deg);
+}
+
+/* ===== SUBCATEGORIES ===== */
+.category-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.category-item > label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+/* Subcategorias escondidas por padrão */
+.subcategories {
+  margin-left: 20px;
+  margin-top: 4px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Mostrar subcategorias quando a categoria estiver marcada */
+.category-item input[type="checkbox"]:checked ~ .subcategories {
+  display: flex;
+}
+
+.subcategories label {
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+/* ===== CATEGORIAS ACORDION ===== */
+.category-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Cabeçalho da categoria */
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.category-header:hover {
+  background-color: #f5f5f5;
+}
+
+.category-header span.arrow {
+  transition: transform 0.3s ease;
+}
+
+/* Girar seta quando expandido */
+.category-item.active .category-header span.arrow {
+  transform: rotate(90deg);
+}
+
+/* Subcategorias (colapsáveis) */
+.subcategories {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  padding-left: 16px;
+}
+
+.category-item.active .subcategories {
+  max-height: 500px; /* valor grande o suficiente para mostrar todas */
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.subcategories label {
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-weight: 400;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+/* ===== FILTERS SIDEBAR ===== */
+.filters-sidebar {
+  background: #ffffff;
+  border: 1px solid #000;
+  padding: 24px;
+  position: sticky;
+  top: 120px;
+  max-height: calc(100vh - 140px); /* altura máxima da sidebar */
+  overflow-y: auto; /* scroll quando excede a altura */
+}
+
+/* Header */
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filters-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.btn-clear-filters {
+  background: none;
+  border: 1px solid #000;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* ===== FILTER GROUP ===== */
+.filter-group {
+  margin-bottom: 28px;
+}
+
+.filter-group h4 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  color: #000;
+  letter-spacing: 0.04em;
+}
+
+/* ===== SEARCH INPUT ===== */
+.filter-search {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #000;
+  font-size: 14px;
+  outline: none;
+}
+
+.filter-search:focus {
+  background: #f9f9f9;
+}
+
+/* ===== CATEGORY CHECKBOXES ===== */
+.category-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.category-header:hover {
+  background-color: #f5f5f5;
+}
+
+.category-header input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.category-header span.arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* Girar seta quando expandido */
+.category-item.active .category-header span.arrow {
+  transform: rotate(90deg);
+}
+
+/* Subcategorias */
+.subcategories {
+  display: flex;
+  flex-direction: column;
+  padding-left: 16px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.category-item.active .subcategories {
+  max-height: 500px; /* suficiente para mostrar todas */
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.subcategories label {
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-weight: 400;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== PRICE RANGE ===== */
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-range input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #000;
+  font-size: 14px;
+}
+
+.price-range span {
+  font-size: 14px;
+  color: #000;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 1024px) {
+  .filters-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;
+    max-width: 90%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .filters-sidebar.active {
+    transform: translateX(0);
+  }
+}
