@@ -98,6 +98,15 @@
   </div>
 </section>
 
+<!-- CATEGORIAS SLIDER -->
+<section class="categories-slider">
+  <div class="container">
+    <h2>Explorar por Categoria</h2>
+    <div class="slider-wrapper" id="categoriesSlider">
+      <!-- Boxes das categorias serão carregadas via JS -->
+    </div>
+  </div>
+</section>
 
 
 <!-- PRODUTOS EM DESTAQUE -->
@@ -114,43 +123,42 @@
   </div>
 </section>
 
-<!-- VANTAGENS / SERVIÇOS -->
-<section class="services">
+<section class="process-3d">
   <div class="container">
-    <h2>Porquê escolher a XYZ Labs?</h2>
-    <div class="service-cards">
-      <div class="service-card">
-        <div class="service-icon">⚡</div>
-        <h3>Impressão Rápida</h3>
-        <p>Receba os seus produtos em tempo recorde com tecnologia de ponta.</p>
+    <h2>Do ficheiro ao objeto físico</h2>
+    <p class="process-subtitle">
+      Um processo claro, técnico e controlado do início ao fim.
+    </p>
+
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-icon upload"></div>
+        <h3>Ficheiro</h3>
+        <p>Receção e validação do modelo 3D.</p>
       </div>
-      <div class="service-card">
-        <div class="service-icon">🎨</div>
-        <h3>Personalização Total</h3>
-        <p>Escolha cores, materiais e design único para cada projeto.</p>
+
+      <div class="process-step">
+        <div class="step-icon material"></div>
+        <h3>Material</h3>
+        <p>Seleção do material conforme a aplicação.</p>
       </div>
-      <div class="service-card">
-        <div class="service-icon">✨</div>
-        <h3>Qualidade Premium</h3>
-        <p>Produtos duráveis e de alta precisão com acabamento profissional.</p>
+
+      <div class="process-step">
+        <div class="step-icon printing"></div>
+        <h3>Produção</h3>
+        <p>Impressão com controlo dimensional.</p>
+      </div>
+
+      <div class="process-step">
+        <div class="step-icon delivery"></div>
+        <h3>Peça final</h3>
+        <p>Acabamento e envio ao cliente.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- NEWSLETTER -->
-<section class="newsletter">
-  <div class="container">
-    <h2>📧 Subscreva a nossa Newsletter</h2>
-    <p>Receba novidades, promoções e lançamentos 3D diretamente no seu email.</p>
-    <form id="newsletterForm">
-      <div class="newsletter-input-group">
-        <input type="email" placeholder="Digite o seu email" required id="newsletterEmail">
-        <button type="submit" class="btn-newsletter">Subscrever</button>
-      </div>
-    </form>
-  </div>
-</section>
+
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -196,5 +204,6 @@
 <script src="../scripts/cart.js"></script>
 <script src="../scripts/homePage.js"></script>
 <script src="../scripts/homepage-products.js"></script>
+<script src="../scripts/categories-slider.js"></script>
 </body>
 </html>

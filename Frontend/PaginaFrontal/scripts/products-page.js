@@ -8,6 +8,17 @@ let categories = [];
 let currentPage = 1;
 const productsPerPage = 12;
 
+function applyCategoryFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoryId = urlParams.get('category');
+  if (!categoryId) return;
+
+  const checkbox = document.querySelector(`.category-filter[value="${categoryId}"]`);
+  if (checkbox) {
+    checkbox.checked = true;
+    applyFilters(); // Aplica o filtro imediatamente
+  }
+}
 // ===== LOAD PRODUCTS =====
 async function loadProducts() {
   try {
@@ -31,6 +42,7 @@ async function loadCategories() {
     const res = await fetch(`${API_BASE}/categories`);
     categories = await res.json();
     renderCategoryFilters();
+    applyCategoryFromURL();
   } catch (err) {
     console.error('Erro ao carregar categorias:', err);
   }
@@ -259,6 +271,9 @@ function applySearchFromURL() {
   searchInput.value = search;
   applyFilters();
 }
+// products.js
+const urlParams = new URLSearchParams(window.location.search);
+
 // ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProducts();      // ⬅️ garante produtos carregados
