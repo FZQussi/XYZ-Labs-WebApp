@@ -60,15 +60,23 @@
     </div>
 
     <!-- Ícones quando logado -->
-    <div id="userIcons" style="display:none">
-      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
-        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
-      </button>
-      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
-    </div>
+    <div id="userIcons" style="display:none; position: relative;">
+  <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+    <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+  </button>
+
+  <!-- 🔽 DROPDOWN USER -->
+  <div id="userDropdown" class="user-dropdown hidden">
+    <p class="dropdown-title" id="dropdownUserName"></p>
+    <ul id="dropdownLinks"></ul>
+  </div>
+
+  <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+    <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</div>
+
   </div>
 </header>
 

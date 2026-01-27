@@ -23,16 +23,18 @@
       </a>
     </div>
 
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <!-- Menu Hamburger (Mobile) -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
+    <!-- Navegação -->
     <nav class="header-nav" id="headerNav">
       <ul>
-        <li><a href="HomePage.html">Home</a></li>
-        <li><a href="products.html" class="active">Produtos</a></li>
+        <li><a href="HomePage.html" class="active">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
         <li><a href="colors.html">Cores</a></li>
         <li><a href="about.html">Sobre</a></li>
@@ -42,30 +44,46 @@
   </div>
 
   <div class="header-right">
-    <div class="header-search">
-      <span class="search-icon">
-        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
-      </span>
-      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
-    </div>
+    <!-- Search Bar -->
+  <div class="header-search">
+  <span class="search-icon" id="searchBtn">
+    <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+  </span>
+  <input
+    type="text"
+    placeholder="Pesquisar produtos..."
+    id="searchInput"
+  >
+</div>
 
+
+    <!-- Botões quando não logado -->
     <div id="authButtons">
       <button id="signInBtn" class="btn-secondary">Sign In</button>
+      
       <button id="signUpBtn" class="btn-primary">Sign Up</button>
     </div>
 
-    <div id="userIcons" style="display:none">
-      <button id="userMenuBtn" class="icon-btn">
-        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
-      </button>
-      <button id="cartBtn" class="icon-btn cart-btn">
-        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
-    </div>
+    <!-- Ícones quando logado -->
+    <div id="userIcons" style="display:none; position: relative;">
+  <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+    <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+  </button>
+
+  <!-- 🔽 DROPDOWN USER -->
+  <div id="userDropdown" class="user-dropdown hidden">
+    <p class="dropdown-title" id="dropdownUserName"></p>
+    <ul id="dropdownLinks"></ul>
+  </div>
+
+  <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+    <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</div>
+
   </div>
 </header>
-
 <div id="sideMenu" class="side-menu">
   <button class="closeBtn" id="closeMenu">×</button>
   <div id="sideContent"></div>
@@ -221,15 +239,18 @@
       <p>Arraste para rodar | Scroll para zoom | Dois dedos para mover</p>
     </div>
 
-    <model-viewer
-      id="model3D"
-      camera-controls
-      auto-rotate
-      shadow-intensity="1"
-      camera-orbit="45deg 55deg 2.5m"
-      exposure="1"
-      alt="Modelo 3D do produto">
-    </model-viewer>
+<model-viewer
+  id="model3D"
+  camera-controls
+  auto-rotate
+  shadow-intensity="1"
+  camera-orbit="45deg 55deg 2.5m"
+  exposure="1"
+  alt="Modelo 3D do produto"
+  background-color="#f0f0f0" 
+>
+</model-viewer>
+
 
     <div class="modal-controls">
       <button class="control-btn" id="resetView">

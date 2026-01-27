@@ -383,7 +383,24 @@ body {
 .signup-link a:hover {
     border-bottom-color: #000000;
 }
+.logo-square {
+    width: 48px;
+    height: 48px;
+    background: #000000;
+    border: 3px solid #000000;
+    position: relative;
+}
 
+.logo-square::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+}
 /* Error States */
 .error-message {
     color: #dc3545;

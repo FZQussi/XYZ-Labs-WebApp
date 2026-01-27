@@ -100,39 +100,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Menu lateral
-  function openMenu(content) {
-    sideContent.innerHTML = content;
-    sideMenu.classList.add('open');
+const userDropdown = document.getElementById('userDropdown');
+const dropdownLinks = document.getElementById('dropdownLinks');
+const dropdownUserName = document.getElementById('dropdownUserName');
+
+if (userMenuBtn && user) {
+  userMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdown.classList.toggle('hidden');
+  });
+
+  dropdownUserName.textContent = `Olá, ${user.name}`;
+
+  let adminLink = '';
+  if (user.role === 'admin') {
+    adminLink = `<li><a href="../../Dashboard/html/dashboard.html">Dashboard</a></li>`;
   }
 
-  if (userMenuBtn) {
-    userMenuBtn.addEventListener('click', () => {
-      let adminLink = '';
+  dropdownLinks.innerHTML = `
+    ${adminLink}
+    <li><a href="../../userpages/html/profile.html">Perfil</a></li>
+    <li><a href="#" id="dropdownLogout">Logout</a></li>
+  `;
 
-      if (user.role === 'admin') {
-        adminLink = `<li><a href="../../Dashboard/html/dashboard.html">Dashboard</a></li>`;
-      }
+  document.getElementById('dropdownLogout').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    location.reload();
+  });
+}
 
-      const content = `
-        <h3>Olá, ${user.name}</h3>
-        <ul>
-          ${adminLink}
-          <li><a href="profile.html">Perfil</a></li>
-          <li><a href="orders.html">Encomendas</a></li>
-          <li><a href="#" id="logoutLink">Logout</a></li>
-        </ul>
-      `;
-
-      openMenu(content);
-
-      document.getElementById('logoutLink').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        location.reload();
-      });
-    });
-  }
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', () => {
+  if (userDropdown) userDropdown.classList.add('hidden');
+});
 
  
 

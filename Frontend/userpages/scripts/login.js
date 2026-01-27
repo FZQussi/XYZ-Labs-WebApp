@@ -112,51 +112,55 @@ class ModernBrutalistLoginForm {
         });
     }
 
-    async handleSubmit(e) {
-        e.preventDefault();
+  async handleSubmit(e) {
+    e.preventDefault();
 
-        const emailValid = this.validateEmail();
-        const passwordValid = this.validatePassword();
-        if (!emailValid || !passwordValid) return;
+    const emailValid = this.validateEmail();
+    const passwordValid = this.validatePassword();
+    if (!emailValid || !passwordValid) return;
 
-        this.setLoading(true);
+    this.setLoading(true);
 
-        try {
-            const res = await fetch(API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    identifier: this.emailInput.value.trim(),
-                    password: this.passwordInput.value
-                })
-            });
+    try {
+        const res = await fetch(API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                identifier: this.emailInput.value.trim(),
+                password: this.passwordInput.value
+            })
+        });
 
-            const data = await res.json();
+        const data = await res.json();
 
-            if (!res.ok) {
-                this.showError('password', data.error || 'Erro ao iniciar sessão');
-                return;
-            }
+        // 🔹 Coloca o log aqui para inspecionar o user
+        console.log('User retornado do login:', data.user);
 
-            // Guardar sessão
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-
-            // Sucesso visual
-            this.showSuccess();
-
-            // Redirecionar
-            setTimeout(() => {
-                window.location.href = '../../PaginaFrontal/html/HomePage.html';
-            }, 2500);
-
-        } catch (err) {
-            console.error(err);
-            this.showError('password', 'Erro no servidor');
-        } finally {
-            this.setLoading(false);
+        if (!res.ok) {
+            this.showError('password', data.error || 'Erro ao iniciar sessão');
+            return;
         }
+
+        // Guardar sessão
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Sucesso visual
+        this.showSuccess();
+
+        // Redirecionar
+        setTimeout(() => {
+            window.location.href = '../../PaginaFrontal/html/HomePage.html';
+        }, 2500);
+
+    } catch (err) {
+        console.error(err);
+        this.showError('password', 'Erro no servidor');
+    } finally {
+        this.setLoading(false);
     }
+}
+
 
     showSuccess() {
         this.form.style.opacity = '0';

@@ -120,20 +120,32 @@ function renderProduct() {
 
   // Configurar modelo 3D
   const open3DBtn = document.getElementById('open3DBtn');
-  if (currentProduct.model_file) {
-    const modelViewer = document.getElementById('model3D');
-    if (modelViewer) {
-      modelViewer.src = `${API_BASE}/models/${currentProduct.model_file}`;
-    }
-    const modalTitle = document.getElementById('modal3DTitle');
-    if (modalTitle) {
-      modalTitle.textContent = `Modelo 3D: ${currentProduct.name}`;
-    }
-  } else {
-    if (open3DBtn) {
-      open3DBtn.style.display = 'none';
-    }
+if (currentProduct.model_file) {
+  const modelViewer = document.getElementById('model3D');
+  if (modelViewer) {
+    modelViewer.src = `${API_BASE}/models/${currentProduct.model_file}`;
+
+    // ⚡ Aqui alteramos a cor do modelo para azul bebê
+    modelViewer.addEventListener('load', () => {
+      const model = modelViewer.model; // acessa o THREE.Group interno
+      model.traverse((node) => {
+        if (node.isMesh && node.material) {
+          node.material.color.set('#89CFF0'); // azul bebê
+        }
+      });
+    });
   }
+
+  const modalTitle = document.getElementById('modal3DTitle');
+  if (modalTitle) {
+    modalTitle.textContent = `Modelo 3D: ${currentProduct.name}`;
+  }
+} else {
+  if (open3DBtn) {
+    open3DBtn.style.display = 'none';
+  }
+}
+
 
   // Atualizar título da página
   document.title = `${currentProduct.name} - XYZ Labs`;

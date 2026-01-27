@@ -77,7 +77,16 @@ router.post('/login', async (req, res) => {
     { expiresIn: '1d' }
   );
 
-  res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+  res.json({
+  token,
+  user: {
+    id: user.id,
+    name: user.name,
+    email: user.email, // <--- adicionado
+    role: user.role
+  }
+});
+
 });
 const authMiddleware = require('./middlewares/auth.middleware');
 
