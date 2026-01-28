@@ -114,10 +114,23 @@
           </div>
 
           <div class="form-group">
-            <label for="customerPhone">Telefone</label>
+            <label for="customerPhone">Telefone*</label>
             <input type="tel" id="customerPhone" 
                    placeholder="+351 XXX XXX XXX">
           </div>
+          <div class="form-group">
+  <label for="materialSelect">Material *</label>
+  <select id="materialSelect" required>
+    <option value="">-- Escolher material --</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label for="colorSelect">Cor *</label>
+  <select id="colorSelect" required>
+    <option value="">-- Escolher cor --</option>
+  </select>
+</div>
 
           <div class="form-group">
             <label for="orderNotes">Notas do Pedido (opcional)</label>
@@ -152,7 +165,10 @@
           <div class="total-row total-final">
             <span>Total Estimado:</span>
             <strong id="orderTotal">€0.00</strong>
-          </div>
+          </div>  
+          <p><strong>Material:</strong> <span id="summaryMaterial"></span></p>
+          <p><strong>Cor:</strong> <span id="summaryColor"></span></p>
+
           <p class="total-note">* Valor final confirmado por email</p>
         </div>
 

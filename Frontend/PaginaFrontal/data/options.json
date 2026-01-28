@@ -1,0 +1,13 @@
+{
+  "materials": [
+    { "id": "pla", "name": "PLA" },
+    { "id": "abs", "name": "ABS" },
+    { "id": "petg", "name": "PETG" }
+  ],
+  "colors": [
+    { "id": "black", "name": "Preto" },
+    { "id": "white", "name": "Branco" },
+    { "id": "red", "name": "Vermelho" },
+    { "id": "blue", "name": "Azul" }
+  ]
+}
