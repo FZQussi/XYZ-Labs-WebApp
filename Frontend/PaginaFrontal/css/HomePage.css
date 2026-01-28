@@ -211,7 +211,7 @@
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xxl);
 }
@@ -224,6 +224,7 @@
   transition: var(--transition-fast);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .product-card:hover {

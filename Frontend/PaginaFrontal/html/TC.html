@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos e Condições | XYZ Labs</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/Header.css">
+  <style>
+    /* Terms Page Specific Styles */
+    .terms-page {
+      padding: var(--spacing-xxl) 0;
+      min-height: calc(100vh - 200px);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xxl);
+      padding-bottom: var(--spacing-lg);
+      border-bottom: var(--border-thicker);
+    }
+
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-black);
+      letter-spacing: -1px;
+    }
+
+    .last-updated {
+      font-size: 0.9rem;
+      color: var(--brutalist-gray);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .content-wrapper {
+      background-color: var(--brutalist-white);
+      border: var(--border-thick);
+      padding: var(--spacing-xxl);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .terms-section {
+      margin-bottom: var(--spacing-xxl);
+    }
+
+    .terms-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .terms-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: var(--border-thin);
+      color: var(--brutalist-black);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .terms-section h3 {
+      font-size: 1.3rem;
+      margin-top: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-black);
+      text-transform: uppercase;
+    }
+
+    .terms-section p {
+      margin-bottom: var(--spacing-md);
+      line-height: 1.8;
+      color: var(--brutalist-gray-dark);
+    }
+
+    .terms-section ul, 
+    .terms-section ol {
+      margin-left: var(--spacing-xl);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .terms-section li {
+      margin-bottom: var(--spacing-sm);
+      line-height: 1.8;
+      color: var(--brutalist-gray-dark);
+    }
+
+    .important-notice {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+      border: var(--border-thick);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+    }
+
+    .important-notice p {
+      margin-bottom: 0;
+      font-weight: 700;
+      color: var(--brutalist-white);
+    }
+
+    .highlight-box {
+      background-color: var(--bg-light);
+      border-left: 6px solid var(--brutalist-black);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: var(--spacing-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
+        <img src="/Frontend/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header-nav" id="headerNav">
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <div class="header-search">
+      <span class="search-icon" id="searchBtn">
+        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
+
+    <div id="authButtons">
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
+    </div>
+
+    <div id="userIcons" style="display:none; position: relative;">
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+
+      <div id="userDropdown" class="user-dropdown hidden">
+        <p class="dropdown-title" id="dropdownUserName"></p>
+        <ul id="dropdownLinks"></ul>
+      </div>
+
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>Termos e Condições</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="terms-page">
+  <div class="container-narrow">
+    
+    <div class="page-header">
+      <h1>Termos e Condições</h1>
+      <p class="last-updated">Última atualização: 28 de Janeiro de 2026</p>
+    </div>
+
+    <div class="content-wrapper">
+
+      <!-- INTRODUÇÃO -->
+      <section class="terms-section">
+        <h2>1. Introdução e Aceitação</h2>
+        <p>Bem-vindo à XYZ Labs. Estes Termos e Condições ("Termos") regem a utilização do nosso website e serviços de impressão 3D.</p>
+        
+        <div class="important-notice">
+          <p>AO UTILIZAR O NOSSO WEBSITE E SERVIÇOS, VOCÊ CONCORDA EM FICAR VINCULADO A ESTES TERMOS. SE NÃO CONCORDAR, NÃO UTILIZE OS NOSSOS SERVIÇOS.</p>
+        </div>
+
+        <p>Estes Termos constituem um acordo legalmente vinculativo entre você ("Cliente", "Utilizador" ou "você") e a XYZ Labs ("XYZ Labs", "nós", "nosso" ou "nos").</p>
+      </section>
+
+      <!-- DEFINIÇÕES -->
+      <section class="terms-section">
+        <h2>2. Definições</h2>
+        <ul>
+          <li><strong>Serviços:</strong> Serviços de impressão 3D, design, consultoria e venda de produtos oferecidos pela XYZ Labs</li>
+          <li><strong>Website:</strong> O website da XYZ Labs e todas as suas páginas e funcionalidades</li>
+          <li><strong>Produto:</strong> Qualquer item físico produzido ou vendido pela XYZ Labs</li>
+          <li><strong>Encomenda:</strong> Pedido de compra de produtos ou serviços</li>
+          <li><strong>Conta:</strong> Conta de utilizador criada no website</li>
+        </ul>
+      </section>
+
+      <!-- ELEGIBILIDADE -->
+      <section class="terms-section">
+        <h2>3. Elegibilidade</h2>
+        <p>Para utilizar os nossos serviços, você deve:</p>
+        <ul>
+          <li>Ter pelo menos 18 anos de idade</li>
+          <li>Ter capacidade legal para celebrar contratos vinculativos</li>
+          <li>Fornecer informações verdadeiras, precisas e completas</li>
+          <li>Não estar proibido de receber serviços sob as leis de Portugal ou qualquer outra jurisdição aplicável</li>
+        </ul>
+      </section>
+
+      <!-- CONTA DE UTILIZADOR -->
+      <section class="terms-section">
+        <h2>4. Conta de Utilizador</h2>
+        
+        <h3>4.1 Criação de Conta</h3>
+        <p>Para aceder a certas funcionalidades, poderá ser necessário criar uma conta. Você é responsável por:</p>
+        <ul>
+          <li>Manter a confidencialidade da sua password</li>
+          <li>Todas as atividades que ocorram sob a sua conta</li>
+          <li>Notificar-nos imediatamente sobre qualquer uso não autorizado</li>
+        </ul>
+
+        <h3>4.2 Suspensão ou Encerramento</h3>
+        <p>Reservamo-nos o direito de suspender ou encerrar a sua conta se:</p>
+        <ul>
+          <li>Violar estes Termos</li>
+          <li>Fornecer informações falsas ou enganosas</li>
+          <li>Envolver-se em atividades fraudulentas ou ilegais</li>
+          <li>Não efetuar pagamentos devidos</li>
+        </ul>
+      </section>
+
+      <!-- ENCOMENDAS E PAGAMENTOS -->
+      <section class="terms-section">
+        <h2>5. Encomendas e Pagamentos</h2>
+        
+        <h3>5.1 Processo de Encomenda</h3>
+        <ul>
+          <li>Todas as encomendas estão sujeitas à aceitação da XYZ Labs</li>
+          <li>Reservamo-nos o direito de recusar ou cancelar qualquer encomenda</li>
+          <li>A encomenda só é considerada confirmada após receção do pagamento</li>
+          <li>Os preços apresentados no website estão sujeitos a alterações sem aviso prévio</li>
+        </ul>
+
+        <h3>5.2 Pagamentos</h3>
+        <ul>
+          <li>Aceitamos os métodos de pagamento indicados no website</li>
+          <li>Todos os preços estão em Euros (€) e incluem IVA, salvo indicação em contrário</li>
+          <li>O pagamento deve ser efetuado no momento da encomenda</li>
+          <li>Em caso de recusa de pagamento, a encomenda será cancelada</li>
+        </ul>
+
+        <h3>5.3 Custos Adicionais</h3>
+        <ul>
+          <li>Os custos de envio serão adicionados ao preço do produto</li>
+          <li>Taxas alfandegárias para envios internacionais são da responsabilidade do cliente</li>
+          <li>Alterações ao projeto após confirmação podem incorrer em custos adicionais</li>
+        </ul>
+      </section>
+
+      <!-- FICHEIROS 3D E PROPRIEDADE INTELECTUAL -->
+      <section class="terms-section">
+        <h2>6. Ficheiros 3D e Propriedade Intelectual</h2>
+        
+        <h3>6.1 Ficheiros Fornecidos pelo Cliente</h3>
+        <p>Ao enviar ficheiros 3D, você declara e garante que:</p>
+        <ul>
+          <li>É o proprietário legítimo ou tem autorização para usar o design</li>
+          <li>O ficheiro não viola direitos de propriedade intelectual de terceiros</li>
+          <li>O design não contém conteúdo ilegal, ofensivo ou inapropriado</li>
+        </ul>
+
+        <div class="highlight-box">
+          <p>A XYZ Labs não se responsabiliza por violações de propriedade intelectual relacionadas com ficheiros fornecidos pelo cliente.</p>
+        </div>
+
+        <h3>6.2 Direitos de Propriedade</h3>
+        <ul>
+          <li>Você mantém todos os direitos sobre os seus designs</li>
+          <li>A XYZ Labs pode armazenar ficheiros apenas para fins de produção</li>
+          <li>Não utilizaremos os seus designs para outros fins sem autorização expressa</li>
+        </ul>
+
+        <h3>6.3 Conteúdo Proibido</h3>
+        <p>Não aceitamos encomendas para produzir:</p>
+        <ul>
+          <li>Armas, componentes de armas ou itens perigosos</li>
+          <li>Produtos que violem direitos de autor, marcas registadas ou patentes</li>
+          <li>Conteúdo pornográfico, ofensivo ou discriminatório</li>
+          <li>Itens ilegais sob a lei portuguesa ou internacional</li>
+          <li>Produtos destinados a fraude ou falsificação</li>
+        </ul>
+      </section>
+
+      <!-- PRODUÇÃO E PRAZOS -->
+      <section class="terms-section">
+        <h2>7. Produção e Prazos de Entrega</h2>
+        
+        <h3>7.1 Prazos de Produção</h3>
+        <ul>
+          <li>Os prazos indicados são estimativas e podem variar</li>
+          <li>Prazos começam a contar após confirmação de pagamento e aprovação do ficheiro</li>
+          <li>Alterações ao projeto podem afetar os prazos</li>
+          <li>Não nos responsabilizamos por atrasos causados por força maior</li>
+        </ul>
+
+        <h3>7.2 Aprovação do Cliente</h3>
+        <ul>
+          <li>Para projetos personalizados, podemos solicitar aprovação antes da produção</li>
+          <li>O cliente tem 48 horas para responder a pedidos de aprovação</li>
+          <li>Falta de resposta será considerada como aprovação tácita</li>
+        </ul>
+      </section>
+
+      <!-- ENVIOS E ENTREGAS -->
+      <section class="terms-section">
+        <h2>8. Envios e Entregas</h2>
+        
+        <h3>8.1 Responsabilidade de Envio</h3>
+        <ul>
+          <li>Utilizamos transportadoras terceiras para envios</li>
+          <li>O risco de perda ou dano transfere-se para o cliente no momento da entrega à transportadora</li>
+          <li>Fornecemos número de rastreamento quando disponível</li>
+        </ul>
+
+        <h3>8.2 Problemas de Entrega</h3>
+        <ul>
+          <li>O cliente deve verificar a encomenda no momento da entrega</li>
+          <li>Danos durante o transporte devem ser comunicados em 48 horas</li>
+          <li>Não nos responsabilizamos por atrasos causados pela transportadora</li>
+          <li>Moradas incorretas fornecidas pelo cliente não são nossa responsabilidade</li>
+        </ul>
+      </section>
+
+      <!-- DEVOLUÇÕES E REEMBOLSOS -->
+      <section class="terms-section">
+        <h2>9. Devoluções e Reembolsos</h2>
+        
+        <h3>9.1 Direito de Devolução</h3>
+        <p>De acordo com a lei portuguesa, tem direito a:</p>
+        <ul>
+          <li>Devolver produtos não personalizados em 14 dias após receção</li>
+          <li>Produto deve estar em estado original e não utilizado</li>
+          <li>Custos de devolução são da responsabilidade do cliente</li>
+        </ul>
+
+        <h3>9.2 Produtos Personalizados</h3>
+        <div class="important-notice">
+          <p>PRODUTOS PERSONALIZADOS OU FEITOS SOB MEDIDA NÃO PODEM SER DEVOLVIDOS, EXCETO EM CASO DE DEFEITO DE FABRICO.</p>
+        </div>
+
+        <h3>9.3 Defeitos de Fabrico</h3>
+        <ul>
+          <li>Defeitos devem ser comunicados em 7 dias após receção</li>
+          <li>Fornecimento de fotografias do defeito é obrigatório</li>
+          <li>Substituiremos ou reembolsaremos produtos defeituosos</li>
+        </ul>
+
+        <h3>9.4 Reembolsos</h3>
+        <ul>
+          <li>Reembolsos serão processados no método de pagamento original</li>
+          <li>Prazo de reembolso: até 14 dias após aprovação da devolução</li>
+          <li>Custos de envio não são reembolsáveis (exceto em caso de erro nosso)</li>
+        </ul>
+      </section>
+
+      <!-- GARANTIAS -->
+      <section class="terms-section">
+        <h2>10. Garantias e Limitações</h2>
+        
+        <h3>10.1 Garantia de Qualidade</h3>
+        <ul>
+          <li>Garantimos que os produtos são livres de defeitos de fabrico</li>
+          <li>Período de garantia: 30 dias a partir da data de entrega</li>
+          <li>Garantia cobre apenas defeitos de fabrico, não uso inadequado</li>
+        </ul>
+
+        <h3>10.2 Limitação de Responsabilidade</h3>
+        <p>A XYZ Labs não será responsável por:</p>
+        <ul>
+          <li>Danos indiretos, incidentais ou consequenciais</li>
+          <li>Perda de lucros ou oportunidades de negócio</li>
+          <li>Uso inadequado dos produtos</li>
+          <li>Problemas causados por ficheiros defeituosos fornecidos pelo cliente</li>
+        </ul>
+
+        <p>Nossa responsabilidade total está limitada ao valor pago pelo produto ou serviço.</p>
+      </section>
+
+      <!-- PRIVACIDADE -->
+      <section class="terms-section">
+        <h2>11. Privacidade e Proteção de Dados</h2>
+        <p>O tratamento dos seus dados pessoais é regido pela nossa <a href="Privacy.html">Política de Privacidade</a>, que faz parte integrante destes Termos.</p>
+        <p>Ao utilizar os nossos serviços, você consente com a recolha e uso de informações conforme descrito na Política de Privacidade.</p>
+      </section>
+
+      <!-- MODIFICAÇÕES -->
+      <section class="terms-section">
+        <h2>12. Modificações aos Termos</h2>
+        <ul>
+          <li>Reservamo-nos o direito de modificar estes Termos a qualquer momento</li>
+          <li>Alterações entram em vigor imediatamente após publicação no website</li>
+          <li>Utilizadores registados serão notificados por email sobre alterações significativas</li>
+          <li>Uso continuado após alterações constitui aceitação dos novos Termos</li>
+        </ul>
+      </section>
+
+      <!-- LEI APLICÁVEL -->
+      <section class="terms-section">
+        <h2>13. Lei Aplicável e Jurisdição</h2>
+        <ul>
+          <li>Estes Termos são regidos pela lei portuguesa</li>
+          <li>Qualquer disputa será resolvida nos tribunais de Portugal</li>
+          <li>Você concorda em submeter-se à jurisdição exclusiva destes tribunais</li>
+        </ul>
+      </section>
+
+      <!-- DISPOSIÇÕES GERAIS -->
+      <section class="terms-section">
+        <h2>14. Disposições Gerais</h2>
+        
+        <h3>14.1 Acordo Completo</h3>
+        <p>Estes Termos constituem o acordo completo entre você e a XYZ Labs relativamente ao uso dos nossos serviços.</p>
+
+        <h3>14.2 Severabilidade</h3>
+        <p>Se qualquer disposição destes Termos for considerada inválida, as restantes disposições permanecerão em pleno vigor e efeito.</p>
+
+        <h3>14.3 Renúncia</h3>
+        <p>A não aplicação de qualquer direito ou disposição não constitui renúncia a esse direito ou disposição.</p>
+
+        <h3>14.4 Cessão</h3>
+        <p>Você não pode ceder ou transferir estes Termos sem o nosso consentimento prévio por escrito. Podemos ceder os nossos direitos a qualquer momento.</p>
+      </section>
+
+      <!-- CONTACTO -->
+      <section class="terms-section">
+        <h2>15. Contacto</h2>
+        <p>Para questões sobre estes Termos e Condições, contacte-nos:</p>
+        <ul>
+          <li><strong>Email:</strong> info@xyzlabs.pt</li>
+          <li><strong>Telefone:</strong> +351 935310984</li>
+          <li><strong>Morada:</strong> XYZ Labs, Portugal</li>
+        </ul>
+      </section>
+
+      <!-- ACEITAÇÃO -->
+      <div class="important-notice">
+        <p>AO UTILIZAR OS NOSSOS SERVIÇOS, VOCÊ RECONHECE TER LIDO, COMPREENDIDO E CONCORDADO EM FICAR VINCULADO A ESTES TERMOS E CONDIÇÕES.</p>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>XYZ Labs</h3>
+        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Links Rápidos</h4>
+        <ul>
+          <li><a href="HomePage.html">Home</a></li>
+          <li><a href="products.html">Produtos</a></li>
+          <li><a href="about.html">Sobre</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="FAQ.html">FAQ</a></li>
+          <li><a href="TC.html">Termos e Condições</a></li>
+          <li><a href="Privacy.html">Política de Privacidade</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p>📧 info@xyzlabs.pt</p>
+        <p>📞 +351 935310984</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/homePage.js"></script>
+
+</body>
+</html>

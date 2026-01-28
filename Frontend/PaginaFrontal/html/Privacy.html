@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade | XYZ Labs</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/Header.css">
+  <style>
+    /* Privacy Page Specific Styles */
+    .privacy-page {
+      padding: var(--spacing-xxl) 0;
+      min-height: calc(100vh - 200px);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xxl);
+      padding-bottom: var(--spacing-lg);
+      border-bottom: var(--border-thicker);
+    }
+
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-black);
+      letter-spacing: -1px;
+    }
+
+    .last-updated {
+      font-size: 0.9rem;
+      color: var(--brutalist-gray);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .content-wrapper {
+      background-color: var(--brutalist-white);
+      border: var(--border-thick);
+      padding: var(--spacing-xxl);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .privacy-section {
+      margin-bottom: var(--spacing-xxl);
+    }
+
+    .privacy-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .privacy-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: var(--border-thin);
+      color: var(--brutalist-black);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .privacy-section h3 {
+      font-size: 1.3rem;
+      margin-top: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-black);
+      text-transform: uppercase;
+    }
+
+    .privacy-section p {
+      margin-bottom: var(--spacing-md);
+      line-height: 1.8;
+      color: var(--brutalist-gray-dark);
+    }
+
+    .privacy-section ul, 
+    .privacy-section ol {
+      margin-left: var(--spacing-xl);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .privacy-section li {
+      margin-bottom: var(--spacing-sm);
+      line-height: 1.8;
+      color: var(--brutalist-gray-dark);
+    }
+
+    .highlight-box {
+      background-color: var(--bg-light);
+      border-left: 6px solid var(--brutalist-black);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+    }
+
+    .highlight-box p {
+      margin-bottom: 0;
+      font-weight: 600;
+    }
+
+    .contact-info {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+      border: var(--border-thick);
+      padding: var(--spacing-xl);
+      margin-top: var(--spacing-xxl);
+    }
+
+    .contact-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-white);
+    }
+
+    .contact-info p {
+      color: var(--brutalist-gray-light);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .contact-info a {
+      color: var(--brutalist-white);
+      text-decoration: underline;
+    }
+
+    .contact-info a:hover {
+      color: var(--brutalist-gray-light);
+    }
+
+    @media (max-width: 768px) {
+      .content-wrapper {
+        padding: var(--spacing-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
+        <img src="/Frontend/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header-nav" id="headerNav">
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <div class="header-search">
+      <span class="search-icon" id="searchBtn">
+        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
+
+    <div id="authButtons">
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
+    </div>
+
+    <div id="userIcons" style="display:none; position: relative;">
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+
+      <div id="userDropdown" class="user-dropdown hidden">
+        <p class="dropdown-title" id="dropdownUserName"></p>
+        <ul id="dropdownLinks"></ul>
+      </div>
+
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>Política de Privacidade</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="privacy-page">
+  <div class="container-narrow">
+    
+    <div class="page-header">
+      <h1>Política de Privacidade</h1>
+      <p class="last-updated">Última atualização: 28 de Janeiro de 2026</p>
+    </div>
+
+    <div class="content-wrapper">
+
+      <!-- INTRODUÇÃO -->
+      <section class="privacy-section">
+        <h2>1. Introdução</h2>
+        <p>A XYZ Labs ("nós", "nosso" ou "nos") está comprometida em proteger a privacidade e segurança dos dados pessoais dos nossos clientes e visitantes do website.</p>
+        <p>Esta Política de Privacidade descreve como recolhemos, utilizamos, armazenamos e protegemos as suas informações pessoais em conformidade com o Regulamento Geral de Proteção de Dados (RGPD) e demais legislação aplicável.</p>
+        
+        <div class="highlight-box">
+          <p>Ao utilizar o nosso website e serviços, você concorda com os termos desta Política de Privacidade.</p>
+        </div>
+      </section>
+
+      <!-- DADOS RECOLHIDOS -->
+      <section class="privacy-section">
+        <h2>2. Dados que Recolhemos</h2>
+        
+        <h3>2.1 Informações Fornecidas por Si</h3>
+        <ul>
+          <li><strong>Dados de Registo:</strong> Nome, email, password, morada de entrega e faturação</li>
+          <li><strong>Informações de Pagamento:</strong> Dados do cartão de crédito/débito (processados de forma segura através de fornecedores certificados)</li>
+          <li><strong>Dados de Encomenda:</strong> Histórico de compras, ficheiros 3D enviados, preferências de produtos</li>
+          <li><strong>Comunicações:</strong> Mensagens enviadas através de formulários de contacto, emails ou chat</li>
+        </ul>
+
+        <h3>2.2 Informações Recolhidas Automaticamente</h3>
+        <ul>
+          <li><strong>Dados de Navegação:</strong> Endereço IP, tipo de navegador, sistema operativo</li>
+          <li><strong>Cookies:</strong> Preferências do website, sessão de login, análise de utilização</li>
+          <li><strong>Dados de Utilização:</strong> Páginas visitadas, tempo de permanência, cliques</li>
+        </ul>
+      </section>
+
+      <!-- UTILIZAÇÃO DOS DADOS -->
+      <section class="privacy-section">
+        <h2>3. Como Utilizamos os Seus Dados</h2>
+        <p>Utilizamos as informações recolhidas para os seguintes fins:</p>
+        <ul>
+          <li>Processar e gerir as suas encomendas</li>
+          <li>Comunicar sobre o estado das encomendas e entregas</li>
+          <li>Melhorar a experiência do utilizador no website</li>
+          <li>Enviar newsletters e promoções (apenas com o seu consentimento)</li>
+          <li>Prevenir fraudes e garantir a segurança do website</li>
+          <li>Cumprir obrigações legais e regulamentares</li>
+          <li>Realizar análises estatísticas e estudos de mercado</li>
+          <li>Fornecer suporte ao cliente</li>
+        </ul>
+      </section>
+
+      <!-- BASE LEGAL -->
+      <section class="privacy-section">
+        <h2>4. Base Legal para Processamento</h2>
+        <p>Processamos os seus dados pessoais com base em:</p>
+        <ul>
+          <li><strong>Execução de Contrato:</strong> Para processar encomendas e fornecer serviços</li>
+          <li><strong>Consentimento:</strong> Para marketing e newsletters (pode retirar o consentimento a qualquer momento)</li>
+          <li><strong>Interesse Legítimo:</strong> Para melhorar os nossos serviços e prevenir fraudes</li>
+          <li><strong>Obrigação Legal:</strong> Para cumprir requisitos legais e fiscais</li>
+        </ul>
+      </section>
+
+      <!-- PARTILHA DE DADOS -->
+      <section class="privacy-section">
+        <h2>5. Partilha de Informações</h2>
+        <p>Não vendemos os seus dados pessoais a terceiros. Podemos partilhar informações com:</p>
+        
+        <h3>5.1 Fornecedores de Serviços</h3>
+        <ul>
+          <li>Processadores de pagamento (Stripe, PayPal)</li>
+          <li>Empresas de transporte e logística</li>
+          <li>Fornecedores de serviços de email e marketing</li>
+          <li>Plataformas de hospedagem e cloud</li>
+        </ul>
+
+        <h3>5.2 Exigências Legais</h3>
+        <p>Podemos divulgar informações quando exigido por lei ou para proteger os nossos direitos legais.</p>
+
+        <div class="highlight-box">
+          <p>Todos os nossos fornecedores são cuidadosamente selecionados e comprometem-se a cumprir as normas de proteção de dados.</p>
+        </div>
+      </section>
+
+      <!-- COOKIES -->
+      <section class="privacy-section">
+        <h2>6. Cookies</h2>
+        <p>Utilizamos cookies e tecnologias semelhantes para:</p>
+        <ul>
+          <li>Manter a sua sessão de login</li>
+          <li>Lembrar as suas preferências</li>
+          <li>Analisar o tráfego do website</li>
+          <li>Personalizar conteúdo e anúncios</li>
+        </ul>
+        
+        <h3>6.1 Tipos de Cookies</h3>
+        <ul>
+          <li><strong>Cookies Essenciais:</strong> Necessários para o funcionamento básico do site</li>
+          <li><strong>Cookies de Desempenho:</strong> Ajudam-nos a perceber como os visitantes usam o site</li>
+          <li><strong>Cookies de Funcionalidade:</strong> Recordam as suas preferências</li>
+          <li><strong>Cookies de Marketing:</strong> Utilizados para publicidade direcionada (requerem consentimento)</li>
+        </ul>
+
+        <p>Pode gerir as suas preferências de cookies através das configurações do navegador ou do nosso banner de cookies.</p>
+      </section>
+
+      <!-- SEGURANÇA -->
+      <section class="privacy-section">
+        <h2>7. Segurança dos Dados</h2>
+        <p>Implementamos medidas técnicas e organizacionais adequadas para proteger os seus dados:</p>
+        <ul>
+          <li>Encriptação SSL/TLS para todas as transmissões de dados</li>
+          <li>Armazenamento seguro em servidores protegidos</li>
+          <li>Acesso restrito aos dados pessoais</li>
+          <li>Monitorização regular de vulnerabilidades</li>
+          <li>Formação de colaboradores em proteção de dados</li>
+          <li>Backup regular de dados</li>
+        </ul>
+      </section>
+
+      <!-- RETENÇÃO -->
+      <section class="privacy-section">
+        <h2>8. Retenção de Dados</h2>
+        <p>Mantemos os seus dados pessoais apenas pelo tempo necessário para:</p>
+        <ul>
+          <li>Cumprir os fins para os quais foram recolhidos</li>
+          <li>Satisfazer requisitos legais e fiscais (mínimo 10 anos para dados de faturação)</li>
+          <li>Resolver disputas e fazer cumprir os nossos acordos</li>
+        </ul>
+        <p>Após este período, os dados serão eliminados de forma segura ou anonimizados.</p>
+      </section>
+
+      <!-- DIREITOS -->
+      <section class="privacy-section">
+        <h2>9. Os Seus Direitos</h2>
+        <p>De acordo com o RGPD, tem os seguintes direitos:</p>
+        <ul>
+          <li><strong>Direito de Acesso:</strong> Solicitar uma cópia dos seus dados pessoais</li>
+          <li><strong>Direito de Retificação:</strong> Corrigir dados incorretos ou incompletos</li>
+          <li><strong>Direito ao Apagamento:</strong> Solicitar a eliminação dos seus dados ("direito a ser esquecido")</li>
+          <li><strong>Direito à Limitação:</strong> Restringir o processamento dos seus dados</li>
+          <li><strong>Direito à Portabilidade:</strong> Receber os seus dados num formato estruturado</li>
+          <li><strong>Direito de Oposição:</strong> Opor-se ao processamento dos seus dados</li>
+          <li><strong>Direito de Retirar Consentimento:</strong> A qualquer momento, para processamentos baseados em consentimento</li>
+        </ul>
+
+        <div class="highlight-box">
+          <p>Para exercer qualquer um destes direitos, contacte-nos através de info@xyzlabs.pt</p>
+        </div>
+      </section>
+
+      <!-- MENORES -->
+      <section class="privacy-section">
+        <h2>10. Menores de Idade</h2>
+        <p>Os nossos serviços não se destinam a menores de 18 anos. Não recolhemos intencionalmente dados de menores. Se tiver conhecimento de que um menor nos forneceu dados pessoais, contacte-nos para que possamos eliminá-los.</p>
+      </section>
+
+      <!-- TRANSFERÊNCIAS INTERNACIONAIS -->
+      <section class="privacy-section">
+        <h2>11. Transferências Internacionais</h2>
+        <p>Os seus dados podem ser transferidos e armazenados em servidores localizados fora do Espaço Económico Europeu (EEE). Nestes casos, garantimos que:</p>
+        <ul>
+          <li>A transferência é feita para países com nível adequado de proteção de dados</li>
+          <li>São implementadas salvaguardas apropriadas (ex: Cláusulas Contratuais Tipo)</li>
+          <li>Os fornecedores cumprem padrões de segurança equivalentes ao RGPD</li>
+        </ul>
+      </section>
+
+      <!-- ALTERAÇÕES -->
+      <section class="privacy-section">
+        <h2>12. Alterações à Política</h2>
+        <p>Podemos atualizar esta Política de Privacidade periodicamente para refletir mudanças nas nossas práticas ou requisitos legais. Notificaremos sobre alterações significativas através de:</p>
+        <ul>
+          <li>Email para utilizadores registados</li>
+          <li>Aviso no website</li>
+          <li>Atualização da data de "Última atualização"</li>
+        </ul>
+        <p>Recomendamos que reveja esta política regularmente.</p>
+      </section>
+
+      <!-- RECLAMAÇÕES -->
+      <section class="privacy-section">
+        <h2>13. Reclamações</h2>
+        <p>Se considerar que os seus direitos de proteção de dados foram violados, tem o direito de apresentar uma reclamação à autoridade de supervisão:</p>
+        <p><strong>Comissão Nacional de Proteção de Dados (CNPD)</strong><br>
+        Website: <a href="https://www.cnpd.pt" target="_blank">www.cnpd.pt</a></p>
+      </section>
+
+      <!-- CONTACTO -->
+      <div class="contact-info">
+        <h3>Contacto para Questões de Privacidade</h3>
+        <p>Se tiver questões sobre esta Política de Privacidade ou sobre como tratamos os seus dados pessoais, contacte-nos:</p>
+        <p><strong>Email:</strong> <a href="mailto:privacy@xyzlabs.pt">privacy@xyzlabs.pt</a></p>
+        <p><strong>Email Geral:</strong> <a href="mailto:info@xyzlabs.pt">info@xyzlabs.pt</a></p>
+        <p><strong>Telefone:</strong> +351 935310984</p>
+        <p><strong>Morada:</strong> XYZ Labs, Portugal</p>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>XYZ Labs</h3>
+        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Links Rápidos</h4>
+        <ul>
+          <li><a href="HomePage.html">Home</a></li>
+          <li><a href="products.html">Produtos</a></li>
+          <li><a href="about.html">Sobre</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="FAQ.html">FAQ</a></li>
+          <li><a href="TC.html">Termos e Condições</a></li>
+          <li><a href="Privacy.html">Política de Privacidade</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p>📧 info@xyzlabs.pt</p>
+        <p>📞 +351 935310984</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/homePage.js"></script>
+
+</body>
+</html>

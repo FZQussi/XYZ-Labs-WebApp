@@ -19,6 +19,7 @@ function applyCategoryFromURL() {
     applyFilters(); // Aplica o filtro imediatamente
   }
 }
+
 // ===== LOAD PRODUCTS =====
 async function loadProducts() {
   try {
@@ -98,9 +99,6 @@ function renderCategoryFilters() {
   document.querySelectorAll('.subcategory-container').forEach(sub => sub.style.display = 'none');
 }
 
-
-
-
 // ===== APPLY FILTERS =====
 function applyFilters() {
   const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(cb => parseInt(cb.value));
@@ -134,8 +132,6 @@ function applyFilters() {
   updateProductsCount();
   renderProducts();
 }
-
-
 
 // ===== SORT PRODUCTS =====
 function sortProducts() {
@@ -186,7 +182,7 @@ function renderProducts() {
         </div>
         <div class="product-info">
           <h3>${product.name}</h3>
-          <p class="product-description">${truncateText(product.description, 80)}</p>
+         
           <div class="product-footer">
             <span class="product-price">€${Number(product.price).toFixed(2)}</span>
             <div class="product-actions">
@@ -194,7 +190,7 @@ function renderProducts() {
                 Ver Detalhes
               </button>
               ${product.stock > 0 
-                ? `<button class="btn-add-cart" onclick="addToCart(${product.id})">
+                ? `<button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${product.id})">
                      🛒 Adicionar
                    </button>`
                 : ''
@@ -206,7 +202,27 @@ function renderProducts() {
     `;
   }).join('');
 
+  // Adicionar event listeners aos cards
+  addCardClickListeners();
+  
   renderPagination();
+}
+
+// ===== ADD CARD CLICK LISTENERS =====
+function addCardClickListeners() {
+  const cards = document.querySelectorAll('.product-card');
+  
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Não redirecionar se clicar nos botões
+      if (e.target.closest('.btn-view') || e.target.closest('.btn-add-cart')) {
+        return;
+      }
+      
+      const productId = card.getAttribute('data-id');
+      viewProduct(productId);
+    });
+  });
 }
 
 // ===== RENDER PAGINATION =====
@@ -301,6 +317,7 @@ function toggleFilters() {
 function truncateText(text, maxLength) {
   return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
+
 function applySearchFromURL() {
   const params = new URLSearchParams(window.location.search);
   const search = params.get('search');
@@ -313,24 +330,6 @@ function applySearchFromURL() {
   searchInput.value = search;
   applyFilters();
 }
-// products.js
-const urlParams = new URLSearchParams(window.location.search);
-
-// ===== EVENT LISTENERS =====
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadProducts();      // ⬅️ garante produtos carregados
-  await loadCategories();    // ⬅️ categorias também
-
-  applySearchFromURL();      // ✅ agora funciona sempre
-
-  document.getElementById('sortBy').addEventListener('change', sortProducts);
-  document.getElementById('minPrice').addEventListener('change', applyFilters);
-  document.getElementById('maxPrice').addEventListener('change', applyFilters);
-  document.getElementById('searchInput').addEventListener('input', applyFilters);
-  document.getElementById('clearFilters').addEventListener('click', clearFilters);
-  document.getElementById('toggleFilters').addEventListener('click', toggleFilters);
-});
-
 
 function setupCollapsibleFilters() {
   const filter = document.querySelector('.filter-collapsible');
@@ -348,12 +347,12 @@ function setupCollapsibleFilters() {
   });
 }
 
+// ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProducts();
   await loadCategories();
 
-  setupCollapsibleFilters(); // ⬅️ aqui
-
+  setupCollapsibleFilters();
   applySearchFromURL();
 
   document.getElementById('sortBy').addEventListener('change', sortProducts);

@@ -1,5 +1,6 @@
-// Backend/controllers/contact.controller.js
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -9,24 +10,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ===== SEND CONTACT MESSAGE =====
 exports.sendContactMessage = async (req, res) => {
   try {
     const { name, email, phone, subject, message } = req.body;
     const files = req.files || [];
 
-    // Validações
     if (!name || !email || !subject || !message) {
       return res.status(400).json({ error: 'Campos obrigatórios em falta' });
     }
 
-    // Preparar attachments
-    const attachments = files.map(file => ({
-      filename: file.originalname,
-      path: file.path
-    }));
-
-    // Subject mapping
     const subjectMap = {
       'custom': 'Peça Personalizada',
       'quote': 'Pedido de Orçamento',
@@ -35,94 +27,129 @@ exports.sendContactMessage = async (req, res) => {
       'partnership': 'Parcerias',
       'other': 'Outro'
     };
-
     const subjectText = subjectMap[subject] || subject;
 
-    // Email para admin
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL,
-      subject: `📧 Novo Contacto: ${subjectText} - ${name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4CAF50;">Nova Mensagem de Contacto</h2>
-          
-          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Nome:</strong> ${name}</p>
-            <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-            ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
-            <p><strong>Assunto:</strong> ${subjectText}</p>
-          </div>
+    // ✅ Responder imediatamente ao frontend
+    res.json({ success: true, message: 'Mensagem enviada com sucesso!' });
 
-          <div style="background-color: #fff; padding: 20px; border-left: 4px solid #4CAF50; margin: 20px 0;">
-            <h3>Mensagem:</h3>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
+    // ===== Envio de email em background =====
+    (async () => {
+      try {
+        const attachments = files.map(file => ({
+          filename: file.originalname,
+          path: file.path
+        }));
 
-          ${files.length > 0 ? `
-            <div style="margin: 20px 0;">
-              <h3>Ficheiros Anexados:</h3>
-              <ul>
-                ${files.map(f => `<li>${f.originalname} (${(f.size / 1024).toFixed(1)} KB)</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
+        // Email para admin
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: process.env.ADMIN_EMAIL,
+          subject: `📧 Novo Contacto: ${subjectText} - ${name}`,
+          html: `
+            <!DOCTYPE html>
+            <html lang="pt">
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                body, p, h1, h2, div, ul, li { margin:0; padding:0; font-family:'Courier New', monospace; color:#111; }
+                body { background:#f0f0f0; padding:20px; }
+                .container { max-width:700px; margin:auto; background:#fff; border:4px solid #111; overflow:hidden; }
+                .header { background:#111; color:#fff; padding:20px; text-align:center; letter-spacing:1px; }
+                .header h1 { font-size:22px; }
+                .content { padding:24px; }
+                h2 { font-size:18px; color:#111; border-bottom:2px solid #111; margin-bottom:12px; }
+                .message { background:#eee; padding:16px; border:2px solid #111; white-space:pre-wrap; margin-bottom:16px; }
+                .attachments ul { list-style:none; padding-left:0; }
+                .attachments li { margin:4px 0; }
+                .footer { background:#111; color:#fff; text-align:center; padding:16px; font-size:12px; letter-spacing:1px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header"><h1>📨 Nova Mensagem de Contacto - XYZ Labs</h1></div>
+                <div class="content">
+                  <div class="info">
+                    <p><strong>Nome:</strong> ${name}</p>
+                    <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                    ${phone ? `<p><strong>Telefone:</strong> ${phone}</p>` : ''}
+                    <p><strong>Assunto:</strong> ${subjectText}</p>
+                  </div>
+                  <div class="message">
+                    <h2>Mensagem:</h2>
+                    <p>${message}</p>
+                  </div>
+                  ${files.length > 0 ? `
+                    <div class="attachments">
+                      <h2>Ficheiros Anexados:</h2>
+                      <ul>
+                        ${files.map(f => `<li>${f.originalname} (${(f.size/1024).toFixed(1)} KB)</li>`).join('')}
+                      </ul>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="footer">XYZ Labs • Impressão 3D Premium • Email gerado automaticamente</div>
+              </div>
+            </body>
+            </html>
+          `,
+          attachments
+        });
 
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-          
-          <p style="color: #666; font-size: 0.9em;">
-            <em>Enviado automaticamente através do formulário de contacto do site XYZ Labs</em>
-          </p>
-        </div>
-      `,
-      attachments: attachments
-    });
+        // Email de confirmação para o cliente
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'Recebemos a sua mensagem - XYZ Labs',
+          html: `
+            <!DOCTYPE html>
+            <html lang="pt">
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                body,p,h1,h2,div,ul,li{margin:0;padding:0;font-family:'Courier New',monospace;color:#111;}
+                body{background:#f0f0f0;padding:20px;}
+                .container{max-width:700px;margin:auto;background:#fff;border:4px solid #111;overflow:hidden;}
+                .header{background:#111;color:#fff;padding:20px;text-align:center;letter-spacing:1px;}
+                .header h1{font-size:22px;}
+                .content{padding:24px;}
+                .message{background:#eee;padding:16px;border:2px solid #111;white-space:pre-wrap;margin-bottom:16px;}
+                .footer{background:#111;color:#fff;text-align:center;padding:16px;font-size:12px;letter-spacing:1px;}
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header"><h1>✅ Recebemos a sua mensagem</h1></div>
+                <div class="content">
+                  <p>Olá ${name},</p>
+                  <p>Recebemos a sua mensagem e entraremos em contacto consigo em breve.</p>
+                  <div class="message">
+                    <h2>Resumo da sua mensagem:</h2>
+                    <p><strong>Assunto:</strong> ${subjectText}</p>
+                    <p>${message}</p>
+                  </div>
+                  <p>Para questões urgentes:</p>
+                  <ul>
+                    <li>📧 Email: info@xyzlabs.pt</li>
+                    <li>📱 Telefone: +351 935 310 984</li>
+                  </ul>
+                </div>
+                <div class="footer">XYZ Labs • Impressão 3D Premium • <a href="http://www.xyzlabs.pt" style="color:#fff;">www.xyzlabs.pt</a></div>
+              </div>
+            </body>
+            </html>
+          `
+        });
 
-    // Email de confirmação para o cliente
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Recebemos a sua mensagem - XYZ Labs',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #4CAF50;">Obrigado pelo seu contacto!</h2>
-          
-          <p>Olá ${name},</p>
-          
-          <p>Recebemos a sua mensagem e entraremos em contacto consigo em breve (normalmente em 24 horas úteis).</p>
-          
-          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3>Resumo da sua mensagem:</h3>
-            <p><strong>Assunto:</strong> ${subjectText}</p>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
-
-          <p>Se tiver alguma questão urgente, pode contactar-nos diretamente:</p>
-          <ul>
-            <li>📧 Email: info@xyzlabs.pt</li>
-            <li>📱 Telefone: +351 912 345 678</li>
-          </ul>
-
-          <p>Atentamente,<br>
-          <strong>Equipa XYZ Labs</strong></p>
-
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-          
-          <p style="color: #666; font-size: 0.9em; text-align: center;">
-            XYZ Labs - Impressão 3D Premium<br>
-            <a href="http://www.xyzlabs.pt">www.xyzlabs.pt</a>
-          </p>
-        </div>
-      `
-    });
-
-    res.json({
-      success: true,
-      message: 'Mensagem enviada com sucesso!'
-    });
+      } catch (err) {
+        console.error('Erro no envio de emails em background:', err);
+      } finally {
+        // Apagar ficheiros temporários
+        files.forEach(file => fs.unlink(file.path, () => {}));
+      }
+    })();
 
   } catch (err) {
     console.error('Erro ao enviar email de contacto:', err);
-    res.status(500).json({ error: 'Erro ao enviar mensagem' });
+    if (!res.headersSent) res.status(500).json({ error: 'Erro ao enviar mensagem' });
   }
 };

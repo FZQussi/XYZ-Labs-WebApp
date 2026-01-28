@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ - Perguntas Frequentes | XYZ Labs</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/Header.css">
+  <style>
+    /* FAQ Specific Styles */
+    .faq-page {
+      padding: var(--spacing-xxl) 0;
+      min-height: calc(100vh - 200px);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xxl);
+      padding-bottom: var(--spacing-lg);
+      border-bottom: var(--border-thicker);
+    }
+
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: var(--spacing-md);
+      color: var(--brutalist-black);
+      letter-spacing: -1px;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: var(--brutalist-gray);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xxl);
+    }
+
+    .category-btn {
+      padding: var(--spacing-lg);
+      background-color: var(--brutalist-white);
+      border: var(--border-thick);
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      letter-spacing: 1px;
+      box-shadow: var(--shadow-small);
+    }
+
+    .category-btn:hover,
+    .category-btn.active {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+      transform: translate(-3px, -3px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .faq-section {
+      margin-bottom: var(--spacing-xxl);
+    }
+
+    .faq-section h2 {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-md);
+      border-bottom: var(--border-thick);
+      color: var(--brutalist-black);
+    }
+
+    .faq-item {
+      background-color: var(--brutalist-white);
+      border: var(--border-thick);
+      margin-bottom: var(--spacing-lg);
+      box-shadow: var(--shadow-small);
+      transition: var(--transition-fast);
+    }
+
+    .faq-item:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: var(--spacing-lg);
+      background-color: var(--brutalist-white);
+      border: none;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-fast);
+      letter-spacing: 0.5px;
+    }
+
+    .faq-question:hover {
+      background-color: var(--bg-light);
+    }
+
+    .faq-question.active {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+    }
+
+    .faq-icon {
+      font-size: 1.5rem;
+      font-weight: 900;
+      transition: transform var(--transition-fast);
+    }
+
+    .faq-question.active .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      border-top: var(--border-thin);
+    }
+
+    .faq-answer.active {
+      max-height: 1000px;
+    }
+
+    .faq-answer-content {
+      padding: var(--spacing-lg);
+      line-height: 1.8;
+      color: var(--brutalist-gray-dark);
+    }
+
+    .faq-answer-content p {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .faq-answer-content ul {
+      margin-left: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .faq-answer-content li {
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .contact-cta {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+      border: var(--border-thicker);
+      padding: var(--spacing-xxl);
+      text-align: center;
+      margin-top: var(--spacing-xxl);
+    }
+
+    .contact-cta h3 {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .contact-cta p {
+      font-size: 1.1rem;
+      margin-bottom: var(--spacing-lg);
+      color: var(--brutalist-gray-light);
+    }
+
+    .btn-contact {
+      display: inline-block;
+      padding: var(--spacing-md) var(--spacing-xxl);
+      background-color: var(--brutalist-white);
+      color: var(--brutalist-black);
+      border: var(--border-thick);
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      letter-spacing: 1px;
+      text-decoration: none;
+    }
+
+    .btn-contact:hover {
+      background-color: var(--brutalist-black);
+      color: var(--brutalist-white);
+      border-color: var(--brutalist-white);
+      transform: translate(-3px, -3px);
+      box-shadow: 6px 6px 0 var(--brutalist-white);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-container">
+  <div class="header-left">
+    <div class="logo-container">
+      <a href="HomePage.html" class="logo-link">
+        <img src="/Frontend/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
+      </a>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header-nav" id="headerNav">
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="products.html">Produtos</a></li>
+        <li><a href="materials.html">Materiais</a></li>
+        <li><a href="colors.html">Cores</a></li>
+        <li><a href="about.html">Sobre</a></li>
+        <li><a href="contact.html">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="header-right">
+    <div class="header-search">
+      <span class="search-icon" id="searchBtn">
+        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
+
+    <div id="authButtons">
+      <button id="signInBtn" class="btn-secondary">Sign In</button>
+      <button id="signUpBtn" class="btn-primary">Sign Up</button>
+    </div>
+
+    <div id="userIcons" style="display:none; position: relative;">
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+
+      <div id="userDropdown" class="user-dropdown hidden">
+        <p class="dropdown-title" id="dropdownUserName"></p>
+        <ul id="dropdownLinks"></ul>
+      </div>
+
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>FAQ</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="faq-page">
+  <div class="container-narrow">
+    
+    <div class="page-header">
+      <h1>Perguntas Frequentes</h1>
+      <p>Encontre respostas rápidas para as questões mais comuns sobre os nossos serviços de impressão 3D</p>
+    </div>
+
+    <!-- FAQ SECTION: GERAL -->
+    <section class="faq-section">
+      <h2>📋 Geral</h2>
+      
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>O que é a XYZ Labs?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>A XYZ Labs é uma empresa especializada em impressão 3D de alta qualidade, oferecendo soluções personalizadas para projetos únicos. Utilizamos tecnologia de ponta e materiais premium para transformar as suas ideias em realidade.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Que tipo de produtos podem criar?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Produzimos uma vasta gama de produtos, incluindo:</p>
+            <ul>
+              <li>Protótipos funcionais</li>
+              <li>Peças de substituição</li>
+              <li>Produtos personalizados</li>
+              <li>Decoração e arte</li>
+              <li>Componentes industriais</li>
+              <li>Moldes e ferramentas</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Onde estão localizados?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>A nossa sede está localizada em Portugal. Realizamos entregas em todo o país e também para o estrangeiro mediante consulta.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION: ENCOMENDAS -->
+    <section class="faq-section">
+      <h2>🛒 Encomendas</h2>
+      
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Como posso fazer uma encomenda?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Pode fazer uma encomenda de três formas:</p>
+            <ul>
+              <li>Através da nossa loja online, escolhendo produtos disponíveis</li>
+              <li>Enviando o seu ficheiro 3D através do formulário de contacto</li>
+              <li>Contactando-nos diretamente por email ou telefone para projetos personalizados</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Que formatos de ficheiro aceitam?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Aceitamos os seguintes formatos de ficheiro 3D:</p>
+            <ul>
+              <li>STL (Standard Triangle Language)</li>
+              <li>OBJ (Wavefront Object)</li>
+              <li>3MF (3D Manufacturing Format)</li>
+              <li>STEP/STP (Standard for Exchange of Product Data)</li>
+            </ul>
+            <p>Se tiver outro formato, contacte-nos que tentaremos encontrar uma solução.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Qual é o prazo de entrega?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>O prazo de entrega varia consoante a complexidade do projeto:</p>
+            <ul>
+              <li>Produtos simples: 5-7 dias úteis</li>
+              <li>Produtos complexos: 10-15 dias úteis</li>
+              <li>Projetos personalizados: Mediante consulta</li>
+            </ul>
+            <p>Oferecemos também serviço expresso mediante disponibilidade.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Posso acompanhar o estado da minha encomenda?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Sim! Após fazer a encomenda, receberá atualizações por email em cada fase do processo. Pode também consultar o estado da sua encomenda na área de cliente do website.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION: MATERIAIS -->
+    <section class="faq-section">
+      <h2>🧪 Materiais e Qualidade</h2>
+      
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Que materiais utilizam?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Trabalhamos com diversos materiais de alta qualidade:</p>
+            <ul>
+              <li>PLA (Ácido Poliláctico) - Ecológico e versátil</li>
+              <li>ABS (Acrilonitrila Butadieno Estireno) - Resistente e durável</li>
+              <li>PETG - Forte e resistente a impactos</li>
+              <li>TPU - Flexível e elástico</li>
+              <li>Resina - Para acabamentos de alta precisão</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Como garantem a qualidade dos produtos?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Todos os nossos produtos passam por rigoroso controlo de qualidade:</p>
+            <ul>
+              <li>Verificação do ficheiro 3D antes da impressão</li>
+              <li>Monitorização constante durante a produção</li>
+              <li>Inspeção visual e dimensional após impressão</li>
+              <li>Acabamentos profissionais quando necessário</li>
+              <li>Embalamento seguro para transporte</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Posso escolher a cor do produto?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Sim! Oferecemos uma vasta gama de cores para a maioria dos materiais. Pode consultar as cores disponíveis na nossa página de materiais ou contactar-nos para cores especiais.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION: PAGAMENTOS E ENVIOS -->
+    <section class="faq-section">
+      <h2>💳 Pagamentos e Envios</h2>
+      
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Que métodos de pagamento aceitam?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Aceitamos os seguintes métodos de pagamento:</p>
+            <ul>
+              <li>Cartão de Crédito/Débito (Visa, Mastercard)</li>
+              <li>MB Way</li>
+              <li>Transferência Bancária</li>
+              <li>PayPal</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Quanto custa o envio?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Os custos de envio variam conforme o destino e peso do produto:</p>
+            <ul>
+              <li>Portugal Continental: A partir de €4.99</li>
+              <li>Ilhas: A partir de €8.99</li>
+              <li>União Europeia: A partir de €12.99</li>
+              <li>Resto do Mundo: Mediante consulta</li>
+            </ul>
+            <p>Envio grátis para encomendas superiores a €100 em Portugal Continental.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Fazem envios internacionais?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Sim, realizamos envios para todo o mundo. Os prazos e custos variam consoante o destino. Contacte-nos para um orçamento personalizado.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION: DEVOLUÇÕES -->
+    <section class="faq-section">
+      <h2>🔄 Devoluções e Garantias</h2>
+      
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Qual é a política de devolução?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Aceitamos devoluções em até 14 dias após a receção do produto, desde que:</p>
+            <ul>
+              <li>O produto esteja em perfeito estado</li>
+              <li>Mantenha a embalagem original</li>
+              <li>Não seja um produto personalizado</li>
+            </ul>
+            <p>Para produtos personalizados, apenas aceitamos devoluções em caso de defeito de fabrico.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>O que fazer se o produto chegar danificado?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Se o produto chegar danificado:</p>
+            <ul>
+              <li>Tire fotografias do produto e da embalagem</li>
+              <li>Contacte-nos em até 48 horas</li>
+              <li>Envie as fotografias por email</li>
+            </ul>
+            <p>Procederemos à substituição ou reembolso total do produto.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Oferecem garantia nos produtos?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <p>Todos os nossos produtos têm garantia de 30 dias contra defeitos de fabrico. Para produtos com uso específico, podemos oferecer garantias estendidas mediante consulta.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT CTA -->
+    <div class="contact-cta">
+      <h3>Não encontrou o que procurava?</h3>
+      <p>A nossa equipa está pronta para ajudar com qualquer questão adicional</p>
+      <a href="contact.html" class="btn-contact">Contacte-nos</a>
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>XYZ Labs</h3>
+        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Links Rápidos</h4>
+        <ul>
+          <li><a href="HomePage.html">Home</a></li>
+          <li><a href="products.html">Produtos</a></li>
+          <li><a href="about.html">Sobre</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Suporte</h4>
+        <ul>
+          <li><a href="FAQ.html">FAQ</a></li>
+          <li><a href="TC.html">Termos e Condições</a></li>
+          <li><a href="Privacy.html">Política de Privacidade</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p>📧 info@xyzlabs.pt</p>
+        <p>📞 +351 935310984</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/homePage.js"></script>
+<script>
+  // FAQ Accordion
+  document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+      const answer = button.nextElementSibling;
+      const isActive = button.classList.contains('active');
+      
+      // Close all other items
+      document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.classList.remove('active');
+        btn.nextElementSibling.classList.remove('active');
+      });
+      
+      // Toggle current item
+      if (!isActive) {
+        button.classList.add('active');
+        answer.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
