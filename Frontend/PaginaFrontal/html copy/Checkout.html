@@ -3,14 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XYZ Labs - Homepage</title>
-   <link rel="stylesheet" href="../css/base.css">
-   <link rel="stylesheet" href="../css/Header.css">
-   <link rel="stylesheet" href="../css/HomePage.css">
+  <title>Fazer Encomenda - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header-container">
   <div class="header-left">
     <div class="logo-container">
@@ -81,95 +78,104 @@
   </div>
 </header>
 
-<!-- Menu Lateral (User/Cart) -->
-<div id="sideMenu" class="side-menu">
-  <button class="closeBtn" id="closeMenu" aria-label="Fechar">×</button>
-  <div id="sideContent"></div>
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / 
+    <a href="products.html">Produtos</a> / 
+    <span>Encomenda</span>
+  </div>
 </div>
 
-<!-- Overlay para menu mobile -->
-<div class="overlay" id="overlay"></div>
-
-<!-- HERO / BANNER -->
-<section class="hero">
-  <img src="/Frontend/lib/images/Banner.webp" alt="Banner XYZ Labs">
-  <div class="hero-content">
-    <h1>Crie o seu produto 3D personalizado</h1>
-    <p>Explore materiais, cores e designs únicos. Transforme a sua ideia em realidade!</p>
+<main class="checkout-page">
+  <div class="container">
     
-    <div class="hero-buttons">
-      <button class="btn-hero" onclick="location.href='products.html'">
-        Explorar Produtos
-      </button>
+    <h1>📦 Finalizar Encomenda</h1>
 
-      <button class="btn-hero secondary" onclick="location.href='contact.html'">
-        Começar a Criar
-      </button>
-    </div>
-  </div>
-</section>
+    <div class="checkout-grid">
+      
+      <!-- Formulário de Contacto -->
+      <div class="checkout-form-section">
+        <h2>Os Seus Dados</h2>
+        
+        <form id="checkoutForm">
+          
+          <div class="form-group">
+            <label for="customerName">Nome Completo *</label>
+            <input type="text" id="customerName" required 
+                   placeholder="João Silva">
+          </div>
 
-<!-- CATEGORIAS SLIDER -->
-<section class="categories-slider">
-  <div class="container">
-    <h2>Explorar por Categoria</h2>
-    <div class="slider-wrapper" id="categoriesSlider">
-      <!-- Boxes das categorias serão carregadas via JS -->
-    </div>
-  </div>
-</section>
+          <div class="form-group">
+            <label for="customerEmail">Email *</label>
+            <input type="email" id="customerEmail" required 
+                   placeholder="joao@exemplo.pt">
+          </div>
 
+          <div class="form-group">
+            <label for="customerPhone">Telefone</label>
+            <input type="tel" id="customerPhone" 
+                   placeholder="+351 XXX XXX XXX">
+          </div>
 
-<!-- PRODUTOS EM DESTAQUE -->
-<section class="featured-products">
-  <div class="container">
-    <h2>Produtos em Destaque</h2>
-    <div class="products-grid" id="featuredProducts">
-      <!-- Produtos carregados via JavaScript -->
-      <div class="loading">A carregar produtos...</div>
-    </div>
-    <div class="view-all-container">
-      <a href="products.html" class="btn-view-all">Ver Todos os Produtos</a>
-    </div>
-  </div>
-</section>
+          <div class="form-group">
+            <label for="orderNotes">Notas do Pedido (opcional)</label>
+            <textarea id="orderNotes" rows="4" 
+                      placeholder="Especificações adicionais, cores personalizadas, prazos..."></textarea>
+          </div>
 
-<section class="process-3d">
-  <div class="container">
-    <h2>Do ficheiro ao objeto físico</h2>
-    <p class="process-subtitle">
-      Um processo claro, técnico e controlado do início ao fim.
-    </p>
+          <div class="form-notice">
+            <p>ℹ️ Após submeter, entraremos em contacto por email para confirmar detalhes e orçamento final.</p>
+          </div>
 
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="step-icon upload"></div>
-        <h3>Ficheiro</h3>
-        <p>Receção e validação do modelo 3D.</p>
+          <button type="submit" class="btn-submit-order" id="submitOrderBtn">
+            📧 Enviar Pedido
+          </button>
+
+        </form>
       </div>
 
-      <div class="process-step">
-        <div class="step-icon material"></div>
-        <h3>Material</h3>
-        <p>Seleção do material conforme a aplicação.</p>
+      <!-- Resumo da Encomenda -->
+      <div class="order-summary-section">
+        <h2>Resumo da Encomenda</h2>
+        
+        <div class="order-items" id="orderItems">
+          <!-- Carregado via JS -->
+        </div>
+
+        <div class="order-totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <strong id="orderSubtotal">€0.00</strong>
+          </div>
+          <div class="total-row total-final">
+            <span>Total Estimado:</span>
+            <strong id="orderTotal">€0.00</strong>
+          </div>
+          <p class="total-note">* Valor final confirmado por email</p>
+        </div>
+
+        <button class="btn-edit-cart" onclick="window.location.href='products.html'">
+          ✏️ Editar Carrinho
+        </button>
       </div>
 
-      <div class="process-step">
-        <div class="step-icon printing"></div>
-        <h3>Produção</h3>
-        <p>Impressão com controlo dimensional.</p>
-      </div>
-
-      <div class="process-step">
-        <div class="step-icon delivery"></div>
-        <h3>Peça final</h3>
-        <p>Acabamento e envio ao cliente.</p>
-      </div>
     </div>
+
   </div>
-</section>
+</main>
 
-
+<!-- Modal de Sucesso -->
+<div id="successModal" class="modal hidden">
+  <div class="modal-content success-modal">
+    <div class="success-icon">✅</div>
+    <h2>Pedido Enviado com Sucesso!</h2>
+    <p>Recebemos o seu pedido <strong>#<span id="orderNumber"></span></strong></p>
+    <p>Entraremos em contacto por email em breve para confirmar todos os detalhes.</p>
+    <button class="btn-primary" onclick="window.location.href='HomePage.html'">
+      Voltar à Homepage
+    </button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -213,8 +219,6 @@
 </footer>
 
 <script src="../scripts/cart.js"></script>
-<script src="../scripts/homePage.js"></script>
-<script src="../scripts/homepage-products.js"></script>
-<script src="../scripts/categories-slider.js"></script>
+<script src="../scripts/checkout.js"></script>
 </body>
 </html>

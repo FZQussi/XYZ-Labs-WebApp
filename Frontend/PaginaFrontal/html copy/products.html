@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XYZ Labs - Homepage</title>
-   <link rel="stylesheet" href="../css/base.css">
-   <link rel="stylesheet" href="../css/Header.css">
-   <link rel="stylesheet" href="../css/HomePage.css">
+  <title>Produtos - XYZ Labs</title>
+  <link rel="stylesheet" href="../css/Products.css">
+  <link rel="stylesheet" href="../css/Header.css">
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- HEADER (mesmo da homepage) -->
 <header class="header-container">
   <div class="header-left">
     <div class="logo-container">
@@ -80,96 +79,103 @@
 
   </div>
 </header>
-
-<!-- Menu Lateral (User/Cart) -->
 <div id="sideMenu" class="side-menu">
-  <button class="closeBtn" id="closeMenu" aria-label="Fechar">×</button>
+  <button class="closeBtn" id="closeMenu">×</button>
   <div id="sideContent"></div>
 </div>
 
-<!-- Overlay para menu mobile -->
 <div class="overlay" id="overlay"></div>
 
-<!-- HERO / BANNER -->
-<section class="hero">
-  <img src="/Frontend/lib/images/Banner.webp" alt="Banner XYZ Labs">
-  <div class="hero-content">
-    <h1>Crie o seu produto 3D personalizado</h1>
-    <p>Explore materiais, cores e designs únicos. Transforme a sua ideia em realidade!</p>
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <div class="container">
+    <a href="HomePage.html">Home</a> / <span>Produtos</span>
+  </div>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="products-page">
+  <div class="container">
     
-    <div class="hero-buttons">
-      <button class="btn-hero" onclick="location.href='products.html'">
-        Explorar Produtos
-      </button>
+    <!-- Filtros e Ordenação -->
+    <aside class="filters-sidebar" id="filtersSidebar">
+        <div class="filter-group">
+  <h4>Pesquisar</h4>
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Pesquisar produtos..."
+    class="filter-search"
+  >
+</div>
 
-      <button class="btn-hero secondary" onclick="location.href='contact.html'">
-        Começar a Criar
-      </button>
-    </div>
-  </div>
-</section>
-
-<!-- CATEGORIAS SLIDER -->
-<section class="categories-slider">
-  <div class="container">
-    <h2>Explorar por Categoria</h2>
-    <div class="slider-wrapper" id="categoriesSlider">
-      <!-- Boxes das categorias serão carregadas via JS -->
-    </div>
-  </div>
-</section>
-
-
-<!-- PRODUTOS EM DESTAQUE -->
-<section class="featured-products">
-  <div class="container">
-    <h2>Produtos em Destaque</h2>
-    <div class="products-grid" id="featuredProducts">
-      <!-- Produtos carregados via JavaScript -->
-      <div class="loading">A carregar produtos...</div>
-    </div>
-    <div class="view-all-container">
-      <a href="products.html" class="btn-view-all">Ver Todos os Produtos</a>
-    </div>
-  </div>
-</section>
-
-<section class="process-3d">
-  <div class="container">
-    <h2>Do ficheiro ao objeto físico</h2>
-    <p class="process-subtitle">
-      Um processo claro, técnico e controlado do início ao fim.
-    </p>
-
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="step-icon upload"></div>
-        <h3>Ficheiro</h3>
-        <p>Receção e validação do modelo 3D.</p>
+      <div class="filters-header">
+        <h3>Filtros</h3>
+        <button class="btn-clear-filters" id="clearFilters">Limpar</button>
       </div>
 
-      <div class="process-step">
-        <div class="step-icon material"></div>
-        <h3>Material</h3>
-        <p>Seleção do material conforme a aplicação.</p>
+      <!-- Categorias -->
+<div class="filter-group filter-collapsible">
+  <button class="filter-toggle" type="button">
+    <span>Categorias</span>
+    <span class="filter-arrow"></span>
+  </button>
+
+  <div id="categoryFilters" class="filter-options collapsed">
+    <!-- Categorias carregadas via JS -->
+    <!-- Cada categoria terá uma <div class="category-item"> com suas subcategorias -->
+  </div>
+</div>
+
+
+
+      <!-- Faixa de Preço -->
+      <div class="filter-group">
+        <h4>Preço</h4>
+        <div class="price-range">
+          <input type="number" id="minPrice" placeholder="Min" min="0">
+          <span>-</span>
+          <input type="number" id="maxPrice" placeholder="Max" min="0">
+        </div>
+      </div>
+    </aside>
+
+    <!-- Lista de Produtos -->
+    <div class="products-content">
+      
+      <!-- Toolbar -->
+      <div class="products-toolbar">
+        <div class="toolbar-left">
+          <button class="btn-toggle-filters" id="toggleFilters">
+            🔽 Filtros
+          </button>
+          <span class="products-count" id="productsCount">0 produtos</span>
+        </div>
+
+        <div class="toolbar-right">
+          <label for="sortBy">Ordenar:</label>
+          <select id="sortBy">
+            <option value="newest">Mais Recentes</option>
+            <option value="price-asc">Preço: Menor - Maior</option>
+            <option value="price-desc">Preço: Maior - Menor</option>
+            <option value="name">Nome (A-Z)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="process-step">
-        <div class="step-icon printing"></div>
-        <h3>Produção</h3>
-        <p>Impressão com controlo dimensional.</p>
+      <!-- Grid de Produtos -->
+      <div class="products-grid" id="productsGrid">
+        <div class="loading">A carregar produtos...</div>
       </div>
 
-      <div class="process-step">
-        <div class="step-icon delivery"></div>
-        <h3>Peça final</h3>
-        <p>Acabamento e envio ao cliente.</p>
+      <!-- Paginação -->
+      <div class="pagination" id="pagination">
+        <!-- Carregado via JS -->
       </div>
     </div>
+
   </div>
-</section>
-
-
+</main>
 
 <!-- FOOTER -->
 <footer class="footer">
@@ -212,9 +218,8 @@
   </div>
 </footer>
 
-<script src="../scripts/cart.js"></script>
 <script src="../scripts/homePage.js"></script>
-<script src="../scripts/homepage-products.js"></script>
-<script src="../scripts/categories-slider.js"></script>
+<script src="../scripts/cart.js"></script>
+<script src="../scripts/products-page.js"></script>
 </body>
 </html>
