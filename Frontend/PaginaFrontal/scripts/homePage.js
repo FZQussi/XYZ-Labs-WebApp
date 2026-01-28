@@ -171,3 +171,28 @@ document.addEventListener('DOMContentLoaded', () => {
     searchBtn.addEventListener('click', goToProductsSearch);
   }
 });
+document.addEventListener('DOMContentLoaded', () => {
+  const lastOrderId = sessionStorage.getItem('lastOrderId');
+  if (lastOrderId) {
+    // Mostra modal
+    showSuccessModal(lastOrderId);
+
+    // Limpa sessionStorage para não mostrar novamente
+    sessionStorage.removeItem('lastOrderId');
+  }
+});
+
+function showSuccessModal(orderId) {
+  const modal = document.getElementById('successModal');
+  const orderNumber = document.getElementById('orderNumber');
+
+  if (!modal || !orderNumber) return;
+
+  orderNumber.textContent = orderId;
+  modal.classList.remove('hidden');
+
+  // Fecha modal após 5 segundos
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 5000);
+}

@@ -1,5 +1,4 @@
 // Backend/email/orderEmailTemplate.js
-
 const orderEmailTemplate = ({
   customer_name,
   customer_email,
@@ -11,7 +10,7 @@ const orderEmailTemplate = ({
   notes,
   total_amount,
   items,
-  order_id // ✅ apenas use o nome do parâmetro
+  order_id
 }) => `
 <!DOCTYPE html>
 <html lang="pt">
@@ -38,7 +37,7 @@ const orderEmailTemplate = ({
 <body>
 <div class="container">
   <div class="header">
-    <h1>📦 Novo Pedido - XYZ Labs</h1>
+    <h1>📦 Resumo do Pedido - XYZ Labs</h1>
     <p style="margin:4px 0; font-size:14px; color:#f1f5f9;">
       Nº do Pedido: <strong>${order_id}</strong>
     </p>

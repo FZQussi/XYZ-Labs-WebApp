@@ -157,7 +157,7 @@ function setupForm() {
   const submitBtn = document.getElementById('submitOrderBtn');
 
   form.addEventListener('submit', async e => {
-    e.preventDefault();
+    e.preventDefault(); // previne reload
 
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
@@ -165,26 +165,18 @@ function setupForm() {
     const notes = document.getElementById('orderNotes').value.trim();
     const material = document.getElementById('materialSelect').value;
     const color = document.getElementById('colorSelect').value;
-
-    // ✅ Novos campos da morada
     const street = document.getElementById('addressStreet').value.trim();
     const postalCode = document.getElementById('addressPostalCode').value.trim();
     const city = document.getElementById('addressCity').value.trim();
     const country = document.getElementById('addressCountry').value;
 
-    // Validação
-    if (!name || !email || !phone) {
-      alert('Por favor, preencha os campos obrigatórios do cliente.');
+    if (!name || !email || !phone || !material || !color || !street || !postalCode || !city || !country) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-    if (!material || !color) {
-      alert('Por favor, selecione o material e a cor.');
-      return;
-    }
-    if (!street || !postalCode || !city || !country) {
-      alert('Por favor, preencha todos os campos de morada.');
-      return;
-    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'A enviar...';
 
     const orderData = {
       customer_name: name,
@@ -209,9 +201,6 @@ function setupForm() {
       }))
     };
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'A enviar...';
-
     try {
       const res = await fetch(`${API_BASE}/orders`, {
         method: 'POST',
@@ -220,10 +209,16 @@ function setupForm() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
 
+      // ✅ Mostrar modal com o número do pedido
       showSuccessModal(data.order_id);
+      
+      // ✅ Limpar carrinho após envio
       cart.clear();
+
+      // ✅ Atualiza botão
+      submitBtn.textContent = '✔ Pedido Enviado';
 
     } catch (err) {
       console.error(err);
@@ -233,6 +228,7 @@ function setupForm() {
     }
   });
 }
+
 
 
 // ===== COUNTRIES =====
