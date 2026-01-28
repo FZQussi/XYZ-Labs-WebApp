@@ -594,3 +594,14 @@
     height: 30px;
   }
 }
+.shipping-info {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-family: monospace;
+  color: #111;
+}
+
+.shipping-info.warning {
+  color: #555;
+}
+

@@ -1,3 +1,4 @@
+// Backend/controllers/orders.controller.js
 const nodemailer = require('nodemailer');
 const orderEmailTemplate = require('../email/orderEmailTemplate');
 
@@ -7,6 +8,10 @@ exports.createOrder = async (req, res) => {
       customer_name,
       customer_email,
       customer_phone,
+      address_street,
+      address_city,
+      address_postal,
+      address_country,
       notes,
       total_amount,
       items
@@ -34,15 +39,20 @@ exports.createOrder = async (req, res) => {
       customer_name,
       customer_email,
       customer_phone,
+      address_street,
+      address_city,
+      address_postal,
+      address_country,
       notes,
       total_amount,
       items
     });
 
+    // ✅ Admin recebe completo, cliente em CC
     await transporter.sendMail({
       from: `"XYZ Labs" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL,
-      cc: customer_email,
+      to: process.env.ADMIN_EMAIL, // Admin
+      cc: customer_email,          // Cliente
       subject: '📦 Novo Pedido Recebido',
       html
     });

@@ -1,13 +1,12 @@
 {
   "materials": [
-    { "id": "pla", "name": "PLA" },
-    { "id": "abs", "name": "ABS" },
-    { "id": "petg", "name": "PETG" }
+    { "id": "pla", "name": "PLA", "multiplier": 1 },
+    { "id": "petg", "name": "PETG", "multiplier": 1.15 },
+    { "id": "abs", "name": "ABS", "multiplier": 1.25 }
   ],
   "colors": [
-    { "id": "black", "name": "Preto" },
-    { "id": "white", "name": "Branco" },
-    { "id": "red", "name": "Vermelho" },
-    { "id": "blue", "name": "Azul" }
+    { "id": "white", "name": "Branco", "multiplier": 1 },
+    { "id": "black", "name": "Preto", "multiplier": 1 },
+    { "id": "gold", "name": "Dourado", "multiplier": 1.2 }
   ]
 }

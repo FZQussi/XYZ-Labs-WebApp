@@ -28,7 +28,7 @@
     <!-- Navegação -->
     <nav class="header-nav" id="headerNav">
       <ul>
-        <li><a href="HomePage.html" class="active">Home</a></li>
+        <li><a href="HomePage.html" >Home</a></li>
         <li><a href="products.html">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
         <li><a href="colors.html">Cores</a></li>
@@ -119,6 +119,44 @@
                    placeholder="+351 XXX XXX XXX">
           </div>
           <div class="form-group">
+            <!-- MORADA -->
+<div class="form-group">
+  <label for="addressStreet">Morada *</label>
+  <input 
+    type="text" 
+    id="addressStreet" 
+    required 
+    placeholder="Rua Exemplo, nº 123">
+</div>
+
+<div class="form-row">
+  <div class="form-group">
+    <label for="addressPostalCode">Código Postal *</label>
+    <input 
+      type="text" 
+      id="addressPostalCode" 
+      required 
+      placeholder="1234-567">
+  </div>
+
+  <div class="form-group">
+    <label for="addressCity">Localidade *</label>
+    <input 
+      type="text" 
+      id="addressCity" 
+      required 
+      placeholder="Lisboa">
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="addressCountry">País</label>
+  <select id="addressCountry" required>
+    <option value="">-- Selecionar país --</option>
+  </select>
+</div>
+
+
   <label for="materialSelect">Material *</label>
   <select id="materialSelect" required>
     <option value="">-- Escolher material --</option>
@@ -160,14 +198,19 @@
         <div class="order-totals">
           <div class="total-row">
             <span>Subtotal:</span>
+            
             <strong id="orderSubtotal">€0.00</strong>
           </div>
+          <p><strong>Material:</strong> <span id="summaryMaterial"></span></p>
+          <p><strong>Cor:</strong> <span id="summaryColor"></span></p>
           <div class="total-row total-final">
             <span>Total Estimado:</span>
             <strong id="orderTotal">€0.00</strong>
+            
           </div>  
-          <p><strong>Material:</strong> <span id="summaryMaterial"></span></p>
-          <p><strong>Cor:</strong> <span id="summaryColor"></span></p>
+          <p class="shipping-info" id="shippingInfo"></p>
+
+          
 
           <p class="total-note">* Valor final confirmado por email</p>
         </div>
@@ -238,5 +281,6 @@
 
 <script src="../scripts/cart.js"></script>
 <script src="../scripts/checkout.js"></script>
+<script src="../scripts/homePage.js"></script>
 </body>
 </html>

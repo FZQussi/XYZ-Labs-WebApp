@@ -1,6 +1,8 @@
-// Frontend/PaginaFrontal/scripts/checkout.js
-
 const API_BASE = 'http://localhost:3001';
+const FREE_SHIPPING_MIN = 50;
+
+let materialOptions = [];
+let colorOptions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!cart.items.length) {
@@ -10,32 +12,40 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loadOrderSummary();
-  setupForm();
   prefillUserData();
   loadOptions();
+  loadCountries();
+  setupForm();
 
-  // listeners seguros (DOM carregado)
   const materialSelect = document.getElementById('materialSelect');
   const colorSelect = document.getElementById('colorSelect');
 
   if (materialSelect && colorSelect) {
     materialSelect.addEventListener('change', e => {
-      const el = document.getElementById('summaryMaterial');
-      if (el) el.textContent = e.target.options[e.target.selectedIndex].text;
+      document.getElementById('summaryMaterial').textContent =
+        e.target.options[e.target.selectedIndex].text;
+
+      calculateFinalTotal();
     });
 
     colorSelect.addEventListener('change', e => {
-      const el = document.getElementById('summaryColor');
-      if (el) el.textContent = e.target.options[e.target.selectedIndex].text;
+      document.getElementById('summaryColor').textContent =
+        e.target.options[e.target.selectedIndex].text;
+
+      calculateFinalTotal();
     });
   }
 });
+
 
 // ===== LOAD OPTIONS =====
 async function loadOptions() {
   try {
     const res = await fetch('../data/options.json');
     const data = await res.json();
+
+    materialOptions = data.materials;
+    colorOptions = data.colors;
 
     const materialSelect = document.getElementById('materialSelect');
     const colorSelect = document.getElementById('colorSelect');
@@ -56,9 +66,10 @@ async function loadOptions() {
 
   } catch (err) {
     console.error('Erro ao carregar opções:', err);
-    alert('Erro ao carregar cores e materiais.');
+    alert('Erro ao carregar materiais e cores.');
   }
 }
+
 
 // ===== ORDER SUMMARY =====
 function loadOrderSummary() {
@@ -85,9 +96,53 @@ function loadOrderSummary() {
 
   document.getElementById('orderSubtotal').textContent = `€${subtotal.toFixed(2)}`;
   document.getElementById('orderTotal').textContent = `€${subtotal.toFixed(2)}`;
+
+  updateShippingInfo(subtotal);
 }
 
-// ===== PREFILL =====
+
+// ===== CALCULAR TOTAL FINAL =====
+function calculateFinalTotal() {
+  const materialId = document.getElementById('materialSelect').value;
+  const colorId = document.getElementById('colorSelect').value;
+
+  const baseSubtotal = cart.getTotal();
+
+  let materialMultiplier = 1;
+  let colorMultiplier = 1;
+
+  const material = materialOptions.find(m => m.id === materialId);
+  if (material) materialMultiplier = material.multiplier;
+
+  const color = colorOptions.find(c => c.id === colorId);
+  if (color) colorMultiplier = color.multiplier;
+
+  const finalTotal = baseSubtotal * materialMultiplier * colorMultiplier;
+
+  document.getElementById('orderTotal').textContent =
+    `€${finalTotal.toFixed(2)}`;
+
+  updateShippingInfo(finalTotal);
+}
+
+
+// ===== SHIPPING INFO =====
+function updateShippingInfo(total) {
+  const shippingInfo = document.getElementById('shippingInfo');
+
+  if (total >= FREE_SHIPPING_MIN) {
+    shippingInfo.textContent = 'Portes: 0€ (encomenda ≥ 50€)';
+    shippingInfo.classList.remove('warning');
+  } else {
+    const missing = (FREE_SHIPPING_MIN - total).toFixed(2);
+    shippingInfo.textContent =
+      `Portes: grátis a partir de 50€ (faltam ${missing}€)`;
+    shippingInfo.classList.add('warning');
+  }
+}
+
+
+// ===== PREFILL USER =====
 function prefillUserData() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -95,7 +150,8 @@ function prefillUserData() {
   if (user.email) document.getElementById('customerEmail').value = user.email;
 }
 
-// ===== FORM =====
+
+// ===== FORM SUBMIT =====
 function setupForm() {
   const form = document.getElementById('checkoutForm');
   const submitBtn = document.getElementById('submitOrderBtn');
@@ -110,28 +166,46 @@ function setupForm() {
     const material = document.getElementById('materialSelect').value;
     const color = document.getElementById('colorSelect').value;
 
+    // ✅ Novos campos da morada
+    const street = document.getElementById('addressStreet').value.trim();
+    const postalCode = document.getElementById('addressPostalCode').value.trim();
+    const city = document.getElementById('addressCity').value.trim();
+    const country = document.getElementById('addressCountry').value;
+
+    // Validação
     if (!name || !email || !phone) {
-      alert('Por favor, preencha os campos obrigatórios.');
+      alert('Por favor, preencha os campos obrigatórios do cliente.');
       return;
     }
-
     if (!material || !color) {
       alert('Por favor, selecione o material e a cor.');
+      return;
+    }
+    if (!street || !postalCode || !city || !country) {
+      alert('Por favor, preencha todos os campos de morada.');
       return;
     }
 
     const orderData = {
       customer_name: name,
       customer_email: email,
-      customer_phone: phone || null,
-      notes: notes || null,
+      customer_phone: phone,
+      notes,
       total_amount: cart.getTotal(),
+      address_street: street,
+      address_postal: postalCode,
+      address_city: city,
+      address_country: country,
       items: cart.items.map(item => ({
         product_id: item.id,
+        product_name: item.name,
+        product_image: item.image,
         quantity: item.quantity,
         price: item.price,
         material_id: material,
-        color_id: color
+        material_name: document.getElementById('materialSelect').selectedOptions[0].text,
+        color_id: color,
+        color_name: document.getElementById('colorSelect').selectedOptions[0].text
       }))
     };
 
@@ -146,7 +220,6 @@ function setupForm() {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       showSuccessModal(data.order_id);
@@ -160,6 +233,29 @@ function setupForm() {
     }
   });
 }
+
+
+// ===== COUNTRIES =====
+async function loadCountries() {
+  try {
+    const res = await fetch('../data/countries.json');
+    const countries = await res.json();
+
+    const countrySelect = document.getElementById('addressCountry');
+
+    countries.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country.code;
+      option.textContent = country.name;
+      if (country.code === 'PT') option.selected = true;
+      countrySelect.appendChild(option);
+    });
+
+  } catch (err) {
+    console.error('Erro ao carregar países:', err);
+  }
+}
+
 
 // ===== SUCCESS MODAL =====
 function showSuccessModal(orderId) {
