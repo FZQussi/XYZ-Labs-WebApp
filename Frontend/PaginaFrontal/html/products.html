@@ -99,47 +99,52 @@
   <div class="container">
     
     <!-- Filtros e Ordenação -->
-    <aside class="filters-sidebar" id="filtersSidebar">
-        <div class="filter-group">
-  <h4>Pesquisar</h4>
-  <input
-    type="text"
-    id="searchInput"
-    placeholder="Pesquisar produtos..."
-    class="filter-search"
-  >
-</div>
-
-      <div class="filters-header">
-        <h3>Filtros</h3>
-        <button class="btn-clear-filters" id="clearFilters">Limpar</button>
-      </div>
-
-      <!-- Categorias -->
-<div class="filter-group filter-collapsible">
-  <button class="filter-toggle" type="button">
-    <span>Categorias</span>
-    <span class="filter-arrow"></span>
-  </button>
-
-  <div id="categoryFilters" class="filter-options collapsed">
-    <!-- Categorias carregadas via JS -->
-    <!-- Cada categoria terá uma <div class="category-item"> com suas subcategorias -->
+   <aside class="filters-sidebar" id="filtersSidebar">
+  
+  <!-- PESQUISA -->
+  <div class="filter-group">
+    <h4>Pesquisar</h4>
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Pesquisar produtos..."
+      class="filter-search"
+    >
   </div>
-</div>
 
+  <!-- CABEÇALHO DOS FILTROS -->
+  <div class="filters-header">
+    <h3>Filtros</h3>
+    <button class="btn-clear-filters" id="clearFilters">Limpar</button>
+  </div>
 
+  <!-- CATEGORIAS -->
+  <div class="filter-group filter-collapsible">
+    <button class="filter-toggle" type="button">
+      <span>Categorias</span>
+      <span class="filter-arrow"></span>
+    </button>
 
-      <!-- Faixa de Preço -->
-      <div class="filter-group">
-        <h4>Preço</h4>
-        <div class="price-range">
-          <input type="number" id="minPrice" placeholder="Min" min="0">
-          <span>-</span>
-          <input type="number" id="maxPrice" placeholder="Max" min="0">
-        </div>
-      </div>
-    </aside>
+    <div id="categoryFilters" class="filter-options collapsed">
+      <!-- Categorias carregadas via JS -->
+    </div>
+  </div>
+
+  <!-- 🆕 FILTROS DE ATRIBUTOS DINÂMICOS -->
+  <div id="dynamicAttributeFilters">
+  
+  </div>
+
+  <!-- FAIXA DE PREÇO -->
+  <div class="filter-group">
+    <h4>Preço</h4>
+    <div class="price-range">
+      <input type="number" id="minPrice" placeholder="Min" min="0">
+      <span>-</span>
+      <input type="number" id="maxPrice" placeholder="Max" min="0">
+    </div>
+  </div>
+</aside>
 
     <!-- Lista de Produtos -->
     <div class="products-content">

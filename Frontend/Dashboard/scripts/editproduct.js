@@ -2,7 +2,8 @@
 (() => {
   const API_BASE = 'http://localhost:3001';
   const token = localStorage.getItem('token');
-
+  let currentProductAttributes = {};
+  let availableAttributes = [];
   // ===== ELEMENTOS MODAL =====
   const editModal = document.getElementById('editProductModal');
   const editForm = document.getElementById('editProductForm');
@@ -389,7 +390,205 @@
       replaceAllImagesBtn.classList.remove('btn-loading');
     }
   });
+  // ===== ADICIONAR NOVA FUNÇÃO =====
+async function loadAttributesForEdit(subcategoryId, productAttributes) {
+  const dynamicAttrsEdit = document.getElementById('dynamicAttributesEdit');
+  
+  if (!dynamicAttrsEdit) {
+    console.warn('Container dynamicAttributesEdit não encontrado');
+    return;
+  }
 
+  if (!subcategoryId) {
+    dynamicAttrsEdit.innerHTML = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/attributes/subcategory/${subcategoryId}`, {
+      headers: authHeaders()
+    });
+    availableAttributes = await res.json();
+
+    if (!availableAttributes.length) {
+      dynamicAttrsEdit.innerHTML = '<p style="color:#666;font-size:13px;margin-top:10px;">Nenhum atributo definido para esta subcategoria</p>';
+      return;
+    }
+
+    renderDynamicAttributesForEdit(productAttributes);
+
+  } catch (err) {
+    console.error('Erro ao carregar atributos:', err);
+    dynamicAttrsEdit.innerHTML = '<p style="color:red;">Erro ao carregar atributos</p>';
+  }
+}
+
+// ===== ADICIONAR NOVA FUNÇÃO =====
+function renderDynamicAttributesForEdit(productAttributes) {
+  const container = document.getElementById('dynamicAttributesEdit');
+  
+  container.innerHTML = '<h4 style="margin:20px 0 10px;font-size:14px;text-transform:uppercase;color:#374151;">Atributos do Produto</h4>';
+
+  availableAttributes.forEach(attr => {
+    const formGroup = document.createElement('div');
+    formGroup.className = 'form-group';
+
+    const label = document.createElement('label');
+    label.textContent = attr.attribute_name;
+    if (attr.is_required) {
+      label.innerHTML += ' <span style="color:red;">*</span>';
+    }
+    formGroup.appendChild(label);
+
+    let input;
+    let currentValue = productAttributes[attr.attribute_name]?.value || '';
+
+    if (attr.attribute_type === 'select') {
+      input = document.createElement('select');
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = '-- Seleciona --';
+      input.appendChild(defaultOption);
+
+      const options = JSON.parse(attr.attribute_options || '[]');
+      options.forEach(optValue => {
+        const option = document.createElement('option');
+        option.value = optValue;
+        option.textContent = optValue;
+        if (optValue === currentValue) {
+          option.selected = true;
+        }
+        input.appendChild(option);
+      });
+
+    } else if (attr.attribute_type === 'multiselect') {
+      input = document.createElement('select');
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.multiple = true;
+      input.required = attr.is_required;
+
+      const options = JSON.parse(attr.attribute_options || '[]');
+      const selectedValues = currentValue ? JSON.parse(currentValue) : [];
+
+      options.forEach(optValue => {
+        const option = document.createElement('option');
+        option.value = optValue;
+        option.textContent = optValue;
+        if (selectedValues.includes(optValue)) {
+          option.selected = true;
+        }
+        input.appendChild(option);
+      });
+
+    } else if (attr.attribute_type === 'number') {
+      input = document.createElement('input');
+      input.type = 'number';
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+      input.value = currentValue;
+
+    } else { // text
+      input = document.createElement('input');
+      input.type = 'text';
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+      input.value = currentValue;
+    }
+
+    formGroup.appendChild(input);
+    container.appendChild(formGroup);
+  });
+}
+
+// ===== ADICIONAR NOVA FUNÇÃO =====
+function collectAttributesForEdit() {
+  const attributes = {};
+
+  availableAttributes.forEach(attr => {
+    const input = document.getElementById(`attr-${attr.id}`);
+    if (input) {
+      if (input.multiple) {
+        const selected = Array.from(input.selectedOptions).map(opt => opt.value);
+        attributes[attr.id] = JSON.stringify(selected);
+      } else {
+        attributes[attr.id] = input.value;
+      }
+    }
+  });
+
+  return attributes;
+}
+
+// ===== ATUALIZAR A FUNÇÃO openEditProductModal =====
+document.addEventListener('openEditProductModal', async (e) => {
+  currentProduct = e.detail;
+
+  editId.value = currentProduct.id;
+  editProductName.textContent = currentProduct.name;
+  editName.value = currentProduct.name;
+  editPrice.value = currentProduct.price;
+  editDesc.value = currentProduct.description;
+  editStock.checked = currentProduct.stock === true;
+
+  // Categoria/Subcategoria
+  const subcat = subcategories.find(sc => sc.id == currentProduct.subcategory_id);
+  if (subcat) {
+    editCategorySelect.value = subcat.category_id;
+    updateSubcategories();
+    editSubcatSelect.value = subcat.id;
+
+    // ✅ NOVO: Carregar atributos
+    await loadAttributesForEdit(subcat.id, currentProduct.attributes || {});
+  } else {
+    editCategorySelect.value = '';
+    editSubcatSelect.innerHTML = '<option value="">-- Seleciona subcategoria --</option>';
+    document.getElementById('dynamicAttributesEdit').innerHTML = '';
+  }
+
+  // ... resto do código (modelo 3D, imagens, etc.)
+  
+  showModal();
+});
+
+// ===== ATUALIZAR O SUBMIT DO editForm =====
+editForm.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  // ✅ NOVO: Coletar atributos
+  const attributes = collectAttributesForEdit();
+
+  const formData = new FormData();
+  formData.append('name', editName.value);
+  formData.append('price', editPrice.value);
+  formData.append('description', editDesc.value);
+  formData.append('subcategory_id', editSubcatSelect.value || null);
+  formData.append('stock', editStock.checked);
+  formData.append('attributes', JSON.stringify(attributes)); // ✅ NOVO
+
+  try {
+    const res = await fetch(`${API_BASE}/products/${editId.value}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: formData
+    });
+    
+    if (!res.ok) throw new Error('Erro ao guardar alterações');
+    
+    console.log('✅ Produto atualizado com sucesso!');
+    hideModal();
+    window.reloadProducts();
+  } catch (err) {
+    console.error('Erro ao guardar alterações:', err);
+    alert('Erro ao guardar alterações');
+  }
+});
   // ===== DELETE PRODUCT =====
   deleteBtn.addEventListener('click', async () => {
     if (!confirm('⚠️ Tens a certeza que queres eliminar este produto?\n\nTodos os ficheiros (modelo 3D e imagens) serão permanentemente eliminados!')) return;

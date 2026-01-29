@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="../css/products.css">
 <link rel="stylesheet" href="../css/forms.css">
 <link rel="stylesheet" href="../css/modals.css">
+<link rel="stylesheet" href="../css/attributes.css">
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 </head>
@@ -19,6 +20,7 @@
     <h2>Admin</h2>
     <button data-tab="users">Utilizadores</button>
     <button data-tab="products">Produtos</button>
+    <button data-tab="attributes">Atributos</button>
     <button id="logoutBtn">Logout</button>
   </aside>
 
@@ -90,7 +92,111 @@
     </div>
   </div>
 </section>
+<section id="attributes" class="tab hidden">
+  <h2>Gestão de Atributos</h2>
+  
+  <p style="margin-bottom: 20px; color: #666;">
+    Define atributos personalizados para cada subcategoria. 
+    Exemplo: Toyota → {Ano, Modelo, Parte do Carro}
+  </p>
 
+  <div class="form-group">
+    <label>Seleciona a Subcategoria</label>
+    <select id="attributeSubcategorySelect" class="form-control">
+      <option value="">-- Seleciona Subcategoria --</option>
+    </select>
+  </div>
+
+  <button id="addAttributeBtn" class="primary-btn" disabled style="margin-bottom: 20px;">
+    + Novo Atributo
+  </button>
+
+  <div id="attributesContainer">
+    <p style="color:#666;padding:20px;text-align:center;">
+      Seleciona uma subcategoria para ver e gerir os atributos
+    </p>
+  </div>
+</section>
+
+
+<div id="attributeModal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close" data-close="attribute">&times;</span>
+    <h3 id="attributeModalTitle">Novo Atributo</h3>
+
+    <form id="attributeForm">
+      <input type="hidden" id="attributeId">
+
+      <div class="form-group">
+        <label>Nome do Atributo *</label>
+        <input 
+          type="text" 
+          id="attributeName" 
+          required 
+          placeholder="Ex: Ano, Marca, Modelo, Parte do Carro"
+        >
+        <small style="color:#666;">Nome do campo que será exibido no formulário</small>
+      </div>
+
+      <div class="form-group">
+        <label>Tipo de Campo *</label>
+        <select id="attributeType" required>
+          <option value="text">Texto Livre</option>
+          <option value="number">Número</option>
+          <option value="select">Lista (Seleção Única)</option>
+          <option value="multiselect">Múltipla Seleção</option>
+        </select>
+        <small style="color:#666;">Tipo de input que será usado</small>
+      </div>
+
+      <div id="optionsContainer" class="form-group" style="display:none;">
+        <label>Opções (uma por linha)</label>
+        <textarea 
+          id="attributeOptions" 
+          rows="6" 
+          placeholder="2020
+2021
+2022
+2023
+2024"
+        ></textarea>
+        <small style="color:#666;">
+          Digite uma opção por linha. Só necessário para "Lista" ou "Múltipla Seleção".
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label style="display:flex;align-items:center;">
+          <input type="checkbox" id="attributeRequired" style="width:auto;margin-right:10px;">
+          <span>Campo obrigatório</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Ordem de Exibição</label>
+        <input 
+          type="number" 
+          id="displayOrder" 
+          value="0" 
+          min="0"
+          placeholder="0"
+        >
+        <small style="color:#666;">
+          Ordem em que o atributo aparece no formulário (0 = primeiro)
+        </small>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px;">
+        <button type="submit" class="primary-btn">
+          💾 Guardar Atributo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="dynamicAttributesContainer" style="border-top:2px solid #e5e7eb;padding-top:20px;margin-top:20px;">
+  <!-- Os atributos dinâmicos aparecerão aqui automaticamente -->
+</div>
 <!-- ============ MODAL: CRIAR UTILIZADOR ============ -->
 <div id="createUserModal" class="modal hidden">
   <div class="modal-content">
@@ -363,7 +469,10 @@
       <div id="tab-edit-details" class="modal-tab-content active">
         <form id="editProductForm">
           <input type="hidden" id="editId">
-
+<!-- Na aba tab-edit-details, adicionar antes dos botões: -->
+<div id="dynamicAttributesEdit" style="border-top:2px solid #e5e7eb;padding-top:20px;margin-top:20px;">
+  <!-- Atributos dinâmicos aparecerão aqui -->
+</div>
           <div class="form-row">
             <div class="form-group">
               <label>Nome *</label>
@@ -602,5 +711,6 @@
   <script src="../scripts/createproduct.js"></script>
   <script src="../scripts/editproduct.js"></script>
     <script src="../scripts/viewproduct.js"></script>
+    <script src="../scripts/attributes-manager.js"></script>
 </body>
 </html>

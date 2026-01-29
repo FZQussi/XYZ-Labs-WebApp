@@ -194,4 +194,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-agora precisamos de averiguar os produtos eu quero que tenham uma categoria por exemplo auutomovel e depois dentro dessa categoria tenham uma subcategoria tipo marca e dentro dessa subcategoria pode ter um array de outras coisas tipo, ano, parte do carro. mas preciso de atualizar o meu back end para isso. e atualizar a pagina para criar o produto e a pagina para exibir os produtos

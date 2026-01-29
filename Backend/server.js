@@ -13,6 +13,7 @@
   const contactRoutes = require('./routes/contact.routes');
   const forgotRoutes = require('./routes/forgot.routes');
   const resetRoutes = require('./routes/reset.routes');
+  const attributesRoutes = require('./routes/attributes.routes');
   const app = express();
   const port = process.env.PORT || 3001;
 
@@ -67,6 +68,7 @@
   app.use('/users', userRoutes);
   app.use('/orders', orderRoutes);
   app.use('/contact', contactRoutes);
+  app.use('/attributes', attributesRoutes);
   // ===== ROTA TESTE =====
   app.get('/', (_, res) => {
     res.send('Backend a funcionar 🚀');

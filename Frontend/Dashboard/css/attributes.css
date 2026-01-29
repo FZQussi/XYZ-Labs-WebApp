@@ -1,0 +1,168 @@
+/* Frontend/Dashboard/css/attributes.css */
+
+/* ===== ATTRIBUTES MANAGER ===== */
+#attributeSubcategorySelect {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+#addAttributeBtn {
+  margin-bottom: 20px;
+}
+
+#addAttributeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== ATTRIBUTES CONTAINER ===== */
+#attributesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.attribute-item {
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.attribute-item:hover {
+  border-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.attribute-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.attribute-type {
+  display: inline-block;
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+.required-badge {
+  display: inline-block;
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.attribute-info .options {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.attribute-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-attr-btn,
+.delete-attr-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-attr-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.edit-attr-btn:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.delete-attr-btn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.delete-attr-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* ===== OPTIONS CONTAINER ===== */
+#optionsContainer {
+  margin-top: 10px;
+}
+
+#attributeOptions {
+  min-height: 100px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+
+/* ===== DYNAMIC ATTRIBUTES (CREATE/EDIT PRODUCT) ===== */
+#dynamicAttributesContainer {
+  border-top: 2px solid #e5e7eb;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+#dynamicAttributesContainer h4 {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+}
+
+#dynamicAttributesContainer .form-group {
+  margin-bottom: 15px;
+}
+
+#dynamicAttributesContainer select[multiple] {
+  min-height: 120px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .attribute-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .attribute-actions {
+    width: 100%;
+    margin-top: 10px;
+    justify-content: flex-start;
+  }
+
+  .edit-attr-btn,
+  .delete-attr-btn {
+    flex: 1;
+  }
+}

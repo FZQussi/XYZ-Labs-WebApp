@@ -594,3 +594,302 @@
     font-size: 12px;
   }
 }
+
+
+
+
+/* ==========================================
+   PRODUCTS-ATTRIBUTES.CSS - Estilos para Atributos Dinâmicos
+   Adicionar ao products.css ou criar ficheiro separado
+   ========================================== */
+
+/* ===== ATRIBUTOS NO CARD DE PRODUTO ===== */
+.product-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+  min-height: 30px;
+}
+
+.attribute-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: var(--bg-light);
+  border: var(--border-thin);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-radius: 3px;
+  color: var(--brutalist-black);
+  white-space: nowrap;
+}
+
+.product-card:hover .attribute-badge {
+  background-color: var(--brutalist-white);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+/* ===== FILTROS DE ATRIBUTOS DINÂMICOS ===== */
+#dynamicAttributeFilters {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: var(--border-thin);
+}
+
+/* Ajustes para filtros collapsible de atributos */
+.filter-collapsible {
+  margin-bottom: var(--spacing-md);
+}
+
+.filter-collapsible .filter-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: var(--spacing-sm) 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--brutalist-black);
+  transition: var(--transition-fast);
+}
+
+.filter-collapsible .filter-toggle:hover {
+  color: var(--brutalist-gray);
+}
+
+.filter-collapsible .filter-arrow {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--brutalist-black);
+  border-bottom: 2px solid var(--brutalist-black);
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+
+.filter-collapsible.open .filter-arrow {
+  transform: rotate(-135deg);
+}
+
+.filter-collapsible .filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+  padding-left: var(--spacing-sm);
+}
+
+.filter-collapsible .filter-options.collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.filter-collapsible .filter-options.open {
+  max-height: 500px;
+  opacity: 1;
+  pointer-events: auto;
+  padding-top: var(--spacing-xs);
+}
+
+/* ===== BADGES DE FILTROS ATIVOS ===== */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--bg-light);
+  border: var(--border-thin);
+  border-radius: 6px;
+}
+
+.active-filters:empty {
+  display: none;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--brutalist-black);
+  color: var(--brutalist-white);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filter-tag:hover {
+  background-color: var(--brutalist-gray-dark);
+  transform: translateY(-1px);
+}
+
+.filter-tag-remove {
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* ===== CONTADOR DE FILTROS ATIVOS ===== */
+.filter-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-count {
+  background-color: var(--brutalist-black);
+  color: var(--brutalist-white);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ===== LOADING STATE PARA FILTROS ===== */
+.filters-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--brutalist-gray);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.filters-loading::after {
+  content: '...';
+  animation: dots 1s infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* ===== EMPTY STATE ===== */
+.no-filters-available {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--brutalist-gray);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ===== HIGHLIGHT PARA PESQUISA ===== */
+.search-highlight {
+  background-color: rgba(255, 255, 0, 0.3);
+  padding: 2px 4px;
+  font-weight: 700;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .product-attributes {
+    gap: 4px;
+  }
+  
+  .attribute-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  #dynamicAttributeFilters {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+  }
+  
+  .product-attributes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .attribute-badge {
+    font-size: 11px;
+  }
+  
+  .filter-collapsible .filter-options.open {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .active-filters {
+    padding: var(--spacing-sm);
+  }
+  
+  .filter-tag {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-options.open {
+  animation: slideDown 0.3s ease;
+}
+
+/* ===== ESTILO PARA CHECKBOXES CHECKED ===== */
+.filter-checkbox input[type="checkbox"]:checked ~ span {
+  font-weight: 700;
+  color: var(--brutalist-black);
+}
+
+.filter-checkbox input[type="checkbox"]:checked::after {
+  background-color: var(--brutalist-black);
+  border-color: var(--brutalist-black);
+}
+
+/* ===== SCROLL SUAVE PARA LISTAS LONGAS ===== */
+.filter-options {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brutalist-black) var(--bg-light);
+}
+
+.filter-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-options::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+.filter-options::-webkit-scrollbar-thumb {
+  background: var(--brutalist-black);
+  border-radius: 3px;
+}
+
+.filter-options::-webkit-scrollbar-thumb:hover {
+  background: var(--brutalist-gray-dark);
+}
