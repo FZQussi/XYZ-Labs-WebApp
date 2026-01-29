@@ -42,7 +42,7 @@ exports.sendContactMessage = async (req, res) => {
 
         // Email para admin
         await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+          from: `"XYZ Labs" <${process.env.EMAIL_USER}>`,
           to: process.env.ADMIN_EMAIL,
           subject: `📧 Novo Contacto: ${subjectText} - ${name}`,
           html: `
@@ -97,7 +97,7 @@ exports.sendContactMessage = async (req, res) => {
 
         // Email de confirmação para o cliente
         await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+           from: `"XYZ Labs" <${process.env.EMAIL_USER}>`,
           to: email,
           subject: 'Recebemos a sua mensagem - XYZ Labs',
           html: `

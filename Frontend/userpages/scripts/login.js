@@ -112,64 +112,76 @@ class ModernBrutalistLoginForm {
         });
     }
 
-  async handleSubmit(e) {
-    e.preventDefault();
+    async handleSubmit(e) {
+        e.preventDefault();
 
-    const emailValid = this.validateEmail();
-    const passwordValid = this.validatePassword();
-    if (!emailValid || !passwordValid) return;
+        const emailValid = this.validateEmail();
+        const passwordValid = this.validatePassword();
+        if (!emailValid || !passwordValid) return;
 
-    this.setLoading(true);
+        this.setLoading(true);
 
-    try {
-        const res = await fetch(API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                identifier: this.emailInput.value.trim(),
-                password: this.passwordInput.value
-            })
-        });
+        try {
+            const res = await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    identifier: this.emailInput.value.trim(),
+                    password: this.passwordInput.value
+                })
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        // 🔹 Coloca o log aqui para inspecionar o user
-        console.log('User retornado do login:', data.user);
+            // 🔹 Log para inspecionar o user
+            console.log('User retornado do login:', data.user);
 
-        if (!res.ok) {
-            this.showError('password', data.error || 'Erro ao iniciar sessão');
-            return;
+            if (!res.ok) {
+                this.showError('password', data.error || 'Erro ao iniciar sessão');
+                return;
+            }
+
+            // Guardar sessão
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Sucesso visual
+            this.showSuccess();
+
+            // Redirecionar
+            setTimeout(() => {
+                window.location.href = '../../PaginaFrontal/html/HomePage.html';
+            }, 2500);
+
+        } catch (err) {
+            console.error(err);
+            this.showError('password', 'Erro no servidor');
+        } finally {
+            this.setLoading(false);
         }
-
-        // Guardar sessão
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Sucesso visual
-        this.showSuccess();
-
-        // Redirecionar
-        setTimeout(() => {
-            window.location.href = '../../PaginaFrontal/html/HomePage.html';
-        }, 2500);
-
-    } catch (err) {
-        console.error(err);
-        this.showError('password', 'Erro no servidor');
-    } finally {
-        this.setLoading(false);
     }
-}
-
 
     showSuccess() {
+        // Esconder o formulário com animação
         this.form.style.opacity = '0';
         this.form.style.transform = 'scale(0.95)';
 
         setTimeout(() => {
             this.form.style.display = 'none';
-            document.querySelector('.social-login').style.display = 'none';
-            document.querySelector('.signup-link').style.display = 'none';
+            
+            // Esconder a secção de divider se existir
+            const divider = document.querySelector('.divider');
+            if (divider) {
+                divider.style.display = 'none';
+            }
+            
+            // Esconder o signup link
+            const signupLink = document.querySelector('.signup-link');
+            if (signupLink) {
+                signupLink.style.display = 'none';
+            }
+            
+            // Mostrar mensagem de sucesso
             this.successMessage.classList.add('show');
         }, 300);
     }
@@ -179,3 +191,7 @@ class ModernBrutalistLoginForm {
 document.addEventListener('DOMContentLoaded', () => {
     new ModernBrutalistLoginForm();
 });
+
+
+
+agora precisamos de averiguar os produtos eu quero que tenham uma categoria por exemplo auutomovel e depois dentro dessa categoria tenham uma subcategoria tipo marca e dentro dessa subcategoria pode ter um array de outras coisas tipo, ano, parte do carro. mas preciso de atualizar o meu back end para isso. e atualizar a pagina para criar o produto e a pagina para exibir os produtos
