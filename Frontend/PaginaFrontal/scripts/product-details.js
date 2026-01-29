@@ -63,13 +63,11 @@ function renderProduct() {
 
   console.log('A renderizar produto:', currentProduct.name);
 
-  // Breadcrumb
+  // ===== Breadcrumb =====
   const breadcrumb = document.getElementById('breadcrumbProduct');
-  if (breadcrumb) {
-    breadcrumb.textContent = currentProduct.name;
-  }
+  if (breadcrumb) breadcrumb.textContent = currentProduct.name;
 
-  // Informações básicas
+  // ===== Informações básicas =====
   const nameEl = document.getElementById('productName');
   const priceEl = document.getElementById('productPrice');
   const descEl = document.getElementById('productDescription');
@@ -78,9 +76,10 @@ function renderProduct() {
   if (priceEl) priceEl.textContent = Number(currentProduct.price).toFixed(2);
   if (descEl) descEl.textContent = currentProduct.description || 'Sem descrição disponível';
 
-  // Categoria e Stock
+  // ===== Categoria e Stock =====
   const categoryEl = document.getElementById('productCategory');
   const stockEl = document.getElementById('productStock');
+  const inStock = !!currentProduct.stock;
 
   if (categoryEl) {
     if (currentProduct.category_name) {
@@ -91,19 +90,17 @@ function renderProduct() {
     }
   }
 
-  const inStock = !!currentProduct.stock;
- if (stockEl) {
-  stockEl.textContent = inStock ? 'Disponível' : 'Esgotado';
-  stockEl.style.color = inStock ? 'green' : 'red';
-  stockEl.classList.toggle('out-of-stock', !inStock);
-}
+  if (stockEl) {
+    stockEl.textContent = inStock ? 'Disponível' : 'Esgotado';
+    stockEl.style.color = inStock ? 'green' : 'red';
+    stockEl.classList.toggle('out-of-stock', !inStock);
+  }
 
-  // Desabilitar botão se sem stock
+  // ===== Botão adicionar ao carrinho =====
   const addBtn = document.getElementById('addToCartBtn');
-  if (addBtn) {
-  addBtn.disabled = !inStock;
-}
-  // Especificações
+  if (addBtn) addBtn.disabled = !inStock;
+
+  // ===== Especificações =====
   const specMaterial = document.getElementById('specMaterial');
   const specCategory = document.getElementById('specCategory');
   const specStock = document.getElementById('specStock');
@@ -111,45 +108,51 @@ function renderProduct() {
   if (specMaterial) specMaterial.textContent = currentProduct.material || 'PLA';
   if (specCategory) specCategory.textContent = currentProduct.category_name || 'Geral';
   if (specStock) {
-  specStock.textContent = inStock ? 'Disponível' : 'Esgotado';
-  specStock.style.color = inStock ? 'green' : 'red';
-}
+    specStock.textContent = inStock ? 'Disponível' : 'Esgotado';
+    specStock.style.color = inStock ? 'green' : 'red';
+  }
 
-  // Configurar galeria
+  // ===== Galeria =====
   setupGallery();
 
-  // Configurar modelo 3D
+  // ===== Modelo 3D =====
   const open3DBtn = document.getElementById('open3DBtn');
-if (currentProduct.model_file) {
-  const modelViewer = document.getElementById('model3D');
-  if (modelViewer) {
-    modelViewer.src = `${API_BASE}/models/${currentProduct.model_file}`;
+  if (currentProduct.model_file) {
+    const modelViewer = document.getElementById('model3D');
+    if (modelViewer) {
+      modelViewer.src = `${API_BASE}/models/${currentProduct.model_file}`;
 
-    // ⚡ Aqui alteramos a cor do modelo para azul bebê
-    modelViewer.addEventListener('load', () => {
-      const model = modelViewer.model; // acessa o THREE.Group interno
-      model.traverse((node) => {
-        if (node.isMesh && node.material) {
-          node.material.color.set('#89CFF0'); // azul bebê
+      // ⚡ Alterar cor do modelo de forma confiável
+      modelViewer.addEventListener('load', () => {
+        const model = modelViewer.model; // THREE.Group interno
+        if (!model) {
+          console.warn('Modelo 3D não carregou ainda.');
+          return;
         }
+
+        // Percorrer todos os meshes e mudar cor
+        model.scene.traverse((node) => {
+          if (node.isMesh && node.material) {
+            // Remove textura se quiser cor sólida
+            if (node.material.map) node.material.map = null;
+
+            node.material.color.set('#60a5c5'); // azul bebê
+            node.material.needsUpdate = true;
+          }
+        });
       });
-    });
+    }
+
+    const modalTitle = document.getElementById('modal3DTitle');
+    if (modalTitle) modalTitle.textContent = `Modelo 3D: ${currentProduct.name}`;
+  } else {
+    if (open3DBtn) open3DBtn.style.display = 'none';
   }
 
-  const modalTitle = document.getElementById('modal3DTitle');
-  if (modalTitle) {
-    modalTitle.textContent = `Modelo 3D: ${currentProduct.name}`;
-  }
-} else {
-  if (open3DBtn) {
-    open3DBtn.style.display = 'none';
-  }
-}
-
-
-  // Atualizar título da página
+  // ===== Título da página =====
   document.title = `${currentProduct.name} - XYZ Labs`;
 }
+
 
 // ===== CONFIGURAR GALERIA =====
 function setupGallery() {
