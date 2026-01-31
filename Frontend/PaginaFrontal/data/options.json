@@ -9,17 +9,20 @@
     "gradient": "linear-gradient(135deg, #81c784, #4caf50)",
     "image": "images/PLABasic.webp",
     "description": "Material ecológico e fácil de imprimir, ideal para a maioria dos projetos.",
+    "multiplier": 1,
     "properties": {
       "Resistência": 60,
       "Flexibilidade": 30,
       "Durabilidade": 50
     },
+    
     "specs": [
       "Temperatura: 190-220°C",
       "Biodegradável",
       "€20-25/kg",
       "Ideal para: Protótipos, decoração, objetos do dia-a-dia"
     ]
+    
   },
   {
     "id": "abs",
@@ -29,6 +32,7 @@
     "gradient": "linear-gradient(135deg, #64b5f6, #2196f3)",
     "image": "images/ABS.webp",
     "description": "Material forte e durável, resistente a altas temperaturas e impactos.",
+    "multiplier": 1.3,
     "properties": {
       "Resistência": 85,
       "Flexibilidade": 40,
@@ -49,6 +53,7 @@
     "gradient": "linear-gradient(135deg, #ba68c8, #9c27b0)",
     "image": "images/PETG.webp",
     "description": "Combina o melhor do PLA e ABS: fácil de imprimir e muito resistente.",
+    "multiplier": 1.2,
     "properties": {
       "Resistência": 80,
       "Flexibilidade": 55,

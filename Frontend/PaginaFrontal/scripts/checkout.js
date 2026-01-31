@@ -3,7 +3,6 @@ const FREE_SHIPPING_MIN = 50;
 
 let materialOptions = [];
 let colorOptions = [];
-
 document.addEventListener('DOMContentLoaded', () => {
   if (!cart.items.length) {
     alert('O seu carrinho está vazio!');
@@ -21,22 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const colorSelect = document.getElementById('colorSelect');
 
   if (materialSelect && colorSelect) {
+    // Quando muda o material
     materialSelect.addEventListener('change', e => {
+      const selectedMaterial = e.target.value;
+
+      // Atualizar resumo do material
       document.getElementById('summaryMaterial').textContent =
-        e.target.options[e.target.selectedIndex].text;
+        e.target.selectedOptions[0].text;
+
+      // Atualizar opções de cores disponíveis
+      updateColorOptions(selectedMaterial);
 
       calculateFinalTotal();
     });
 
+    // Quando muda a cor
     colorSelect.addEventListener('change', e => {
       document.getElementById('summaryColor').textContent =
-        e.target.options[e.target.selectedIndex].text;
+        e.target.selectedOptions[0].text;
 
       calculateFinalTotal();
     });
   }
 });
-
 
 // ===== LOAD OPTIONS =====
 async function loadOptions() {
@@ -50,6 +56,7 @@ async function loadOptions() {
     const materialSelect = document.getElementById('materialSelect');
     const colorSelect = document.getElementById('colorSelect');
 
+    // Popular materiais
     data.materials.forEach(m => {
       const option = document.createElement('option');
       option.value = m.id;
@@ -57,16 +64,45 @@ async function loadOptions() {
       materialSelect.appendChild(option);
     });
 
-    data.colors.forEach(c => {
-      const option = document.createElement('option');
-      option.value = c.id;
-      option.textContent = c.name;
-      colorSelect.appendChild(option);
-    });
+    // Opcional: selecionar automaticamente o primeiro material
+    if (materialOptions.length > 0) {
+      materialSelect.value = materialOptions[0].id;
+      document.getElementById('summaryMaterial').textContent = materialOptions[0].name;
+
+      // Atualizar cores para o primeiro material
+      updateColorOptions(materialOptions[0].id);
+    }
 
   } catch (err) {
     console.error('Erro ao carregar opções:', err);
     alert('Erro ao carregar materiais e cores.');
+  }
+}
+
+// ===== ATUALIZAR CORES DISPONÍVEIS =====
+function updateColorOptions(materialId) {
+  const colorSelect = document.getElementById('colorSelect');
+  if (!colorSelect) return;
+
+  // Limpar opções anteriores
+  colorSelect.innerHTML = '<option value="">-- Escolher cor --</option>';
+
+  // Filtrar cores disponíveis para o material selecionado
+  const filteredColors = colorOptions.filter(c => c.material === materialId);
+
+  filteredColors.forEach(c => {
+    const option = document.createElement('option');
+    option.value = c.id;
+    option.textContent = c.name;
+    colorSelect.appendChild(option);
+  });
+
+  // Selecionar automaticamente a primeira cor disponível
+  if (filteredColors.length > 0) {
+    colorSelect.value = filteredColors[0].id;
+    document.getElementById('summaryColor').textContent = filteredColors[0].name;
+  } else {
+    document.getElementById('summaryColor').textContent = '--';
   }
 }
 
