@@ -85,4 +85,5 @@
     console.log(`✅ Servidor a correr em http://localhost:${port}`);
     console.log(`✅ CORS configurado para múltiplas origens`);
     console.log(`✅ CORS configurado para múltiplas origens`);
+    console.log(`✅ CORS configurado para múltiplas origens`);
   });
