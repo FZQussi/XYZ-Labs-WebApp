@@ -1,4 +1,4 @@
-// Backend/controllers/products.controller.js - ATUALIZADO PARA MÚLTIPLAS CATEGORIAS
+// Backend/controllers/products.controller.js (ATUALIZADO)
 const client = require('../db');
 const fs = require('fs');
 const path = require('path');
@@ -16,34 +16,24 @@ function deleteFile(filename, folder = 'images') {
   }
 }
 
-// ===== GET ALL PRODUCTS (com múltiplas categorias e atributos) =====
+// ===== GET ALL PRODUCTS (com atributos) =====
 exports.getProducts = async (req, res) => {
   try {
     const result = await client.query(`
       SELECT
         p.*,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object(
-              'id', c.id,
-              'name', c.name,
-              'is_primary', pc.is_primary
-            )
-          ) FILTER (WHERE c.id IS NOT NULL),
-          '[]'
-        ) as categories
+        sc.name AS subcategory_name,
+        c.name AS category_name
       FROM products p
-      LEFT JOIN product_categories pc ON pc.product_id = p.id
-      LEFT JOIN categories c ON c.id = pc.category_id
+      LEFT JOIN subcategories sc ON sc.id = p.subcategory_id
+      LEFT JOIN categories c ON c.id = sc.category_id
       WHERE p.is_active = true
-      GROUP BY p.id
       ORDER BY p.created_at DESC
     `);
 
     // Buscar atributos de cada produto
-    const productsWithData = await Promise.all(
+    const productsWithAttributes = await Promise.all(
       result.rows.map(async (product) => {
-        // Atributos
         const attributesResult = await client.query(`
           SELECT 
             pa.attribute_value,
@@ -67,19 +57,24 @@ exports.getProducts = async (req, res) => {
       })
     );
 
-    res.json(productsWithData);
+    res.json(productsWithAttributes);
   } catch (err) {
     console.error('Erro ao obter produtos:', err);
     res.status(500).json({ error: 'Erro ao obter produtos' });
   }
 };
 
-// ===== GET PRODUCT BY ID (com categorias e atributos) =====
+// ===== GET PRODUCT BY ID (com atributos) =====
 exports.getProductById = async (req, res) => {
   try {
     const result = await client.query(`
-      SELECT p.*
+      SELECT
+        p.*,
+        sc.name AS subcategory_name,
+        c.name AS category_name
       FROM products p
+      LEFT JOIN subcategories sc ON sc.id = p.subcategory_id
+      LEFT JOIN categories c ON c.id = sc.category_id
       WHERE p.id = $1
     `, [req.params.id]);
 
@@ -88,19 +83,6 @@ exports.getProductById = async (req, res) => {
     }
 
     const product = result.rows[0];
-
-    // Buscar categorias
-    const categoriesResult = await client.query(`
-      SELECT 
-        c.id,
-        c.name,
-        c.slug,
-        pc.is_primary
-      FROM product_categories pc
-      JOIN categories c ON c.id = pc.category_id
-      WHERE pc.product_id = $1
-      ORDER BY pc.is_primary DESC, c.name
-    `, [product.id]);
 
     // Buscar atributos
     const attributesResult = await client.query(`
@@ -126,7 +108,6 @@ exports.getProductById = async (req, res) => {
 
     res.json({
       ...product,
-      categories: categoriesResult.rows,
       attributes
     });
   } catch (err) {
@@ -135,57 +116,40 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// ===== CREATE PRODUCT (com múltiplas categorias e atributos) =====
+// ===== CREATE PRODUCT (com atributos) =====
 exports.createProduct = async (req, res) => {
   const dbClient = await client.connect();
   
   try {
     await dbClient.query('BEGIN');
 
-    const { name, description, price, category_ids, primary_category_id, attributes } = req.body;
+    const { name, description, price, subcategory_id, attributes } = req.body;
     const model_file = req.file?.filename || null;
     const stock = req.body.stock === 'true' || req.body.stock === true;
 
-    // Validar que pelo menos uma categoria foi selecionada
-    let categoryIdsArray = [];
-    if (category_ids) {
-      categoryIdsArray = typeof category_ids === 'string' 
-        ? JSON.parse(category_ids) 
-        : category_ids;
-    }
+    let category_id = null;
 
-    if (!categoryIdsArray.length) {
-      throw new Error('Pelo menos uma categoria deve ser selecionada');
-    }
-
-    // Se primary_category_id não foi fornecido, usar a primeira categoria
-    const primaryCategoryId = primary_category_id || categoryIdsArray[0];
-
-    // Validar que a categoria primária está na lista de categorias
-    if (!categoryIdsArray.includes(parseInt(primaryCategoryId))) {
-      throw new Error('A categoria primária deve estar na lista de categorias selecionadas');
+    // Obter category_id a partir da subcategoria
+    if (subcategory_id) {
+      const catResult = await dbClient.query(
+        'SELECT category_id FROM subcategories WHERE id = $1',
+        [subcategory_id]
+      );
+      category_id = catResult.rows[0]?.category_id || null;
     }
 
     // Criar produto
     const productResult = await dbClient.query(
-      `INSERT INTO products
-        (name, description, price, model_file, stock, images)
-       VALUES ($1,$2,$3,$4,$5,$6)
-       RETURNING *`,
-      [name, description, price, model_file, stock, []]
+      `
+      INSERT INTO products
+        (name, description, price, model_file, subcategory_id, category_id, stock, images)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *
+      `,
+      [name, description, price, model_file, subcategory_id || null, category_id, stock, []]
     );
 
     const product = productResult.rows[0];
-
-    // Inserir categorias na tabela product_categories
-    for (const categoryId of categoryIdsArray) {
-      const isPrimary = parseInt(categoryId) === parseInt(primaryCategoryId);
-      
-      await dbClient.query(`
-        INSERT INTO product_categories (product_id, category_id, is_primary)
-        VALUES ($1, $2, $3)
-      `, [product.id, categoryId, isPrimary]);
-    }
 
     // Inserir atributos se fornecidos
     if (attributes) {
@@ -203,19 +167,19 @@ exports.createProduct = async (req, res) => {
 
     await dbClient.query('COMMIT');
 
-    console.log('✅ Produto criado:', product.name);
+    console.log('✅ Produto criado com atributos:', product.name);
     res.status(201).json(product);
 
   } catch (err) {
     await dbClient.query('ROLLBACK');
     console.error('Erro ao criar produto:', err);
-    res.status(500).json({ error: err.message || 'Erro ao criar produto' });
+    res.status(500).json({ error: 'Erro ao criar produto' });
   } finally {
     dbClient.release();
   }
 };
 
-// ===== UPDATE PRODUCT (com múltiplas categorias e atributos) =====
+// ===== UPDATE PRODUCT (com atributos) =====
 exports.updateProduct = async (req, res) => {
   const dbClient = await client.connect();
   
@@ -241,7 +205,7 @@ exports.updateProduct = async (req, res) => {
 
     // Atualizar campos do produto
     for (const key in req.body) {
-      if (!['images', 'attributes', 'category_ids', 'primary_category_id'].includes(key)) {
+      if (key !== 'images' && key !== 'attributes') {
         fields.push(`${key} = $${i++}`);
         values.push(req.body[key]);
       }
@@ -265,33 +229,6 @@ exports.updateProduct = async (req, res) => {
       `, values);
     }
 
-    // Atualizar categorias se fornecidas
-    if (req.body.category_ids) {
-      let categoryIdsArray = typeof req.body.category_ids === 'string' 
-        ? JSON.parse(req.body.category_ids) 
-        : req.body.category_ids;
-
-      const primaryCategoryId = req.body.primary_category_id || categoryIdsArray[0];
-
-      // Validar que a categoria primária está na lista
-      if (!categoryIdsArray.includes(parseInt(primaryCategoryId))) {
-        throw new Error('A categoria primária deve estar na lista de categorias selecionadas');
-      }
-
-      // Remover categorias antigas
-      await dbClient.query('DELETE FROM product_categories WHERE product_id = $1', [productId]);
-
-      // Inserir novas categorias
-      for (const categoryId of categoryIdsArray) {
-        const isPrimary = parseInt(categoryId) === parseInt(primaryCategoryId);
-        
-        await dbClient.query(`
-          INSERT INTO product_categories (product_id, category_id, is_primary)
-          VALUES ($1, $2, $3)
-        `, [productId, categoryId, isPrimary]);
-      }
-    }
-
     // Atualizar atributos se fornecidos
     if (req.body.attributes) {
       const attributesObj = typeof req.body.attributes === 'string' 
@@ -307,6 +244,8 @@ exports.updateProduct = async (req, res) => {
           await dbClient.query(`
             INSERT INTO product_attributes (product_id, attribute_id, attribute_value)
             VALUES ($1, $2, $3)
+            ON CONFLICT (product_id, attribute_id) 
+            DO UPDATE SET attribute_value = $3
           `, [productId, attrId, attrValue]);
         }
       }
@@ -323,7 +262,7 @@ exports.updateProduct = async (req, res) => {
   } catch (err) {
     await dbClient.query('ROLLBACK');
     console.error('Erro ao atualizar produto:', err);
-    res.status(500).json({ error: err.message || 'Erro ao atualizar produto' });
+    res.status(500).json({ error: 'Erro ao atualizar produto' });
   } finally {
     dbClient.release();
   }

@@ -1,12 +1,9 @@
-// Frontend/Dashboard/scripts/editproduct.js - ATUALIZADO PARA MÚLTIPLAS CATEGORIAS
+// Frontend/Dashboard/scripts/editproduct.js
 (() => {
   const API_BASE = 'http://localhost:3001';
   const token = localStorage.getItem('token');
   let currentProductAttributes = {};
   let availableAttributes = [];
-  let categories = [];
-  let selectedCategories = new Set();
-  
   // ===== ELEMENTOS MODAL =====
   const editModal = document.getElementById('editProductModal');
   const editForm = document.getElementById('editProductForm');
@@ -15,10 +12,9 @@
   const editPrice = document.getElementById('editPrice');
   const editDesc = document.getElementById('editDescription');
   const editStock = document.getElementById('editStock');
+  const editCategorySelect = document.getElementById('editCategory');
+  const editSubcatSelect = document.getElementById('editSubcategory');
   const editProductName = document.getElementById('editProductName');
-  
-  // NOVO: Container para categorias
-  const categoriesEditContainer = document.getElementById('editCategoriesContainer');
   
   // Modelo 3D
   const editCurrentModel = document.getElementById('editCurrentModel');
@@ -44,6 +40,8 @@
   // Abas
   const tabButtons = editModal.querySelectorAll('.modal-tab-btn');
 
+  let categories = [];
+  let subcategories = [];
   let currentProduct = null;
 
   // ===== AUTENTICAÇÃO =====
@@ -68,191 +66,42 @@
     });
   });
 
-  // ===== LOAD CATEGORIES =====
-  async function loadCategories() {
+  // ===== LOAD CATEGORIES E SUBCATEGORIES =====
+  async function loadCategoriesAndSubcategories() {
     try {
-      const res = await fetch(`${API_BASE}/categories`, { headers: authHeaders() });
-      categories = await res.json();
+      const [catRes, subcatRes] = await Promise.all([
+        fetch(`${API_BASE}/categories`, { headers: authHeaders() }),
+        fetch(`${API_BASE}/subcategories`, { headers: authHeaders() }),
+      ]);
+
+      categories = await catRes.json();
+      subcategories = await subcatRes.json();
+
+      editCategorySelect.innerHTML = '<option value="">-- Seleciona categoria --</option>';
+      categories.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = c.name;
+        editCategorySelect.appendChild(option);
+      });
+
     } catch (err) {
-      console.error('Erro ao carregar categorias:', err);
+      console.error('Erro ao carregar categorias/subcategorias:', err);
     }
   }
 
-  // ===== RENDERIZAR SELEÇÃO DE CATEGORIAS PARA EDIÇÃO =====
-  function renderCategoriesEdit(productCategories) {
-    if (!categoriesEditContainer) {
-      console.error('Container de categorias não encontrado');
-      return;
-    }
-
-    // Limpar seleção anterior
-    selectedCategories.clear();
-    
-    // Encontrar categoria primária
-    const primaryCategory = productCategories.find(pc => pc.is_primary);
-    const primaryCategoryId = primaryCategory?.id;
-
-    // Adicionar categorias do produto à seleção
-    productCategories.forEach(pc => {
-      selectedCategories.add(pc.id);
-    });
-
-    categoriesEditContainer.innerHTML = `
-      <h4 style="margin:20px 0 10px;font-size:14px;text-transform:uppercase;">
-        Categorias do Produto *
-      </h4>
-      <p style="font-size:12px;color:#666;margin-bottom:10px;">
-        Seleciona todas as categorias onde este produto deve aparecer. 
-        Clica no botão "★" para definir a categoria primária.
-      </p>
-      <div class="categories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">
-        ${categories.map(cat => {
-          const isSelected = selectedCategories.has(cat.id);
-          const isPrimary = cat.id === primaryCategoryId;
-          
-          return `
-            <div class="category-edit-item" 
-                 data-category-id="${cat.id}"
-                 style="
-                   display:flex;
-                   align-items:center;
-                   gap:8px;
-                   padding:10px;
-                   border:2px solid ${isSelected ? '#2563eb' : '#e5e7eb'};
-                   background-color:${isSelected ? '#eff6ff' : 'transparent'};
-                   border-radius:6px;
-                   cursor:pointer;
-                   transition:all 0.3s ease;
-                 ">
-              <input 
-                type="checkbox" 
-                value="${cat.id}" 
-                class="category-edit-checkbox"
-                ${isSelected ? 'checked' : ''}
-                style="cursor:pointer;"
-              >
-              <span style="font-size:14px;font-weight:600;flex:1;">${cat.name}</span>
-              <button 
-                type="button"
-                class="btn-set-primary"
-                data-category-id="${cat.id}"
-                style="
-                  background:${isPrimary ? '#10b981' : '#e5e7eb'};
-                  color:${isPrimary ? 'white' : '#666'};
-                  border:none;
-                  width:28px;
-                  height:28px;
-                  border-radius:50%;
-                  cursor:pointer;
-                  font-size:16px;
-                  display:${isSelected ? 'flex' : 'none'};
-                  align-items:center;
-                  justify-content:center;
-                  transition:all 0.3s ease;
-                "
-                title="${isPrimary ? 'Categoria primária' : 'Definir como primária'}"
-              >
-                ★
-              </button>
-            </div>
-          `;
-        }).join('')}
-      </div>
-      <p id="categoriesEditError" style="color:#ef4444;font-size:12px;margin-top:10px;display:none;">
-        ⚠️ Seleciona pelo menos uma categoria
-      </p>
-    `;
-
-    // Event listeners
-    document.querySelectorAll('.category-edit-checkbox').forEach(checkbox => {
-      checkbox.addEventListener('change', handleCategoryEditSelection);
-    });
-
-    document.querySelectorAll('.btn-set-primary').forEach(btn => {
-      btn.addEventListener('click', handleSetPrimary);
-    });
-
-    // Hover effects
-    document.querySelectorAll('.category-edit-item').forEach(item => {
-      item.addEventListener('mouseenter', function() {
-        const checkbox = this.querySelector('.category-edit-checkbox');
-        if (!checkbox.checked) {
-          this.style.borderColor = '#93c5fd';
-          this.style.backgroundColor = '#f0f9ff';
-        }
-      });
-      item.addEventListener('mouseleave', function() {
-        const checkbox = this.querySelector('.category-edit-checkbox');
-        if (!checkbox.checked) {
-          this.style.borderColor = '#e5e7eb';
-          this.style.backgroundColor = 'transparent';
-        }
-      });
+  function updateSubcategories() {
+    const catId = editCategorySelect.value;
+    editSubcatSelect.innerHTML = '<option value="">-- Seleciona subcategoria --</option>';
+    subcategories.filter(sc => sc.category_id == catId).forEach(sc => {
+      const option = document.createElement('option');
+      option.value = sc.id;
+      option.textContent = sc.name;
+      editSubcatSelect.appendChild(option);
     });
   }
 
-  // ===== HANDLE CATEGORY SELECTION IN EDIT =====
-  function handleCategoryEditSelection(e) {
-    const categoryId = parseInt(e.target.value);
-    const item = e.target.closest('.category-edit-item');
-    const setPrimaryBtn = item.querySelector('.btn-set-primary');
-
-    if (e.target.checked) {
-      selectedCategories.add(categoryId);
-      item.style.borderColor = '#2563eb';
-      item.style.backgroundColor = '#eff6ff';
-      setPrimaryBtn.style.display = 'flex';
-      
-      // Se for a primeira categoria, tornar primária automaticamente
-      if (selectedCategories.size === 1) {
-        setPrimaryBtn.style.backgroundColor = '#10b981';
-        setPrimaryBtn.style.color = 'white';
-      }
-    } else {
-      selectedCategories.delete(categoryId);
-      item.style.borderColor = '#e5e7eb';
-      item.style.backgroundColor = 'transparent';
-      setPrimaryBtn.style.display = 'none';
-      
-      // Se remover a primária, definir outra como primária
-      const wasPrimary = setPrimaryBtn.style.backgroundColor === 'rgb(16, 185, 129)';
-      if (wasPrimary && selectedCategories.size > 0) {
-        const firstCategoryId = Array.from(selectedCategories)[0];
-        const firstItem = document.querySelector(`.category-edit-item[data-category-id="${firstCategoryId}"]`);
-        const firstBtn = firstItem.querySelector('.btn-set-primary');
-        firstBtn.style.backgroundColor = '#10b981';
-        firstBtn.style.color = 'white';
-      }
-    }
-
-    if (selectedCategories.size > 0) {
-      document.getElementById('categoriesEditError').style.display = 'none';
-    }
-  }
-
-  // ===== HANDLE SET PRIMARY =====
-  function handleSetPrimary(e) {
-    e.stopPropagation();
-    const categoryId = parseInt(e.target.dataset.categoryId);
-    
-    // Remover primária de todas
-    document.querySelectorAll('.btn-set-primary').forEach(btn => {
-      btn.style.backgroundColor = '#e5e7eb';
-      btn.style.color = '#666';
-    });
-    
-    // Definir esta como primária
-    e.target.style.backgroundColor = '#10b981';
-    e.target.style.color = 'white';
-  }
-
-  // ===== GET PRIMARY CATEGORY ID =====
-  function getPrimaryCategoryId() {
-    const primaryBtn = Array.from(document.querySelectorAll('.btn-set-primary'))
-      .find(btn => btn.style.backgroundColor === 'rgb(16, 185, 129)');
-    
-    return primaryBtn ? parseInt(primaryBtn.dataset.categoryId) : Array.from(selectedCategories)[0];
-  }
+  editCategorySelect.addEventListener('change', updateSubcategories);
 
   // ===== LOAD PRODUCT IMAGES =====
   async function loadProductImages(productId) {
@@ -329,10 +178,18 @@
     editName.value = currentProduct.name;
     editPrice.value = currentProduct.price;
     editDesc.value = currentProduct.description;
-    editStock.checked = currentProduct.stock === true;
+   editStock.checked = currentProduct.stock === true;
 
-    // Renderizar categorias
-    renderCategoriesEdit(currentProduct.categories || []);
+    // Categoria/Subcategoria
+    const subcat = subcategories.find(sc => sc.id == currentProduct.subcategory_id);
+    if (subcat) {
+      editCategorySelect.value = subcat.category_id;
+      updateSubcategories();
+      editSubcatSelect.value = subcat.id;
+    } else {
+      editCategorySelect.value = '';
+      editSubcatSelect.innerHTML = '<option value="">-- Seleciona subcategoria --</option>';
+    }
 
     // Modelo 3D
     if (currentProduct.model_file) {
@@ -369,19 +226,12 @@
   editForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Validar categorias
-    if (selectedCategories.size === 0) {
-      document.getElementById('categoriesEditError').style.display = 'block';
-      return;
-    }
-
     const formData = new FormData();
     formData.append('name', editName.value);
     formData.append('price', editPrice.value);
     formData.append('description', editDesc.value);
+    formData.append('subcategory_id', editSubcatSelect.value || null);
     formData.append('stock', editStock.checked);
-    formData.append('category_ids', JSON.stringify(Array.from(selectedCategories)));
-    formData.append('primary_category_id', getPrimaryCategoryId());
 
     try {
       const res = await fetch(`${API_BASE}/products/${editId.value}`, {
@@ -390,17 +240,14 @@
         body: formData
       });
       
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Erro ao guardar alterações');
-      }
+      if (!res.ok) throw new Error('Erro ao guardar alterações');
       
       console.log('✅ Produto atualizado com sucesso!');
       hideModal();
       window.reloadProducts();
     } catch (err) {
       console.error('Erro ao guardar alterações:', err);
-      alert(err.message || 'Erro ao guardar alterações');
+      alert('Erro ao guardar alterações');
     }
   });
 
@@ -543,7 +390,205 @@
       replaceAllImagesBtn.classList.remove('btn-loading');
     }
   });
+  // ===== ADICIONAR NOVA FUNÇÃO =====
+async function loadAttributesForEdit(subcategoryId, productAttributes) {
+  const dynamicAttrsEdit = document.getElementById('dynamicAttributesEdit');
+  
+  if (!dynamicAttrsEdit) {
+    console.warn('Container dynamicAttributesEdit não encontrado');
+    return;
+  }
 
+  if (!subcategoryId) {
+    dynamicAttrsEdit.innerHTML = '';
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/attributes/subcategory/${subcategoryId}`, {
+      headers: authHeaders()
+    });
+    availableAttributes = await res.json();
+
+    if (!availableAttributes.length) {
+      dynamicAttrsEdit.innerHTML = '<p style="color:#666;font-size:13px;margin-top:10px;">Nenhum atributo definido para esta subcategoria</p>';
+      return;
+    }
+
+    renderDynamicAttributesForEdit(productAttributes);
+
+  } catch (err) {
+    console.error('Erro ao carregar atributos:', err);
+    dynamicAttrsEdit.innerHTML = '<p style="color:red;">Erro ao carregar atributos</p>';
+  }
+}
+
+// ===== ADICIONAR NOVA FUNÇÃO =====
+function renderDynamicAttributesForEdit(productAttributes) {
+  const container = document.getElementById('dynamicAttributesEdit');
+  
+  container.innerHTML = '<h4 style="margin:20px 0 10px;font-size:14px;text-transform:uppercase;color:#374151;">Atributos do Produto</h4>';
+
+  availableAttributes.forEach(attr => {
+    const formGroup = document.createElement('div');
+    formGroup.className = 'form-group';
+
+    const label = document.createElement('label');
+    label.textContent = attr.attribute_name;
+    if (attr.is_required) {
+      label.innerHTML += ' <span style="color:red;">*</span>';
+    }
+    formGroup.appendChild(label);
+
+    let input;
+    let currentValue = productAttributes[attr.attribute_name]?.value || '';
+
+    if (attr.attribute_type === 'select') {
+      input = document.createElement('select');
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = '-- Seleciona --';
+      input.appendChild(defaultOption);
+
+      const options = JSON.parse(attr.attribute_options || '[]');
+      options.forEach(optValue => {
+        const option = document.createElement('option');
+        option.value = optValue;
+        option.textContent = optValue;
+        if (optValue === currentValue) {
+          option.selected = true;
+        }
+        input.appendChild(option);
+      });
+
+    } else if (attr.attribute_type === 'multiselect') {
+      input = document.createElement('select');
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.multiple = true;
+      input.required = attr.is_required;
+
+      const options = JSON.parse(attr.attribute_options || '[]');
+      const selectedValues = currentValue ? JSON.parse(currentValue) : [];
+
+      options.forEach(optValue => {
+        const option = document.createElement('option');
+        option.value = optValue;
+        option.textContent = optValue;
+        if (selectedValues.includes(optValue)) {
+          option.selected = true;
+        }
+        input.appendChild(option);
+      });
+
+    } else if (attr.attribute_type === 'number') {
+      input = document.createElement('input');
+      input.type = 'number';
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+      input.value = currentValue;
+
+    } else { // text
+      input = document.createElement('input');
+      input.type = 'text';
+      input.id = `attr-${attr.id}`;
+      input.name = `attr-${attr.id}`;
+      input.required = attr.is_required;
+      input.value = currentValue;
+    }
+
+    formGroup.appendChild(input);
+    container.appendChild(formGroup);
+  });
+}
+
+// ===== ADICIONAR NOVA FUNÇÃO =====
+function collectAttributesForEdit() {
+  const attributes = {};
+
+  availableAttributes.forEach(attr => {
+    const input = document.getElementById(`attr-${attr.id}`);
+    if (input) {
+      if (input.multiple) {
+        const selected = Array.from(input.selectedOptions).map(opt => opt.value);
+        attributes[attr.id] = JSON.stringify(selected);
+      } else {
+        attributes[attr.id] = input.value;
+      }
+    }
+  });
+
+  return attributes;
+}
+
+// ===== ATUALIZAR A FUNÇÃO openEditProductModal =====
+document.addEventListener('openEditProductModal', async (e) => {
+  currentProduct = e.detail;
+
+  editId.value = currentProduct.id;
+  editProductName.textContent = currentProduct.name;
+  editName.value = currentProduct.name;
+  editPrice.value = currentProduct.price;
+  editDesc.value = currentProduct.description;
+  editStock.checked = currentProduct.stock === true;
+
+  // Categoria/Subcategoria
+  const subcat = subcategories.find(sc => sc.id == currentProduct.subcategory_id);
+  if (subcat) {
+    editCategorySelect.value = subcat.category_id;
+    updateSubcategories();
+    editSubcatSelect.value = subcat.id;
+
+    // ✅ NOVO: Carregar atributos
+    await loadAttributesForEdit(subcat.id, currentProduct.attributes || {});
+  } else {
+    editCategorySelect.value = '';
+    editSubcatSelect.innerHTML = '<option value="">-- Seleciona subcategoria --</option>';
+    document.getElementById('dynamicAttributesEdit').innerHTML = '';
+  }
+
+  // ... resto do código (modelo 3D, imagens, etc.)
+  
+  showModal();
+});
+
+// ===== ATUALIZAR O SUBMIT DO editForm =====
+editForm.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  // ✅ NOVO: Coletar atributos
+  const attributes = collectAttributesForEdit();
+
+  const formData = new FormData();
+  formData.append('name', editName.value);
+  formData.append('price', editPrice.value);
+  formData.append('description', editDesc.value);
+  formData.append('subcategory_id', editSubcatSelect.value || null);
+  formData.append('stock', editStock.checked);
+  formData.append('attributes', JSON.stringify(attributes)); // ✅ NOVO
+
+  try {
+    const res = await fetch(`${API_BASE}/products/${editId.value}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: formData
+    });
+    
+    if (!res.ok) throw new Error('Erro ao guardar alterações');
+    
+    console.log('✅ Produto atualizado com sucesso!');
+    hideModal();
+    window.reloadProducts();
+  } catch (err) {
+    console.error('Erro ao guardar alterações:', err);
+    alert('Erro ao guardar alterações');
+  }
+});
   // ===== DELETE PRODUCT =====
   deleteBtn.addEventListener('click', async () => {
     if (!confirm('⚠️ Tens a certeza que queres eliminar este produto?\n\nTodos os ficheiros (modelo 3D e imagens) serão permanentemente eliminados!')) return;
@@ -565,5 +610,5 @@
     }
   });
 
-  document.addEventListener('DOMContentLoaded', loadCategories);
+  document.addEventListener('DOMContentLoaded', loadCategoriesAndSubcategories);
 })();
