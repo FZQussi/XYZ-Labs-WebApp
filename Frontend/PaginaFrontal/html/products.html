@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Produtos - XYZ Labs</title>
-   <link rel="stylesheet" href="../css/base.css">
-   <link rel="stylesheet" href="../css/Header.css">
-   <link rel="stylesheet" href="../css/products.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/Header.css">
+  <link rel="stylesheet" href="../css/products.css">
 </head>
 <body>
 
-<!-- HEADER (mesmo da homepage) -->
+<!-- HEADER -->
 <header class="header-container">
   <div class="header-left">
     <div class="logo-container">
@@ -19,17 +19,13 @@
       </a>
     </div>
 
-    <!-- Menu Hamburger (Mobile) -->
     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </button>
 
-    <!-- Navegação -->
     <nav class="header-nav" id="headerNav">
       <ul>
-        <li><a href="HomePage.html" >Home</a></li>
+        <li><a href="HomePage.html">Home</a></li>
         <li><a href="products.html" class="active">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
         <li><a href="colors.html">Cores</a></li>
@@ -40,50 +36,33 @@
   </div>
 
   <div class="header-right">
-    <!-- Search Bar -->
-  <div class="header-search">
-  <span class="search-icon" id="searchBtn">
-    <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
-  </span>
-  <input
-    type="text"
-    placeholder="Pesquisar produtos..."
-    id="searchInput"
-  >
-</div>
+    <div class="header-search">
+      <span class="search-icon" id="searchBtn">
+        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
 
-
-    <!-- Botões quando não logado -->
     <div id="authButtons">
       <button id="signInBtn" class="btn-secondary">Sign In</button>
-      
       <button id="signUpBtn" class="btn-primary">Sign Up</button>
     </div>
 
-    <!-- Ícones quando logado -->
     <div id="userIcons" style="display:none; position: relative;">
-  <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
-    <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
-  </button>
-
-  <!-- 🔽 DROPDOWN USER -->
-  <div id="userDropdown" class="user-dropdown hidden">
-    <p class="dropdown-title" id="dropdownUserName"></p>
-    <ul id="dropdownLinks"></ul>
-  </div>
-
-  <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-    <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-    <span class="cart-badge" id="cartBadge">0</span>
-  </button>
-</div>
-
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+      <div id="userDropdown" class="user-dropdown hidden">
+        <p class="dropdown-title" id="dropdownUserName"></p>
+        <ul id="dropdownLinks"></ul>
+      </div>
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
   </div>
 </header>
-<div id="sideMenu" class="side-menu">
-  <button class="closeBtn" id="closeMenu">×</button>
-  <div id="sideContent"></div>
-</div>
 
 <div class="overlay" id="overlay"></div>
 
@@ -97,70 +76,43 @@
 <!-- CONTEÚDO PRINCIPAL -->
 <main class="products-page">
   <div class="container">
-    
-    <!-- Filtros e Ordenação -->
-   <aside class="filters-sidebar" id="filtersSidebar">
-  
-  <!-- PESQUISA -->
-  <div class="filter-group">
-    <h4>Pesquisar</h4>
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Pesquisar produtos..."
-      class="filter-search"
-    >
-  </div>
 
-  <!-- CABEÇALHO DOS FILTROS -->
-  <div class="filters-header">
-    <h3>Filtros</h3>
-    <button class="btn-clear-filters" id="clearFilters">Limpar</button>
-  </div>
+    <!-- SIDEBAR DE CATEGORIAS -->
+    <aside class="filters-sidebar" id="filtersSidebar">
+      <div class="filters-header">
+        <h3>Categorias</h3>
+        <button class="btn-clear-filters" id="clearCategories">Limpar</button>
+      </div>
 
-  <!-- CATEGORIAS -->
-  <div class="filter-group filter-collapsible">
-    <button class="filter-toggle" type="button">
-      <span>Categorias</span>
-      <span class="filter-arrow"></span>
-    </button>
+      <div class="filter-group filter-collapsible">
+        <div id="categoryFilters" class="filter-options collapsed">
+          <!-- Categorias carregadas via JS -->
+        </div>
+      </div>
+    </aside>
 
-    <div id="categoryFilters" class="filter-options collapsed">
-      <!-- Categorias carregadas via JS -->
-    </div>
-  </div>
-
-  <!-- 🆕 FILTROS DE ATRIBUTOS DINÂMICOS -->
-  <div id="dynamicAttributeFilters">
-  
-  </div>
-
-  <!-- FAIXA DE PREÇO -->
-  <div class="filter-group">
-    <h4>Preço</h4>
-    <div class="price-range">
-      <input type="number" id="minPrice" placeholder="Min" min="0">
-      <span>-</span>
-      <input type="number" id="maxPrice" placeholder="Max" min="0">
-    </div>
-  </div>
-</aside>
-
-    <!-- Lista de Produtos -->
+    <!-- LISTA DE PRODUTOS -->
     <div class="products-content">
-      
-      <!-- Toolbar -->
+
+      <!-- TOOLBAR -->
       <div class="products-toolbar">
         <div class="toolbar-left">
-          <button class="btn-toggle-filters" id="toggleFilters">
-            🔽 Filtros
-          </button>
+          <button class="btn-toggle-filters" id="toggleFilters">🔽 Filtros</button>
           <span class="products-count" id="productsCount">0 produtos</span>
         </div>
 
         <div class="toolbar-right">
-          <label for="sortBy">Ordenar:</label>
-          <select id="sortBy">
+          <input type="number" id="minPriceTop" placeholder="Min €" class="toolbar-input">
+          <input type="number" id="maxPriceTop" placeholder="Max €" class="toolbar-input">
+
+          <select id="filterStockTop" class="toolbar-select">
+            <option value="">Stock</option>
+            <option value="true">Com stock</option>
+            <option value="false">Sem stock</option>
+          </select>
+
+          <label for="sortByTop">Ordenar:</label>
+          <select id="sortByTop" class="toolbar-select">
             <option value="newest">Mais Recentes</option>
             <option value="price-asc">Preço: Menor - Maior</option>
             <option value="price-desc">Preço: Maior - Menor</option>
@@ -169,15 +121,13 @@
         </div>
       </div>
 
-      <!-- Grid de Produtos -->
+      <!-- GRID DE PRODUTOS -->
       <div class="products-grid" id="productsGrid">
         <div class="loading">A carregar produtos...</div>
       </div>
 
-      <!-- Paginação -->
-      <div class="pagination" id="pagination">
-        <!-- Carregado via JS -->
-      </div>
+      <!-- PAGINAÇÃO -->
+      <div class="pagination" id="pagination"></div>
     </div>
 
   </div>

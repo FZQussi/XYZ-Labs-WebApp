@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loadProduct(productId);
+  
+  loadRelatedProducts(productId);
   setupEventListeners();
 });
 
@@ -77,18 +79,30 @@ function renderProduct() {
   if (descEl) descEl.textContent = currentProduct.description || 'Sem descrição disponível';
 
   // ===== Categoria e Stock =====
-  const categoryEl = document.getElementById('productCategory');
+  const tagsContainer = document.getElementById('productTags');
+
+if (tagsContainer) {
+  tagsContainer.innerHTML = '';
+
+  const categories = currentProduct.categories || [];
+
+  categories.forEach(cat => {
+    const tag = document.createElement('span');
+    tag.className = 'product-tag';
+
+    if (cat.is_primary) {
+      tag.classList.add('primary');
+    }
+
+    tag.textContent = cat.name;
+    tagsContainer.appendChild(tag);
+  });
+}
+
   const stockEl = document.getElementById('productStock');
   const inStock = !!currentProduct.stock;
 
-  if (categoryEl) {
-    if (currentProduct.category_name) {
-      categoryEl.textContent = currentProduct.category_name;
-      categoryEl.style.display = '';
-    } else {
-      categoryEl.style.display = 'none';
-    }
-  }
+
 
   if (stockEl) {
     stockEl.textContent = inStock ? 'Disponível' : 'Esgotado';
@@ -106,7 +120,15 @@ function renderProduct() {
   const specStock = document.getElementById('specStock');
 
   if (specMaterial) specMaterial.textContent = currentProduct.material || 'PLA';
-  if (specCategory) specCategory.textContent = currentProduct.category_name || 'Geral';
+  if (specCategory) {
+  const primary = (currentProduct.categories || [])
+    .find(c => c.is_primary);
+
+  specCategory.textContent = primary
+    ? primary.name
+    : 'Geral';
+}
+
   if (specStock) {
     specStock.textContent = inStock ? 'Disponível' : 'Esgotado';
     specStock.style.color = inStock ? 'green' : 'red';
@@ -123,24 +145,27 @@ function renderProduct() {
       modelViewer.src = `${API_BASE}/models/${currentProduct.model_file}`;
 
       // ⚡ Alterar cor do modelo de forma confiável
-      modelViewer.addEventListener('load', () => {
-        const model = modelViewer.model; // THREE.Group interno
-        if (!model) {
-          console.warn('Modelo 3D não carregou ainda.');
-          return;
-        }
+      modelViewer.addEventListener('scene-graph-ready', () => {
+  const model = modelViewer.model;
 
-        // Percorrer todos os meshes e mudar cor
-        model.scene.traverse((node) => {
-          if (node.isMesh && node.material) {
-            // Remove textura se quiser cor sólida
-            if (node.material.map) node.material.map = null;
+  if (!model) {
+    console.warn('Modelo ainda não disponível');
+    return;
+  }
 
-            node.material.color.set('#60a5c5'); // azul bebê
-            node.material.needsUpdate = true;
-          }
-        });
-      });
+  model.traverse((node) => {
+    if (node.isMesh && node.material) {
+
+      if (node.material.map) {
+        node.material.map = null;
+      }
+
+      node.material.color.set('#60a5c5');
+      node.material.needsUpdate = true;
+    }
+  });
+});
+
     }
 
     const modalTitle = document.getElementById('modal3DTitle');
@@ -574,3 +599,86 @@ function toggleRotation() {
     `;
   }
 }
+// ===== FUNÇÃO PARA EMBARALHAR ARRAY (FISHER-YATES SHUFFLE) =====
+function shuffleArray(array) {
+  const shuffled = [...array]; // Cria uma cópia do array
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// ===== LOAD RELATED PRODUCTS =====
+async function loadRelatedProducts(currentProductId) {
+  const container = document.getElementById('relatedProducts');
+
+  try {
+    const res = await fetch(`${API_BASE}/products`);
+    const allProducts = await res.json();
+
+    // Filtrar o produto atual
+    const filtered = allProducts.filter(p => p.id != currentProductId);
+
+    // Embaralhar e pegar 6 produtos
+    const relatedProducts = shuffleArray(filtered).slice(0, 6);
+
+    if (!relatedProducts.length) {
+      container.innerHTML = '<p class="no-products">Nenhum produto relacionado disponível</p>';
+      return;
+    }
+
+    container.innerHTML = relatedProducts.map(product => {
+      const image = product.images && product.images[0] 
+        ? `${API_BASE}/images/${product.images[0]}` 
+        : '/Frontend/images/placeholder.jpg';
+
+      return `
+        <div class="homepage-product-card" data-id="${product.id}">
+          <div class="homepage-product-image">
+            <img src="${image}" alt="${product.name}" loading="lazy">
+            ${product.stock <= 0 ? '<div class="homepage-out-of-stock">Esgotado</div>' : ''}
+          </div>
+          <div class="homepage-product-info">
+            <h3>${product.name}</h3>
+            <div class="homepage-product-footer">
+              <span class="homepage-product-price">€${Number(product.price).toFixed(2)}</span>
+              <div class="homepage-product-actions">
+                <button class="homepage-btn-view" onclick="window.location.href='product-details.html?id=${product.id}'">
+                  Ver Detalhes
+                </button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Adicionar event listeners aos cards
+    addRelatedCardClickListeners();
+
+  } catch (err) {
+    console.error('Erro ao carregar produtos relacionados:', err);
+    container.innerHTML = '<p class="error">Erro ao carregar produtos relacionados</p>';
+  }
+}
+
+// ===== ADD CARD CLICK LISTENERS (RELATED PRODUCTS) =====
+function addRelatedCardClickListeners() {
+  const cards = document.querySelectorAll('#relatedProducts .homepage-product-card');
+
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Não redirecionar se clicar nos botões
+      if (e.target.closest('.homepage-btn-view') || e.target.closest('.homepage-btn-add-cart')) {
+        return;
+      }
+
+      const productId = card.getAttribute('data-id');
+      window.location.href = `product-details.html?id=${productId}`;
+    });
+  });
+}
+
+

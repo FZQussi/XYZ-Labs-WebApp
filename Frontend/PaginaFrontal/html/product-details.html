@@ -11,6 +11,7 @@
    <link rel="stylesheet" href="../css/base.css">
    <link rel="stylesheet" href="../css/Header.css">
    <link rel="stylesheet" href="../css/product-details.css">
+  
 </head>
 <body>
 
@@ -152,10 +153,11 @@
         <div class="product-header">
           <h1 id="productName">Carregando...</h1>
           
-          <div class="product-meta">
-            <span class="product-category" id="productCategory"></span>
-            <span class="product-stock" id="productStock"></span>
-          </div>
+         <div class="product-meta">
+  <div class="product-tags" id="productTags"></div>
+  <span class="product-stock" id="productStock"></span>
+</div>
+
         </div>
 
         <div class="product-price-section">
@@ -265,6 +267,21 @@
 
   </div>
 </div>
+<!-- ===== PRODUTOS RELACIONADOS ===== -->
+<section class="related-products">
+  <div class="container">
+    <h2>Produtos Relacionados</h2>
+    <br><br><br>
+    <div class="homepage-products-grid" id="relatedProducts">
+      <div class="loading">A carregar produtos...</div>
+    </div>
+    <div class="homepage-view-all-container">
+      <a href="products.html" class="homepage-btn-view-all">Ver Todos os Produtos</a>
+    </div>
+  </div>
+</section>
+
+
 
 <!-- FOOTER -->
 <footer class="footer">

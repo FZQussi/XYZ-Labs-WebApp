@@ -189,94 +189,51 @@ function renderCategoryFilters() {
 
 // ===== APPLY FILTERS (ATUALIZADO COM ATRIBUTOS) =====
 function applyFilters() {
-  // Filtros de categoria/subcategoria
+  // 🔹 Filtro de pesquisa
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+  // 🔹 Filtros de preço
+  const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+  const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+
+  // 🔹 Filtro de categorias (ids selecionados)
   const selectedCategories = Array.from(
     document.querySelectorAll('.category-filter:checked')
   ).map(cb => parseInt(cb.value));
-  
-  const selectedSubcategories = Array.from(
-    document.querySelectorAll('.subcategory-filter input:checked')
-  ).map(cb => parseInt(cb.value));
 
-  // Filtros de preço
-  const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-  const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-  
-  // Filtro de pesquisa
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  // 🔹 Filtro de stock
+  const stockValue = document.getElementById('filterStock').value;
 
-  // 🆕 FILTROS DE ATRIBUTOS DINÂMICOS
-  const attributeFilters = {};
-  document.querySelectorAll('.attribute-filter:checked').forEach(checkbox => {
-    const attrName = checkbox.dataset.attribute;
-    const attrValue = checkbox.value;
-    
-    if (!attributeFilters[attrName]) {
-      attributeFilters[attrName] = [];
-    }
-    attributeFilters[attrName].push(attrValue);
-  });
-
-  console.log('Filtros de atributos aplicados:', attributeFilters);
-
-  // Aplicar todos os filtros
+  // 🔹 Aplicar filtros
   filteredProducts = allProducts.filter(product => {
-    // Filtro de subcategoria
-    if (selectedSubcategories.length > 0 && 
-        !selectedSubcategories.includes(product.subcategory_id)) {
-      return false;
+    const productPrice = Number(product.price);
+
+    // Pesquisa
+    if (searchTerm && !product.name.toLowerCase().includes(searchTerm)) return false;
+
+    // Preço
+    if (productPrice < minPrice || productPrice > maxPrice) return false;
+
+    // Categoria — verificar se pelo menos uma categoria do produto está selecionada
+    if (selectedCategories.length) {
+      const productCategoryIds = product.categories.map(c => c.id);
+      const hasCategoryMatch = productCategoryIds.some(id => selectedCategories.includes(id));
+      if (!hasCategoryMatch) return false;
     }
 
-    // Filtro de categoria (se não houver subcategorias selecionadas)
-    if (selectedSubcategories.length === 0 && 
-        selectedCategories.length > 0 && 
-        !selectedCategories.includes(product.category_id)) {
-      return false;
-    }
-
-    // Filtro de preço
-    if (product.price < minPrice || product.price > maxPrice) {
-      return false;
-    }
-
-    // Filtro de pesquisa
-    if (searchTerm && !product.name.toLowerCase().includes(searchTerm)) {
-      return false;
-    }
-
-    // 🆕 FILTROS DE ATRIBUTOS DINÂMICOS
-    if (Object.keys(attributeFilters).length > 0) {
-      // Verificar se o produto tem os atributos filtrados
-      for (const [attrName, selectedValues] of Object.entries(attributeFilters)) {
-        const productAttrValue = product.attributes?.[attrName];
-        
-        if (!productAttrValue) {
-          return false; // Produto não tem este atributo
-        }
-        
-        // Se o valor do produto for array (multiselect)
-        if (Array.isArray(productAttrValue)) {
-          // Verifica se algum dos valores selecionados está no array do produto
-          const hasMatch = selectedValues.some(val => 
-            productAttrValue.includes(val)
-          );
-          if (!hasMatch) return false;
-        } else {
-          // Valor simples - verificar se está nos valores selecionados
-          if (!selectedValues.includes(productAttrValue)) {
-            return false;
-          }
-        }
-      }
-    }
+    // Stock
+    if (stockValue === "true" && !product.stock) return false;
+    if (stockValue === "false" && product.stock) return false;
 
     return true;
   });
 
+  // Reset página e atualizar display
   currentPage = 1;
   updateProductsCount();
   renderProducts();
 }
+
 
 // ===== SORT PRODUCTS =====
 function sortProducts() {
