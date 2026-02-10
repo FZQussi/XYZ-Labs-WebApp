@@ -40,41 +40,15 @@ exports.getProducts = async (req, res) => {
       ORDER BY p.created_at DESC
     `);
 
-    // Buscar atributos de cada produto
-    const productsWithData = await Promise.all(
-      result.rows.map(async (product) => {
-        // Atributos
-        const attributesResult = await client.query(`
-          SELECT 
-            pa.attribute_value,
-            sa.attribute_name,
-            sa.attribute_type
-          FROM product_attributes pa
-          JOIN subcategory_attributes sa ON pa.attribute_id = sa.id
-          WHERE pa.product_id = $1
-          ORDER BY sa.display_order
-        `, [product.id]);
+    res.json(result.rows);
 
-        const attributes = {};
-        attributesResult.rows.forEach(attr => {
-          attributes[attr.attribute_name] = attr.attribute_value;
-        });
-
-        return {
-          ...product,
-          attributes
-        };
-      })
-    );
-
-    res.json(productsWithData);
   } catch (err) {
     console.error('Erro ao obter produtos:', err);
     res.status(500).json({ error: 'Erro ao obter produtos' });
   }
 };
 
-// ===== GET PRODUCT BY ID (com categorias e atributos) =====
+
 exports.getProductById = async (req, res) => {
   try {
     const result = await client.query(`
@@ -89,12 +63,11 @@ exports.getProductById = async (req, res) => {
 
     const product = result.rows[0];
 
-    // Buscar categorias
+    // Buscar categorias apenas
     const categoriesResult = await client.query(`
       SELECT 
         c.id,
         c.name,
-        c.slug,
         pc.is_primary
       FROM product_categories pc
       JOIN categories c ON c.id = pc.category_id
@@ -102,38 +75,16 @@ exports.getProductById = async (req, res) => {
       ORDER BY pc.is_primary DESC, c.name
     `, [product.id]);
 
-    // Buscar atributos
-    const attributesResult = await client.query(`
-      SELECT 
-        pa.attribute_value,
-        sa.attribute_name,
-        sa.attribute_type,
-        sa.id as attribute_id
-      FROM product_attributes pa
-      JOIN subcategory_attributes sa ON pa.attribute_id = sa.id
-      WHERE pa.product_id = $1
-      ORDER BY sa.display_order
-    `, [product.id]);
-
-    const attributes = {};
-    attributesResult.rows.forEach(attr => {
-      attributes[attr.attribute_name] = {
-        value: attr.attribute_value,
-        type: attr.attribute_type,
-        attribute_id: attr.attribute_id
-      };
-    });
-
     res.json({
       ...product,
-      categories: categoriesResult.rows,
-      attributes
+      categories: categoriesResult.rows
     });
   } catch (err) {
     console.error('Erro ao obter produto:', err);
     res.status(500).json({ error: 'Erro ao obter produto' });
   }
 };
+
 
 // ===== CREATE PRODUCT (com múltiplas categorias e atributos) =====
 exports.createProduct = async (req, res) => {
@@ -185,20 +136,6 @@ exports.createProduct = async (req, res) => {
         INSERT INTO product_categories (product_id, category_id, is_primary)
         VALUES ($1, $2, $3)
       `, [product.id, categoryId, isPrimary]);
-    }
-
-    // Inserir atributos se fornecidos
-    if (attributes) {
-      const attributesObj = typeof attributes === 'string' ? JSON.parse(attributes) : attributes;
-      
-      for (const [attrId, attrValue] of Object.entries(attributesObj)) {
-        if (attrValue) {
-          await dbClient.query(`
-            INSERT INTO product_attributes (product_id, attribute_id, attribute_value)
-            VALUES ($1, $2, $3)
-          `, [product.id, attrId, attrValue]);
-        }
-      }
     }
 
     await dbClient.query('COMMIT');
@@ -291,27 +228,6 @@ exports.updateProduct = async (req, res) => {
         `, [productId, categoryId, isPrimary]);
       }
     }
-
-    // Atualizar atributos se fornecidos
-    if (req.body.attributes) {
-      const attributesObj = typeof req.body.attributes === 'string' 
-        ? JSON.parse(req.body.attributes) 
-        : req.body.attributes;
-
-      // Eliminar atributos existentes
-      await dbClient.query('DELETE FROM product_attributes WHERE product_id = $1', [productId]);
-
-      // Inserir novos atributos
-      for (const [attrId, attrValue] of Object.entries(attributesObj)) {
-        if (attrValue) {
-          await dbClient.query(`
-            INSERT INTO product_attributes (product_id, attribute_id, attribute_value)
-            VALUES ($1, $2, $3)
-          `, [productId, attrId, attrValue]);
-        }
-      }
-    }
-
     await dbClient.query('COMMIT');
 
     // Buscar produto atualizado

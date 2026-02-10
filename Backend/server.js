@@ -8,12 +8,12 @@
   const productRoutes = require('./routes/products.routes');
   const userRoutes = require('./routes/users.routes');
   const categoriesRoutes = require('./routes/categories.routes');
-  const subcategoriesRoutes = require('./routes/subcategories.routes');
+  //const subcategoriesRoutes = require('./routes/subcategories.routes');
   const orderRoutes = require('./routes/orders.routes');
   const contactRoutes = require('./routes/contact.routes');
   const forgotRoutes = require('./routes/forgot.routes');
   const resetRoutes = require('./routes/reset.routes');
-  const attributesRoutes = require('./routes/attributes.routes');
+ // const attributesRoutes = require('./routes/attributes.routes');
   const app = express();
   const port = process.env.PORT || 3001;
 
@@ -61,14 +61,14 @@
   app.use('/reset-password', resetRoutes);
   // ===== ROTAS =====
   app.use('/categories', categoriesRoutes);
-  app.use('/subcategories', subcategoriesRoutes);
+ // app.use('/subcategories', subcategoriesRoutes);
   app.use('/auth', authRoutes);
   app.use('/admin', adminRoutes);
   app.use('/products', productRoutes);
   app.use('/users', userRoutes);
   app.use('/orders', orderRoutes);
   app.use('/contact', contactRoutes);
-  app.use('/attributes', attributesRoutes);
+ // app.use('/attributes', attributesRoutes);
   // ===== ROTA TESTE =====
   app.get('/', (_, res) => {
     res.send('Backend a funcionar 🚀');

@@ -401,26 +401,20 @@
         <label>Descrição</label>
         <textarea id="createDescription" rows="4" required></textarea>
       </div>
-<div class="form-group">
-  <label>Categorias *</label>
-  <div id="categoriesCheckboxes" class="categories-checkbox-container">
-    <!-- Categorias carregadas via JS -->
-  </div>
-  <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-    Seleciona todas as categorias a que este produto pertence
-  </small>
-</div>
 
-<!-- CATEGORIA PRINCIPAL -->
-<div class="form-group">
-  <label>Categoria Principal *</label>
-  <select id="primaryCategory" disabled>
-    <option value="">-- Categoria Principal --</option>
-  </select>
-  <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-    Escolhe qual a categoria principal para breadcrumbs e navegação
-  </small>
-</div>
+        <div class="form-group">
+        <label>Categoria</label>
+        <select id="createCategory">
+            <option value="">-- Seleciona categoria --</option>
+        </select>
+        </div>
+
+        <div class="form-group">
+        <label>Subcategoria</label>
+        <select id="createSubcategory">
+            <option value="">-- Seleciona subcategoria --</option>
+        </select>
+        </div>
 
 
 
@@ -496,26 +490,21 @@
             <textarea id="editDescription" rows="4" required></textarea>
           </div>
 
-       <div class="form-group">
-  <label>Categorias *</label>
-  <div id="categoriesCheckboxes" class="categories-checkbox-container">
-    <!-- Categorias carregadas via JS -->
-  </div>
-  <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-    Seleciona todas as categorias a que este produto pertence
-  </small>
-</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="editCategory" data-category-select>
+                <option value="">-- Seleciona categoria --</option>
+              </select>
+            </div>
 
-<!-- CATEGORIA PRINCIPAL -->
-<div class="form-group">
-  <label>Categoria Principal *</label>
-  <select id="primaryCategory" disabled>
-    <option value="">-- Categoria Principal --</option>
-  </select>
-  <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-    Escolhe qual a categoria principal para breadcrumbs e navegação
-  </small>
-</div>
+            <div class="form-group">
+              <label>Subcategoria</label>
+              <select id="editSubcategory" data-subcat-select data-for-category="editCategory">
+                <option value="">-- Seleciona subcategoria --</option>
+              </select>
+            </div>
+          </div>
 
           <div class="form-group">
   <label>Stock Disponível</label>
@@ -718,9 +707,10 @@
   <script src="../scripts/users.js"></script>
   <script src="../scripts/products.js"></script>
   <script src="../scripts/categories.js"></script>
- 
+  <script src="../scripts/subcategories.js"></script>
   <script src="../scripts/createproduct.js"></script>
   <script src="../scripts/editproduct.js"></script>
-  <script src="../scripts/viewproduct.js"></script>
+    <script src="../scripts/viewproduct.js"></script>
+    <script src="../scripts/attributes-manager.js"></script>
 </body>
 </html>

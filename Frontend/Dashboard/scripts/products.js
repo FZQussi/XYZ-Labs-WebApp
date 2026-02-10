@@ -35,10 +35,20 @@
         const row = document.createElement('div');
         row.className = 'product-item';
 
+        // nomes das categorias
+        const categories = (p.categories || [])
+          .map(c => c.name)
+          .join(', ');
+
         row.innerHTML = `
           <span class="product-name">${p.name}</span>
           <span>€${Number(p.price).toFixed(2)}</span>
-          <span>${p.stock ?? 0}</span>
+          <span class="${p.stock ? 'in-stock' : 'out-stock'}">
+            ${p.stock ? 'Disponível' : 'Indisponível'}
+          </span>
+          <span class="product-categories">
+            ${categories || '—'}
+          </span>
           <span class="status ${p.is_active ? 'active' : 'inactive'}">
             ${p.is_active ? 'Ativo' : 'Inativo'}
           </span>

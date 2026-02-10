@@ -1,273 +1,162 @@
-// Frontend/Dashboard/scripts/editproduct.js - ATUALIZADO PARA MÚLTIPLAS CATEGORIAS
 (() => {
   const API_BASE = 'http://localhost:3001';
   const token = localStorage.getItem('token');
-  let currentProductAttributes = {};
-  let availableAttributes = [];
+
   let categories = [];
-  let selectedCategories = new Set();
-  
-  // ===== ELEMENTOS MODAL =====
+  let currentProduct = null;
+
+  // ===== ELEMENTOS MODAL DE EDIÇÃO =====
   const editModal = document.getElementById('editProductModal');
-  const editForm = document.getElementById('editProductForm');
-  const editId = document.getElementById('editId');
-  const editName = document.getElementById('editName');
-  const editPrice = document.getElementById('editPrice');
-  const editDesc = document.getElementById('editDescription');
-  const editStock = document.getElementById('editStock');
-  const editProductName = document.getElementById('editProductName');
-  
-  // NOVO: Container para categorias
-  const categoriesEditContainer = document.getElementById('editCategoriesContainer');
-  
+  const editForm = editModal.querySelector('#editProductForm');
+  const editId = editModal.querySelector('#editId');
+  const editName = editModal.querySelector('#editName');
+  const editPrice = editModal.querySelector('#editPrice');
+  const editDesc = editModal.querySelector('#editDescription');
+  const editStock = editModal.querySelector('#editStock');
+  const editProductName = editModal.querySelector('#editProductName');
+
+  // Categorias (dentro do modal)
+  const categoriesContainer = editModal.querySelector('#categoriesCheckboxes');
+  const primaryCategorySelect = editModal.querySelector('#primaryCategory');
+
   // Modelo 3D
-  const editCurrentModel = document.getElementById('editCurrentModel');
-  const currentModelFilename = document.getElementById('currentModelFilename');
-  const editModelFile = document.getElementById('editModelFile');
-  const newModelFilename = document.getElementById('newModelFilename');
-  const uploadNewModelBtn = document.getElementById('uploadNewModelBtn');
+  const editCurrentModel = editModal.querySelector('#editCurrentModel');
+  const currentModelFilename = editModal.querySelector('#currentModelFilename');
+  const editModelFile = editModal.querySelector('#editModelFile');
+  const newModelFilename = editModal.querySelector('#newModelFilename');
+  const uploadNewModelBtn = editModal.querySelector('#uploadNewModelBtn');
 
   // Imagens
-  const editImagesGrid = document.getElementById('editImagesGrid');
-  const imageCount = document.getElementById('imageCount');
-  const editNewImages = document.getElementById('editNewImages');
-  const newImagesInfo = document.getElementById('newImagesInfo');
-  const uploadNewImagesBtn = document.getElementById('uploadNewImagesBtn');
-  const editReplaceImages = document.getElementById('editReplaceImages');
-  const replaceImagesInfo = document.getElementById('replaceImagesInfo');
-  const replaceAllImagesBtn = document.getElementById('replaceAllImagesBtn');
+  const editImagesGrid = editModal.querySelector('#editImagesGrid');
+  const imageCount = editModal.querySelector('#imageCount');
+  const editNewImages = editModal.querySelector('#editNewImages');
+  const newImagesInfo = editModal.querySelector('#newImagesInfo');
+  const uploadNewImagesBtn = editModal.querySelector('#uploadNewImagesBtn');
+  const editReplaceImages = editModal.querySelector('#editReplaceImages');
+  const replaceImagesInfo = editModal.querySelector('#replaceImagesInfo');
+  const replaceAllImagesBtn = editModal.querySelector('#replaceAllImagesBtn');
 
   // Botões
   const editCloseBtn = editModal.querySelector('[data-close="edit"]');
-  const deleteBtn = document.getElementById('deleteProductBtn');
+  const deleteBtn = editModal.querySelector('#deleteProductBtn');
 
   // Abas
   const tabButtons = editModal.querySelectorAll('.modal-tab-btn');
 
-  let currentProduct = null;
-
   // ===== AUTENTICAÇÃO =====
-  function authHeaders() { return { Authorization: `Bearer ${token}` }; }
+  const authHeaders = () => ({ Authorization: `Bearer ${token}` });
 
-  function showModal() { editModal.classList.remove('hidden'); }
-  function hideModal() { editModal.classList.add('hidden'); }
+  // ===== MODAL =====
+  const showModal = () => editModal.classList.remove('hidden');
+  const hideModal = () => editModal.classList.add('hidden');
 
   // ===== SISTEMA DE ABAS =====
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const tabName = btn.dataset.tab;
-      
+
       tabButtons.forEach(b => b.classList.remove('active'));
-      editModal.querySelectorAll('.modal-tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
+      editModal.querySelectorAll('.modal-tab-content').forEach(content => content.classList.remove('active'));
 
       btn.classList.add('active');
-      const targetContent = document.getElementById(`tab-${tabName}`);
+      const targetContent = editModal.querySelector(`#tab-${tabName}`);
       if (targetContent) targetContent.classList.add('active');
     });
   });
 
-  // ===== LOAD CATEGORIES =====
+  // ===== CARREGAR CATEGORIAS =====
   async function loadCategories() {
     try {
       const res = await fetch(`${API_BASE}/categories`, { headers: authHeaders() });
       categories = await res.json();
+      console.log('Categorias carregadas:', categories);
     } catch (err) {
       console.error('Erro ao carregar categorias:', err);
     }
   }
 
-  // ===== RENDERIZAR SELEÇÃO DE CATEGORIAS PARA EDIÇÃO =====
-  function renderCategoriesEdit(productCategories) {
-    if (!categoriesEditContainer) {
-      console.error('Container de categorias não encontrado');
+  // ===== RENDERIZAR CHECKBOXES DE CATEGORIAS =====
+  function renderEditCategoryCheckboxes(selectedCategoryIds = [], primaryCategoryId = null) {
+    categoriesContainer.innerHTML = '';
+    primaryCategorySelect.innerHTML = '<option value="">-- Categoria Principal --</option>';
+
+    categories.forEach(cat => {
+      const isChecked = selectedCategoryIds.includes(cat.id);
+
+      const div = document.createElement('div');
+      div.className = 'category-checkbox-item';
+      div.innerHTML = `
+        <label>
+          <input 
+            type="checkbox" 
+            value="${cat.id}" 
+            class="edit-category-checkbox"
+            data-category-name="${cat.name}"
+            ${isChecked ? 'checked' : ''}
+          >
+          <span class="category-label">${cat.name}</span>
+        </label>
+      `;
+      categoriesContainer.appendChild(div);
+
+      // Popular select de categoria principal
+      if (isChecked) {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.name;
+        primaryCategorySelect.appendChild(option);
+      }
+    });
+
+    // Restaurar categoria primária
+    if (primaryCategoryId) primaryCategorySelect.value = primaryCategoryId;
+
+    // Event listeners dentro do modal
+    categoriesContainer.querySelectorAll('.edit-category-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', updatePrimaryCategoryOptions);
+    });
+
+    // Ajusta desabilitado se não houver categorias selecionadas
+    primaryCategorySelect.disabled = categoriesContainer.querySelectorAll('.edit-category-checkbox:checked').length === 0;
+  }
+
+  function updatePrimaryCategoryOptions() {
+    const selectedCheckboxes = categoriesContainer.querySelectorAll('.edit-category-checkbox:checked');
+    const currentValue = primaryCategorySelect.value;
+
+    primaryCategorySelect.innerHTML = '<option value="">-- Categoria Principal --</option>';
+
+    if (selectedCheckboxes.length === 0) {
+      primaryCategorySelect.disabled = true;
       return;
     }
 
-    // Limpar seleção anterior
-    selectedCategories.clear();
-    
-    // Encontrar categoria primária
-    const primaryCategory = productCategories.find(pc => pc.is_primary);
-    const primaryCategoryId = primaryCategory?.id;
-
-    // Adicionar categorias do produto à seleção
-    productCategories.forEach(pc => {
-      selectedCategories.add(pc.id);
+    primaryCategorySelect.disabled = false;
+    selectedCheckboxes.forEach(cb => {
+      const option = document.createElement('option');
+      option.value = cb.value;
+      option.textContent = cb.dataset.categoryName;
+      primaryCategorySelect.appendChild(option);
     });
 
-    categoriesEditContainer.innerHTML = `
-      <h4 style="margin:20px 0 10px;font-size:14px;text-transform:uppercase;">
-        Categorias do Produto *
-      </h4>
-      <p style="font-size:12px;color:#666;margin-bottom:10px;">
-        Seleciona todas as categorias onde este produto deve aparecer. 
-        Clica no botão "★" para definir a categoria primária.
-      </p>
-      <div class="categories-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">
-        ${categories.map(cat => {
-          const isSelected = selectedCategories.has(cat.id);
-          const isPrimary = cat.id === primaryCategoryId;
-          
-          return `
-            <div class="category-edit-item" 
-                 data-category-id="${cat.id}"
-                 style="
-                   display:flex;
-                   align-items:center;
-                   gap:8px;
-                   padding:10px;
-                   border:2px solid ${isSelected ? '#2563eb' : '#e5e7eb'};
-                   background-color:${isSelected ? '#eff6ff' : 'transparent'};
-                   border-radius:6px;
-                   cursor:pointer;
-                   transition:all 0.3s ease;
-                 ">
-              <input 
-                type="checkbox" 
-                value="${cat.id}" 
-                class="category-edit-checkbox"
-                ${isSelected ? 'checked' : ''}
-                style="cursor:pointer;"
-              >
-              <span style="font-size:14px;font-weight:600;flex:1;">${cat.name}</span>
-              <button 
-                type="button"
-                class="btn-set-primary"
-                data-category-id="${cat.id}"
-                style="
-                  background:${isPrimary ? '#10b981' : '#e5e7eb'};
-                  color:${isPrimary ? 'white' : '#666'};
-                  border:none;
-                  width:28px;
-                  height:28px;
-                  border-radius:50%;
-                  cursor:pointer;
-                  font-size:16px;
-                  display:${isSelected ? 'flex' : 'none'};
-                  align-items:center;
-                  justify-content:center;
-                  transition:all 0.3s ease;
-                "
-                title="${isPrimary ? 'Categoria primária' : 'Definir como primária'}"
-              >
-                ★
-              </button>
-            </div>
-          `;
-        }).join('')}
-      </div>
-      <p id="categoriesEditError" style="color:#ef4444;font-size:12px;margin-top:10px;display:none;">
-        ⚠️ Seleciona pelo menos uma categoria
-      </p>
-    `;
-
-    // Event listeners
-    document.querySelectorAll('.category-edit-checkbox').forEach(checkbox => {
-      checkbox.addEventListener('change', handleCategoryEditSelection);
-    });
-
-    document.querySelectorAll('.btn-set-primary').forEach(btn => {
-      btn.addEventListener('click', handleSetPrimary);
-    });
-
-    // Hover effects
-    document.querySelectorAll('.category-edit-item').forEach(item => {
-      item.addEventListener('mouseenter', function() {
-        const checkbox = this.querySelector('.category-edit-checkbox');
-        if (!checkbox.checked) {
-          this.style.borderColor = '#93c5fd';
-          this.style.backgroundColor = '#f0f9ff';
-        }
-      });
-      item.addEventListener('mouseleave', function() {
-        const checkbox = this.querySelector('.category-edit-checkbox');
-        if (!checkbox.checked) {
-          this.style.borderColor = '#e5e7eb';
-          this.style.backgroundColor = 'transparent';
-        }
-      });
-    });
-  }
-
-  // ===== HANDLE CATEGORY SELECTION IN EDIT =====
-  function handleCategoryEditSelection(e) {
-    const categoryId = parseInt(e.target.value);
-    const item = e.target.closest('.category-edit-item');
-    const setPrimaryBtn = item.querySelector('.btn-set-primary');
-
-    if (e.target.checked) {
-      selectedCategories.add(categoryId);
-      item.style.borderColor = '#2563eb';
-      item.style.backgroundColor = '#eff6ff';
-      setPrimaryBtn.style.display = 'flex';
-      
-      // Se for a primeira categoria, tornar primária automaticamente
-      if (selectedCategories.size === 1) {
-        setPrimaryBtn.style.backgroundColor = '#10b981';
-        setPrimaryBtn.style.color = 'white';
-      }
-    } else {
-      selectedCategories.delete(categoryId);
-      item.style.borderColor = '#e5e7eb';
-      item.style.backgroundColor = 'transparent';
-      setPrimaryBtn.style.display = 'none';
-      
-      // Se remover a primária, definir outra como primária
-      const wasPrimary = setPrimaryBtn.style.backgroundColor === 'rgb(16, 185, 129)';
-      if (wasPrimary && selectedCategories.size > 0) {
-        const firstCategoryId = Array.from(selectedCategories)[0];
-        const firstItem = document.querySelector(`.category-edit-item[data-category-id="${firstCategoryId}"]`);
-        const firstBtn = firstItem.querySelector('.btn-set-primary');
-        firstBtn.style.backgroundColor = '#10b981';
-        firstBtn.style.color = 'white';
-      }
-    }
-
-    if (selectedCategories.size > 0) {
-      document.getElementById('categoriesEditError').style.display = 'none';
+    if (currentValue && Array.from(selectedCheckboxes).some(cb => cb.value === currentValue)) {
+      primaryCategorySelect.value = currentValue;
+    } else if (selectedCheckboxes.length === 1) {
+      primaryCategorySelect.value = selectedCheckboxes[0].value;
     }
   }
 
-  // ===== HANDLE SET PRIMARY =====
-  function handleSetPrimary(e) {
-    e.stopPropagation();
-    const categoryId = parseInt(e.target.dataset.categoryId);
-    
-    // Remover primária de todas
-    document.querySelectorAll('.btn-set-primary').forEach(btn => {
-      btn.style.backgroundColor = '#e5e7eb';
-      btn.style.color = '#666';
-    });
-    
-    // Definir esta como primária
-    e.target.style.backgroundColor = '#10b981';
-    e.target.style.color = 'white';
-  }
-
-  // ===== GET PRIMARY CATEGORY ID =====
-  function getPrimaryCategoryId() {
-    const primaryBtn = Array.from(document.querySelectorAll('.btn-set-primary'))
-      .find(btn => btn.style.backgroundColor === 'rgb(16, 185, 129)');
-    
-    return primaryBtn ? parseInt(primaryBtn.dataset.categoryId) : Array.from(selectedCategories)[0];
-  }
-
-  // ===== LOAD PRODUCT IMAGES =====
+  // ===== CARREGAR IMAGENS DO PRODUTO =====
   async function loadProductImages(productId) {
     try {
-      const res = await fetch(`${API_BASE}/products/${productId}`, {
-        headers: authHeaders()
-      });
+      const res = await fetch(`${API_BASE}/products/${productId}`, { headers: authHeaders() });
       const product = await res.json();
-      
       const images = product.images || [];
-      imageCount.textContent = images.length;
 
+      imageCount.textContent = images.length;
       editImagesGrid.innerHTML = '';
 
-      if (images.length === 0) {
+      if (!images.length) {
         editImagesGrid.innerHTML = '<p class="no-images-edit">Nenhuma imagem</p>';
         return;
       }
@@ -290,51 +179,52 @@
         item.appendChild(deleteBtn);
         editImagesGrid.appendChild(item);
       });
-
     } catch (err) {
       console.error('Erro ao carregar imagens:', err);
     }
   }
 
-  // ===== DELETE IMAGE =====
+  // ===== ELIMINAR IMAGEM =====
   async function deleteImage(productId, filename) {
     if (!confirm('Eliminar esta imagem?')) return;
-
     try {
       const res = await fetch(`${API_BASE}/products/${productId}/images`, {
         method: 'DELETE',
-        headers: {
-          ...authHeaders(),
-          'Content-Type': 'application/json'
-        },
+        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename })
       });
-
       if (!res.ok) throw new Error('Erro ao eliminar imagem');
-
       await loadProductImages(productId);
-      console.log('✅ Imagem eliminada com sucesso');
     } catch (err) {
-      console.error('Erro ao eliminar imagem:', err);
+      console.error(err);
       alert('Erro ao eliminar imagem');
     }
   }
 
-  // ===== OPEN MODAL =====
+  // ===== ABRIR MODAL DE EDIÇÃO =====
   document.addEventListener('openEditProductModal', async (e) => {
     currentProduct = e.detail;
 
+    if (!currentProduct) return console.error('Produto inválido para edição');
+    console.log('Produto recebido para edição:', currentProduct);
+
+    // ===== POPULAR CAMPOS PRINCIPAIS =====
     editId.value = currentProduct.id;
     editProductName.textContent = currentProduct.name;
     editName.value = currentProduct.name;
-    editPrice.value = currentProduct.price;
-    editDesc.value = currentProduct.description;
-    editStock.checked = currentProduct.stock === true;
+    editPrice.value = currentProduct.price ?? 0;
+    editDesc.value = currentProduct.description ?? '';
+    editStock.checked = !!currentProduct.stock;
 
-    // Renderizar categorias
-    renderCategoriesEdit(currentProduct.categories || []);
+    // ===== CATEGORIAS =====
+    const productCategoryIds = (currentProduct.categories || []).map(c => parseInt(c.id));
+    const primaryCategoryId = parseInt(
+      (currentProduct.categories || []).find(c => c.is_primary)?.id || productCategoryIds[0]
+    );
 
-    // Modelo 3D
+    renderEditCategoryCheckboxes(productCategoryIds, primaryCategoryId);
+
+    // ===== MODELO 3D =====
     if (currentProduct.model_file) {
       editCurrentModel.src = `${API_BASE}/models/${currentProduct.model_file}`;
       currentModelFilename.textContent = `📦 ${currentProduct.model_file}`;
@@ -343,45 +233,52 @@
       currentModelFilename.textContent = 'Sem modelo 3D';
     }
 
-    // Limpar inputs
+    // Limpar inputs de upload de modelo
     editModelFile.value = '';
     newModelFilename.textContent = '';
     uploadNewModelBtn.disabled = true;
+
+    // ===== IMAGENS =====
     editNewImages.value = '';
     newImagesInfo.textContent = '';
     uploadNewImagesBtn.disabled = true;
+
     editReplaceImages.value = '';
     replaceImagesInfo.textContent = '';
     replaceAllImagesBtn.disabled = true;
 
-    // Carregar imagens
+    // Carregar imagens atuais
     await loadProductImages(currentProduct.id);
 
-    // Ativa primeira aba
+    // ===== ATIVAR PRIMEIRA ABA =====
     tabButtons[0].click();
 
+    // ===== MOSTRAR MODAL =====
     showModal();
   });
 
   editCloseBtn.addEventListener('click', hideModal);
 
-  // ===== SUBMIT DETALHES =====
+  // ===== SUBMIT FORM =====
   editForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    // Validar categorias
-    if (selectedCategories.size === 0) {
-      document.getElementById('categoriesEditError').style.display = 'block';
-      return;
-    }
+    const selectedCategoryIds = Array.from(
+      categoriesContainer.querySelectorAll('.edit-category-checkbox:checked')
+    ).map(cb => parseInt(cb.value));
+
+    const primaryCategoryId = parseInt(primaryCategorySelect.value);
+
+    if (!selectedCategoryIds.length) return alert('Seleciona pelo menos uma categoria');
+    if (!primaryCategoryId) return alert('Seleciona uma categoria principal');
 
     const formData = new FormData();
     formData.append('name', editName.value);
     formData.append('price', editPrice.value);
     formData.append('description', editDesc.value);
     formData.append('stock', editStock.checked);
-    formData.append('category_ids', JSON.stringify(Array.from(selectedCategories)));
-    formData.append('primary_category_id', getPrimaryCategoryId());
+    formData.append('category_ids', JSON.stringify(selectedCategoryIds));
+    formData.append('primary_category_id', primaryCategoryId);
 
     try {
       const res = await fetch(`${API_BASE}/products/${editId.value}`, {
@@ -389,181 +286,19 @@
         headers: authHeaders(),
         body: formData
       });
-      
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || 'Erro ao guardar alterações');
       }
-      
-      console.log('✅ Produto atualizado com sucesso!');
+      console.log('✅ Produto atualizado!');
       hideModal();
       window.reloadProducts();
     } catch (err) {
-      console.error('Erro ao guardar alterações:', err);
+      console.error(err);
       alert(err.message || 'Erro ao guardar alterações');
     }
   });
 
-  // ===== UPLOAD NOVO MODELO =====
-  editModelFile.addEventListener('change', () => {
-    if (editModelFile.files.length > 0) {
-      newModelFilename.textContent = `✅ ${editModelFile.files[0].name}`;
-      uploadNewModelBtn.disabled = false;
-    } else {
-      newModelFilename.textContent = '';
-      uploadNewModelBtn.disabled = true;
-    }
-  });
-
-  uploadNewModelBtn.addEventListener('click', async () => {
-    if (!editModelFile.files.length) return;
-
-    const formData = new FormData();
-    formData.append('modelFile', editModelFile.files[0]);
-
-    try {
-      uploadNewModelBtn.classList.add('btn-loading');
-      uploadNewModelBtn.disabled = true;
-
-      const res = await fetch(`${API_BASE}/products/${editId.value}`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Erro ao enviar modelo');
-
-      const updated = await res.json();
-      editCurrentModel.src = `${API_BASE}/models/${updated.model_file}`;
-      currentModelFilename.textContent = `📦 ${updated.model_file}`;
-      
-      editModelFile.value = '';
-      newModelFilename.textContent = '';
-      uploadNewModelBtn.disabled = true;
-
-      console.log('✅ Modelo atualizado com sucesso!');
-    } catch (err) {
-      console.error('Erro ao enviar modelo:', err);
-      alert('Erro ao enviar modelo');
-    } finally {
-      uploadNewModelBtn.classList.remove('btn-loading');
-    }
-  });
-
-  // ===== ADICIONAR IMAGENS =====
-  editNewImages.addEventListener('change', () => {
-    const count = editNewImages.files.length;
-    if (count > 0) {
-      newImagesInfo.textContent = `✅ ${count} imagem(ns) selecionada(s)`;
-      uploadNewImagesBtn.disabled = false;
-    } else {
-      newImagesInfo.textContent = '';
-      uploadNewImagesBtn.disabled = true;
-    }
-  });
-
-  uploadNewImagesBtn.addEventListener('click', async () => {
-    if (!editNewImages.files.length) return;
-
-    const formData = new FormData();
-    for (let i = 0; i < Math.min(4, editNewImages.files.length); i++) {
-      formData.append('images', editNewImages.files[i]);
-    }
-
-    try {
-      uploadNewImagesBtn.classList.add('btn-loading');
-      uploadNewImagesBtn.disabled = true;
-
-      const res = await fetch(`${API_BASE}/products/${editId.value}/images`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Erro ao adicionar imagens');
-
-      await loadProductImages(editId.value);
-      
-      editNewImages.value = '';
-      newImagesInfo.textContent = '';
-
-      console.log('✅ Imagens adicionadas com sucesso!');
-    } catch (err) {
-      console.error('Erro ao adicionar imagens:', err);
-      alert('Erro ao adicionar imagens');
-    } finally {
-      uploadNewImagesBtn.classList.remove('btn-loading');
-    }
-  });
-
-  // ===== SUBSTITUIR TODAS AS IMAGENS =====
-  editReplaceImages.addEventListener('change', () => {
-    const count = editReplaceImages.files.length;
-    if (count > 0) {
-      replaceImagesInfo.textContent = `✅ ${count} imagem(ns) selecionada(s)`;
-      replaceAllImagesBtn.disabled = false;
-    } else {
-      replaceImagesInfo.textContent = '';
-      replaceAllImagesBtn.disabled = true;
-    }
-  });
-
-  replaceAllImagesBtn.addEventListener('click', async () => {
-    if (!editReplaceImages.files.length) return;
-    
-    if (!confirm('⚠️ Isto irá eliminar todas as imagens atuais. Continuar?')) return;
-
-    const formData = new FormData();
-    for (let i = 0; i < Math.min(4, editReplaceImages.files.length); i++) {
-      formData.append('images', editReplaceImages.files[i]);
-    }
-
-    try {
-      replaceAllImagesBtn.classList.add('btn-loading');
-      replaceAllImagesBtn.disabled = true;
-
-      const res = await fetch(`${API_BASE}/products/${editId.value}/images`, {
-        method: 'PUT',
-        headers: authHeaders(),
-        body: formData
-      });
-
-      if (!res.ok) throw new Error('Erro ao substituir imagens');
-
-      await loadProductImages(editId.value);
-      
-      editReplaceImages.value = '';
-      replaceImagesInfo.textContent = '';
-
-      console.log('✅ Imagens substituídas com sucesso!');
-    } catch (err) {
-      console.error('Erro ao substituir imagens:', err);
-      alert('Erro ao substituir imagens');
-    } finally {
-      replaceAllImagesBtn.classList.remove('btn-loading');
-    }
-  });
-
-  // ===== DELETE PRODUCT =====
-  deleteBtn.addEventListener('click', async () => {
-    if (!confirm('⚠️ Tens a certeza que queres eliminar este produto?\n\nTodos os ficheiros (modelo 3D e imagens) serão permanentemente eliminados!')) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/products/${editId.value}`, {
-        method: 'DELETE',
-        headers: authHeaders()
-      });
-      
-      if (!res.ok) throw new Error('Erro ao eliminar produto');
-      
-      console.log('✅ Produto eliminado com sucesso!');
-      hideModal();
-      window.reloadProducts();
-    } catch (err) {
-      console.error('Erro ao eliminar produto:', err);
-      alert('Erro ao eliminar produto');
-    }
-  });
-
+  // ===== INICIALIZAÇÃO =====
   document.addEventListener('DOMContentLoaded', loadCategories);
 })();
