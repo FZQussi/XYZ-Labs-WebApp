@@ -1,5 +1,9 @@
 // Frontend/Dashboard/scripts/viewproduct.js
-document.addEventListener('DOMContentLoaded', () => {
+
+(() => {
+
+  const API_BASE = 'http://localhost:3001';
+
   const modal = document.getElementById('viewProductModal');
 
   const nameEl = document.getElementById('viewName');
@@ -11,115 +15,147 @@ document.addEventListener('DOMContentLoaded', () => {
   const subcatEl = document.getElementById('viewSubcategory');
   const modelViewer = document.getElementById('viewModel');
 
-  // Elementos das abas
-  const tabButtons = document.querySelectorAll('.modal-tab-btn');
-  const tabContents = document.querySelectorAll('.modal-tab-content');
+  const tabButtons = modal.querySelectorAll('.modal-tab-btn');
+  const tabContents = modal.querySelectorAll('.modal-tab-content');
 
-  function show() { modal.classList.remove('hidden'); }
-  function hide() { modal.classList.add('hidden'); }
+  const closeBtn = modal.querySelector('[data-close="view"]');
 
-  modal.querySelector('[data-close="view"]').addEventListener('click', hide);
+  const showModal = () => modal.classList.remove('hidden');
+  const hideModal = () => modal.classList.add('hidden');
 
-  // === SISTEMA DE ABAS ===
+  if (closeBtn) closeBtn.addEventListener('click', hideModal);
+
+  // ===== ABAS =====
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
+
       const tabName = btn.dataset.tab;
 
-      // Remove active de todos os botões
       tabButtons.forEach(b => b.classList.remove('active'));
-      
-      // Esconde todos os conteúdos
-      tabContents.forEach(content => content.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
 
-      // Ativa o botão clicado
       btn.classList.add('active');
 
-      // Mostra o conteúdo correspondente
-      const targetContent = document.getElementById(`tab-${tabName}`);
-      if (targetContent) {
-        targetContent.classList.add('active');
-      }
+      const target = modal.querySelector(`#tab-${tabName}`);
+      if (target) target.classList.add('active');
     });
   });
 
-  // Evento para abrir modal
-  document.addEventListener('openViewProductModal', async e => {
+  // ===== ABRIR MODAL =====
+  document.addEventListener('openViewProductModal', e => {
+
     const p = e.detail;
-    console.log('🚀 Produto recebido no modal:', p);
 
-    // === ABA DETALHES ===
-    nameEl.textContent = p.name;
-    priceEl.textContent = Number(p.price).toFixed(2);
-    stockEl.textContent = p.stock ?? 0;
+    console.log('📦 Produto recebido no VIEW:', p);
+
+    // ===== HEADER =====
+    nameEl.textContent = p.name ?? '—';
+
+    // ===== DETALHES =====
+    priceEl.textContent = Number(p.price || 0).toFixed(2);
+
+    stockEl.textContent =
+      typeof p.stock === 'boolean'
+        ? (p.stock ? 'Disponível' : 'Sem stock')
+        : (p.stock ?? 0);
+
     statusEl.textContent = p.is_active ? 'Ativo' : 'Inativo';
-    descEl.textContent = p.description;
-    catEl.textContent = p.category_name ?? '—';
-    subcatEl.textContent = p.subcategory_name ?? '—';
 
-    // === ABA MODELO 3D ===
-    if (p.model_file) {
-      modelViewer.src = `http://localhost:3001/models/${p.model_file}`;
-      console.log('📦 Model 3D:', modelViewer.src);
-      modelViewer.style.backgroundColor = '#cccccc';
-      modelViewer.style.color = '#005f6b';
+    descEl.textContent = p.description ?? '—';
+
+    // ===== CATEGORIAS (igual ao edit) =====
+    if (Array.isArray(p.categories) && p.categories.length > 0) {
+
+      const primary = p.categories.find(c => c.is_primary);
+
+      catEl.textContent = primary
+        ? primary.name
+        : p.categories[0].name;
+
+      // Mostrar restantes categorias como "subcategoria fake"
+      const others = p.categories
+        .filter(c => !c.is_primary)
+        .map(c => c.name);
+
+      subcatEl.textContent = others.length
+        ? others.join(', ')
+        : '—';
+
     } else {
-      modelViewer.src = '';
-      modelViewer.alt = 'Sem modelo 3D disponível';
+      catEl.textContent = '—';
+      subcatEl.textContent = '—';
     }
 
-    // === ABA IMAGENS ===
+    // ===== MODELO 3D =====
+    if (p.model_file) {
+
+      modelViewer.src = `${API_BASE}/models/${p.model_file}`;
+
+      console.log('🎨 Model SRC:', modelViewer.src);
+
+    } else {
+
+      modelViewer.src = '';
+      modelViewer.alt = 'Sem modelo 3D';
+    }
+
+    // ===== IMAGENS =====
     const imagesGrid = document.getElementById('imagesGrid');
-    imagesGrid.innerHTML = ''; // Limpa imagens anteriores
+    imagesGrid.innerHTML = '';
 
     const images = p.images || [];
-    console.log('🖼️ Imagens do produto:', images);
 
-    if (images.length > 0) {
+    console.log('🖼️ Imagens VIEW:', images);
+
+    if (!images.length) {
+
+      imagesGrid.innerHTML =
+        '<p class="no-images">Nenhuma imagem disponível</p>';
+
+    } else {
+
       images.forEach((filename, index) => {
-        const imgContainer = document.createElement('div');
-        imgContainer.className = 'image-item';
+
+        const div = document.createElement('div');
+        div.className = 'image-item';
 
         const img = document.createElement('img');
-        img.src = `http://localhost:3001/images/${filename}`;
+        img.src = `${API_BASE}/images/${filename}`;
         img.alt = `Imagem ${index + 1}`;
         img.loading = 'lazy';
 
-        // Clique para ampliar
-        img.addEventListener('click', () => {
-          openImageLightbox(img.src);
-        });
+        img.onclick = () => openImageLightbox(img.src);
 
-        imgContainer.appendChild(img);
-        imagesGrid.appendChild(imgContainer);
+        div.appendChild(img);
+        imagesGrid.appendChild(div);
       });
-    } else {
-      imagesGrid.innerHTML = '<p class="no-images">Nenhuma imagem disponível</p>';
     }
 
-    // Ativa a primeira aba por padrão
     tabButtons[0].click();
-
-    show();
+    showModal();
   });
 
-  // === LIGHTBOX PARA IMAGENS ===
+  // ===== LIGHTBOX =====
   function openImageLightbox(src) {
+
     const lightbox = document.createElement('div');
     lightbox.className = 'image-lightbox';
+
     lightbox.innerHTML = `
       <div class="lightbox-content">
         <span class="lightbox-close">&times;</span>
-        <img src="${src}" alt="Imagem ampliada">
+        <img src="${src}">
       </div>
     `;
 
     document.body.appendChild(lightbox);
 
-    // Fechar ao clicar no X ou fora da imagem
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+    lightbox.onclick = e => {
+      if (e.target === lightbox ||
+          e.target.classList.contains('lightbox-close')) {
         lightbox.remove();
       }
-    });
+    };
   }
-});
+
+})();
