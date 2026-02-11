@@ -3,7 +3,7 @@ const API_BASE = 'http://localhost:3001';
 let allProducts = [];
 let filteredProducts = [];
 let categories = [];
-let availableAttributes = {}; // Armazena atributos únicos dos produtos
+let availableAttributes = {};
 let currentPage = 1;
 const productsPerPage = 12;
 
@@ -26,14 +26,12 @@ async function loadProducts() {
     const res = await fetch(`${API_BASE}/products`);
     allProducts = await res.json();
     
-    // Extrair atributos únicos de todos os produtos
     extractAvailableAttributes();
-    
     filteredProducts = [...allProducts];
     
     updateProductsCount();
     renderProducts();
-    renderDynamicAttributeFilters(); // Renderiza filtros de atributos
+    renderDynamicAttributeFilters();
     
   } catch (err) {
     console.error('Erro ao carregar produtos:', err);
@@ -53,7 +51,6 @@ function extractAvailableAttributes() {
           availableAttributes[attrName] = new Set();
         }
         
-        // Se o valor for array (multiselect), adiciona cada item
         if (Array.isArray(attrValue)) {
           attrValue.forEach(val => availableAttributes[attrName].add(val));
         } else {
@@ -67,8 +64,6 @@ function extractAvailableAttributes() {
   Object.keys(availableAttributes).forEach(key => {
     availableAttributes[key] = Array.from(availableAttributes[key]).sort();
   });
-  
-  console.log('Atributos disponíveis:', availableAttributes);
 }
 
 // ===== RENDERIZAR FILTROS DE ATRIBUTOS DINÂMICOS =====
@@ -79,24 +74,23 @@ function renderDynamicAttributeFilters() {
   container.innerHTML = '';
   
   if (Object.keys(availableAttributes).length === 0) {
-    return; // Não há atributos para mostrar
+    return;
   }
   
   Object.entries(availableAttributes).forEach(([attrName, values]) => {
     if (values.length === 0) return;
     
-    const filterGroup = document.createElement('div');
-    filterGroup.className = 'filter-group filter-collapsible';
+    const filterSection = document.createElement('div');
+    filterSection.className = 'filter-section';
     
-    filterGroup.innerHTML = `
-      <button class="filter-toggle" type="button">
-        <span>${attrName}</span>
-        <span class="filter-arrow"></span>
-      </button>
-      
-      <div class="filter-options collapsed" data-attribute="${attrName}">
+    filterSection.innerHTML = `
+      <div class="filter-section-header">
+        <h3>${attrName}</h3>
+        <button class="btn-clear" onclick="clearAttributeFilter('${attrName}')">Limpar</button>
+      </div>
+      <div class="filter-list" data-attribute="${attrName}">
         ${values.map(value => `
-          <label class="filter-checkbox">
+          <label>
             <input type="checkbox" 
                    value="${value}" 
                    class="attribute-filter" 
@@ -107,23 +101,20 @@ function renderDynamicAttributeFilters() {
       </div>
     `;
     
-    container.appendChild(filterGroup);
-    
-    // Event listeners para collapse/expand
-    const toggleBtn = filterGroup.querySelector('.filter-toggle');
-    const optionsDiv = filterGroup.querySelector('.filter-options');
-    
-    toggleBtn.addEventListener('click', () => {
-      filterGroup.classList.toggle('open');
-      optionsDiv.classList.toggle('collapsed');
-      optionsDiv.classList.toggle('open');
-    });
+    container.appendChild(filterSection);
     
     // Event listeners para os checkboxes
-    filterGroup.querySelectorAll('.attribute-filter').forEach(checkbox => {
+    filterSection.querySelectorAll('.attribute-filter').forEach(checkbox => {
       checkbox.addEventListener('change', applyFilters);
     });
   });
+}
+
+// ===== LIMPAR FILTRO DE ATRIBUTO ESPECÍFICO =====
+function clearAttributeFilter(attrName) {
+  document.querySelectorAll(`.attribute-filter[data-attribute="${attrName}"]`)
+    .forEach(cb => cb.checked = false);
+  applyFilters();
 }
 
 // ===== LOAD CATEGORIES =====
@@ -144,7 +135,7 @@ function renderCategoryFilters() {
   
   container.innerHTML = categories.map(cat => {
     return `
-    <div class="filter-checkbox category-container">
+    <div class="category-container">
       <label>
         <input type="checkbox" value="${cat.id}" class="category-filter">
         <span>${cat.name}</span>
@@ -153,7 +144,7 @@ function renderCategoryFilters() {
       ${cat.subcategories && cat.subcategories.length ? `
         <div class="subcategory-container">
           ${cat.subcategories.map(sub => `
-            <label class="filter-checkbox subcategory-filter">
+            <label class="subcategory-filter">
               <input type="checkbox" value="${sub.id}" data-parent="${cat.id}">
               <span>${sub.name}</span>
             </label>
@@ -187,24 +178,28 @@ function renderCategoryFilters() {
   );
 }
 
-// ===== APPLY FILTERS (ATUALIZADO COM ATRIBUTOS) =====
+// ===== APPLY FILTERS (COM ATRIBUTOS) =====
 function applyFilters() {
-  // 🔹 Filtro de pesquisa
   const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-
-  // 🔹 Filtros de preço
   const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
   const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-
-  // 🔹 Filtro de categorias (ids selecionados)
+  
   const selectedCategories = Array.from(
     document.querySelectorAll('.category-filter:checked')
   ).map(cb => parseInt(cb.value));
-
-  // 🔹 Filtro de stock
+  
   const stockValue = document.getElementById('filterStock').value;
+  
+  // Coletar atributos selecionados
+  const selectedAttributes = {};
+  document.querySelectorAll('.attribute-filter:checked').forEach(cb => {
+    const attrName = cb.getAttribute('data-attribute');
+    if (!selectedAttributes[attrName]) {
+      selectedAttributes[attrName] = [];
+    }
+    selectedAttributes[attrName].push(cb.value);
+  });
 
-  // 🔹 Aplicar filtros
   filteredProducts = allProducts.filter(product => {
     const productPrice = Number(product.price);
 
@@ -214,7 +209,7 @@ function applyFilters() {
     // Preço
     if (productPrice < minPrice || productPrice > maxPrice) return false;
 
-    // Categoria — verificar se pelo menos uma categoria do produto está selecionada
+    // Categoria
     if (selectedCategories.length) {
       const productCategoryIds = product.categories.map(c => c.id);
       const hasCategoryMatch = productCategoryIds.some(id => selectedCategories.includes(id));
@@ -225,15 +220,30 @@ function applyFilters() {
     if (stockValue === "true" && !product.stock) return false;
     if (stockValue === "false" && product.stock) return false;
 
+    // Atributos dinâmicos
+    if (Object.keys(selectedAttributes).length > 0) {
+      for (const [attrName, selectedValues] of Object.entries(selectedAttributes)) {
+        if (!product.attributes || !product.attributes[attrName]) {
+          return false;
+        }
+        
+        const productAttrValue = product.attributes[attrName];
+        const productValues = Array.isArray(productAttrValue) 
+          ? productAttrValue 
+          : [productAttrValue];
+        
+        const hasMatch = selectedValues.some(val => productValues.includes(val));
+        if (!hasMatch) return false;
+      }
+    }
+
     return true;
   });
 
-  // Reset página e atualizar display
   currentPage = 1;
   updateProductsCount();
   renderProducts();
 }
-
 
 // ===== SORT PRODUCTS =====
 function sortProducts() {
@@ -263,7 +273,6 @@ function sortProducts() {
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   
-  // Paginação
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
@@ -278,7 +287,6 @@ function renderProducts() {
       ? `${API_BASE}/images/${product.images[0]}` 
       : '/Frontend/images/placeholder.jpg';
 
-    // 🆕 Renderizar atributos do produto (opcional)
     let attributesHTML = '';
     if (product.attributes && Object.keys(product.attributes).length > 0) {
       attributesHTML = '<div class="product-attributes">';
@@ -317,9 +325,7 @@ function renderProducts() {
     `;
   }).join('');
 
-  // Adicionar event listeners aos cards
   addCardClickListeners();
-  
   renderPagination();
 }
 
@@ -410,27 +416,38 @@ function addToCart(productId) {
   }
 }
 
-// ===== CLEAR FILTERS (ATUALIZADO) =====
+// ===== CLEAR ALL FILTERS =====
 function clearFilters() {
-  // Limpar filtros de categoria
+  // Categorias
   document.querySelectorAll('.category-filter').forEach(cb => cb.checked = false);
   document.querySelectorAll('.subcategory-filter input').forEach(cb => cb.checked = false);
   
-  // Limpar filtros de atributos dinâmicos
+  // Atributos
   document.querySelectorAll('.attribute-filter').forEach(cb => cb.checked = false);
   
-  // Limpar outros filtros
+  // Outros
   document.getElementById('minPrice').value = '';
   document.getElementById('maxPrice').value = '';
+  document.getElementById('filterStock').value = '';
   document.getElementById('searchInput').value = '';
   
+  applyFilters();
+}
+
+// ===== CLEAR CATEGORIES ONLY =====
+function clearCategoriesOnly() {
+  document.querySelectorAll('.category-filter').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.subcategory-filter input').forEach(cb => cb.checked = false);
   applyFilters();
 }
 
 // ===== TOGGLE FILTERS (MOBILE) =====
 function toggleFilters() {
   const sidebar = document.getElementById('filtersSidebar');
+  const overlay = document.getElementById('overlay');
+  
   sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
 }
 
 // ===== APPLY SEARCH FROM URL =====
@@ -447,35 +464,30 @@ function applySearchFromURL() {
   applyFilters();
 }
 
-// ===== SETUP COLLAPSIBLE FILTERS =====
-function setupCollapsibleFilters() {
-  const filter = document.querySelector('.filter-collapsible');
-  if (!filter) return;
-
-  const toggle = filter.querySelector('.filter-toggle');
-  const content = filter.querySelector('.filter-options');
-
-  toggle.addEventListener('click', () => {
-    const isOpen = filter.classList.contains('open');
-
-    filter.classList.toggle('open');
-    content.classList.toggle('open', !isOpen);
-    content.classList.toggle('collapsed', isOpen);
-  });
-}
-
 // ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', async () => {
   await loadProducts();
   await loadCategories();
 
-  setupCollapsibleFilters();
   applySearchFromURL();
 
+  // Toolbar controls
   document.getElementById('sortBy').addEventListener('change', sortProducts);
-  document.getElementById('minPrice').addEventListener('change', applyFilters);
-  document.getElementById('maxPrice').addEventListener('change', applyFilters);
+  document.getElementById('minPrice').addEventListener('input', applyFilters);
+  document.getElementById('maxPrice').addEventListener('input', applyFilters);
+  document.getElementById('filterStock').addEventListener('change', applyFilters);
   document.getElementById('searchInput').addEventListener('input', applyFilters);
+  
+  // Clear buttons
   document.getElementById('clearFilters').addEventListener('click', clearFilters);
+  document.getElementById('clearCategories').addEventListener('click', clearCategoriesOnly);
+  
+  // Toggle filters (mobile)
   document.getElementById('toggleFilters').addEventListener('click', toggleFilters);
+  
+  // Close sidebar when clicking overlay
+  document.getElementById('overlay').addEventListener('click', () => {
+    document.getElementById('filtersSidebar').classList.remove('active');
+    document.getElementById('overlay').classList.remove('active');
+  });
 });

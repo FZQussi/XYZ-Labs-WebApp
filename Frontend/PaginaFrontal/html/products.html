@@ -77,48 +77,80 @@
 <main class="products-page">
   <div class="container">
 
-    <!-- SIDEBAR DE CATEGORIAS -->
+    <!-- SIDEBAR DE FILTROS -->
     <aside class="filters-sidebar" id="filtersSidebar">
-      <div class="filters-header">
-        <h3>Categorias</h3>
-        <button class="btn-clear-filters" id="clearCategories">Limpar</button>
-      </div>
-
-      <div class="filter-group filter-collapsible">
-        <div id="categoryFilters" class="filter-options collapsed">
+      
+      <!-- CATEGORIAS -->
+      <div class="filter-section">
+        <div class="filter-section-header">
+          <h3>Categorias</h3>
+          <button class="btn-clear" id="clearCategories">Limpar</button>
+        </div>
+        <div id="categoryFilters" class="filter-list">
           <!-- Categorias carregadas via JS -->
         </div>
       </div>
+
+      <!-- FILTROS DINÂMICOS DE ATRIBUTOS -->
+      <div id="dynamicAttributeFilters">
+        <!-- Atributos carregados via JS -->
+      </div>
+
     </aside>
 
-    <!-- LISTA DE PRODUTOS -->
+    <!-- CONTEÚDO DE PRODUTOS -->
     <div class="products-content">
 
       <!-- TOOLBAR -->
       <div class="products-toolbar">
-        <div class="toolbar-left">
-          <button class="btn-toggle-filters" id="toggleFilters">🔽 Filtros</button>
-          <span class="products-count" id="productsCount">0 produtos</span>
+        
+        <!-- LINHA 1: Contador e Toggle Filtros -->
+        <div class="toolbar-row toolbar-top">
+          <div class="toolbar-left">
+            <button class="btn-toggle-filters" id="toggleFilters">
+              <span>📋</span> Filtros
+            </button>
+            <span class="products-count" id="productsCount">0 produtos</span>
+          </div>
+          <button class="btn-clear-all" id="clearFilters">Limpar Todos</button>
         </div>
 
-        <div class="toolbar-right">
-          <input type="number" id="minPriceTop" placeholder="Min €" class="toolbar-input">
-          <input type="number" id="maxPriceTop" placeholder="Max €" class="toolbar-input">
+        <!-- LINHA 2: Filtros e Ordenação -->
+        <div class="toolbar-row toolbar-filters">
+          
+          <!-- Filtros de Preço -->
+          <div class="filter-group-inline">
+            <label>Preço</label>
+            <div class="price-inputs">
+              <input type="number" id="minPrice" placeholder="Min €" class="input-price">
+              <span class="separator">-</span>
+              <input type="number" id="maxPrice" placeholder="Max €" class="input-price">
+            </div>
+          </div>
 
-          <select id="filterStockTop" class="toolbar-select">
-            <option value="">Stock</option>
-            <option value="true">Com stock</option>
-            <option value="false">Sem stock</option>
-          </select>
+          <!-- Filtro de Stock -->
+          <div class="filter-group-inline">
+            <label>Stock</label>
+            <select id="filterStock" class="select-filter">
+              <option value="">Todos</option>
+              <option value="true">Com stock</option>
+              <option value="false">Sem stock</option>
+            </select>
+          </div>
 
-          <label for="sortByTop">Ordenar:</label>
-          <select id="sortByTop" class="toolbar-select">
-            <option value="newest">Mais Recentes</option>
-            <option value="price-asc">Preço: Menor - Maior</option>
-            <option value="price-desc">Preço: Maior - Menor</option>
-            <option value="name">Nome (A-Z)</option>
-          </select>
+          <!-- Ordenação -->
+          <div class="filter-group-inline">
+            <label>Ordenar</label>
+            <select id="sortBy" class="select-filter">
+              <option value="newest">Mais Recentes</option>
+              <option value="price-asc">Preço: Menor - Maior</option>
+              <option value="price-desc">Preço: Maior - Menor</option>
+              <option value="name">Nome (A-Z)</option>
+            </select>
+          </div>
+
         </div>
+
       </div>
 
       <!-- GRID DE PRODUTOS -->
