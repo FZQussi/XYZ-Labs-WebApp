@@ -108,7 +108,8 @@ img {
 
 /* ===== CONTAINERS ===== */
 .container {
-  max-width: 1600px;
+  max-width: 3600px;
+
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
 }

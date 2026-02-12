@@ -219,9 +219,11 @@
 </main>
 
 <!-- MODAL 3D -->
+<!-- MODAL 3D COM SELETORES DE MATERIAL E COR -->
 <div id="modal3D" class="modal-3d hidden">
   <div class="modal-3d-content">
     
+    <!-- Botão Fechar -->
     <button class="modal-close" id="close3DBtn" aria-label="Fechar">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -229,31 +231,70 @@
       </svg>
     </button>
 
+    <!-- Header do Modal -->
     <div class="modal-header">
       <h2 id="modal3DTitle">Visualização 3D</h2>
       <p>Arraste para rodar | Scroll para zoom | Dois dedos para mover</p>
     </div>
 
-<model-viewer
-  id="model3D"
-  camera-controls
-  auto-rotate
-  shadow-intensity="1"
-  camera-orbit="45deg 55deg 2.5m"
-  exposure="1"
-  alt="Modelo 3D do produto"
-  background-color="#f0f0f0" 
->
-</model-viewer>
+    <!-- Model Viewer -->
+    <model-viewer
+      id="model3D"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1.5"
+      shadow-softness="0.8"
+      exposure="1.2"
+      alt="Modelo 3D do produto"
+      background-color="#e8e8e8"
+      environment-image="neutral"
+    >
+    </model-viewer>
 
+    <!-- ⭐ SELETORES DE CUSTOMIZAÇÃO -->
+    <div class="customization-panel">
+      
+      <!-- Seletor de Material -->
+      <div class="customization-section">
+        <h3 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Material
+        </h3>
+        <div class="material-selector" id="materialSelector">
+          <!-- Botões de material carregados via JS -->
+        </div>
+      </div>
 
+      <!-- Seletor de Cor -->
+      <div class="customization-section">
+        <h3 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a7 7 0 1 0 10 10"></path>
+          </svg>
+          Cor
+          <span class="selected-color-name" id="selectedColorLabel"></span>
+        </h3>
+        <div class="color-selector" id="colorSelector">
+          <!-- Botões de cor carregados via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Controles do Modelo 3D -->
     <div class="modal-controls">
       <button class="control-btn" id="resetView">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M23 4v6h-6M1 20v-6h6"/>
           <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
         </svg>
-        Reset
+        Reset Vista
       </button>
 
       <button class="control-btn" id="toggleRotation">
@@ -271,10 +312,17 @@
 <section class="related-products">
   <div class="container">
     <h2>Produtos Relacionados</h2>
-    <br><br><br>
-    <div class="homepage-products-grid" id="relatedProducts">
-      <div class="loading">A carregar produtos...</div>
-    </div>
+    
+<div class="related-wrapper">
+  <button class="related-scroll-btn left" id="relatedScrollLeft">‹</button>
+
+  <div class="homepage-products-grid" id="relatedProducts">
+    <div class="loading">A carregar produtos...</div>
+  </div>
+
+  <button class="related-scroll-btn right" id="relatedScrollRight">›</button>
+</div>
+
     <div class="homepage-view-all-container">
       <a href="products.html" class="homepage-btn-view-all">Ver Todos os Produtos</a>
     </div>

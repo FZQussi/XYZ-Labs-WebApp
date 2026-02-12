@@ -16,7 +16,6 @@
 
 /* ===== GALLERY ===== */
 .product-gallery {
- 
   top: 180px;
   height: fit-content;
 }
@@ -409,14 +408,15 @@
 .modal-3d {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: rgba(31, 31, 31, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 99;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition-normal);
+  
 }
 
 .modal-3d:not(.hidden) {
@@ -468,7 +468,7 @@
   font-size: 1.5rem;
   font-weight: 900;
   text-transform: uppercase;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
 }
 
 .modal-header p {
@@ -632,6 +632,7 @@ model-viewer {
 /* ===== HOMEPAGE PRODUCT CARDS ADAPTADOS ===== */
 .homepage-products-grid {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xxl);
@@ -805,5 +806,456 @@ model-viewer {
   
   .homepage-product-image {
     height: 250px;
+  }
+}
+
+
+
+/* ==========================================
+   SELETORES DE MATERIAL E COR - MODAL 3D
+   ========================================== */
+
+/* Painel de Customização */
+.customization-panel {
+  background-color: var(--brutalist-white);
+  border: var(--border-thick);
+  border-top: none;
+  padding: var(--spacing-lg);
+  display: flex;
+  gap: var(--spacing-xl);
+}
+
+.customization-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-md);
+  color: var(--brutalist-black);
+}
+
+.section-title svg {
+  flex-shrink: 0;
+}
+
+.selected-color-name {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brutalist-gray);
+  text-transform: none;
+  letter-spacing: 0.5px;
+}
+
+/* ==========================================
+   SELETOR DE MATERIAL
+   ========================================== */
+
+.material-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.material-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: var(--spacing-md);
+  background-color: var(--brutalist-white);
+  border: var(--border-thin);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.material-btn:hover {
+  background-color: var(--bg-light);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+}
+
+.material-btn.active {
+  background-color: var(--brutalist-black);
+  color: var(--brutalist-white);
+  box-shadow: var(--shadow-small);
+  transform: translate(-2px, -2px);
+}
+
+.material-btn.active .material-badge {
+  background-color: var(--brutalist-white);
+  color: var(--brutalist-black);
+}
+
+.material-name {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.material-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: var(--brutalist-black);
+  color: var(--brutalist-white);
+  border: 1px solid var(--brutalist-black);
+}
+
+/* ==========================================
+   SELETOR DE COR
+   ========================================== */
+
+.color-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.color-btn {
+  width: 44px;
+  height: 44px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+}
+
+.color-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+  border-color: var(--brutalist-gray);
+}
+
+.color-btn.active {
+  border-color: var(--brutalist-black);
+  box-shadow: 0 0 0 3px var(--brutalist-white),
+              0 0 0 6px var(--brutalist-black);
+  transform: translate(-2px, -2px);
+}
+
+/* Checkmark para cor ativa */
+.color-btn.active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--brutalist-white);
+  text-shadow: 
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
+
+/* Checkmark preto para cores claras */
+.color-btn.active[style*="#F"]:after,
+.color-btn.active[style*="#f"]:after,
+.color-btn.active[style*="white"]:after {
+  color: var(--brutalist-black);
+  text-shadow: 
+    -1px -1px 0 #fff,
+     1px -1px 0 #fff,
+    -1px  1px 0 #fff,
+     1px  1px 0 #fff;
+}
+
+/* ==========================================
+   RESPONSIVO - CUSTOMIZATION PANEL
+   ========================================== */
+
+@media (max-width: 1024px) {
+  .customization-panel {
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .material-selector {
+    flex-direction: column;
+  }
+
+  .material-btn {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .customization-panel {
+    padding: var(--spacing-md);
+  }
+
+  .section-title {
+    font-size: 0.8rem;
+  }
+
+  .color-selector {
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: var(--spacing-xs);
+  }
+
+  .color-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .material-name {
+    font-size: 11px;
+  }
+
+  .material-badge {
+    font-size: 8px;
+    padding: 1px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .customization-panel {
+    padding: var(--spacing-sm);
+  }
+
+  .selected-color-name {
+    display: none; /* Esconder em mobile muito pequeno */
+  }
+
+  .color-selector {
+    grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  }
+
+  .color-btn {
+    width: 34px;
+    height: 34px;
+    border-width: 2px;
+  }
+
+  .color-btn.active::after {
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   ANIMAÇÕES
+   ========================================== */
+
+@keyframes colorPulse {
+  0%, 100% {
+    transform: translate(-2px, -2px) scale(1);
+  }
+  50% {
+    transform: translate(-2px, -2px) scale(1.05);
+  }
+}
+
+.color-btn.active {
+  animation: colorPulse 0.3s ease-out;
+}
+
+@keyframes materialSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.material-btn {
+  animation: materialSlide 0.2s ease-out;
+}
+
+/* ==========================================
+   ESTADOS DE LOADING
+   ========================================== */
+
+.material-selector.loading,
+.color-selector.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.material-selector.loading::after,
+.color-selector.loading::after {
+  content: 'A carregar...';
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brutalist-gray);
+  padding: var(--spacing-md);
+}
+
+/* ==========================================
+   ESTADOS VAZIOS
+   ========================================== */
+
+.color-selector:empty::after {
+  content: 'Nenhuma cor disponível';
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brutalist-gray);
+  padding: var(--spacing-lg);
+  border: var(--border-thin);
+  background-color: var(--bg-light);
+}
+
+.material-selector:empty::after {
+  content: 'Nenhum material disponível';
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brutalist-gray);
+  padding: var(--spacing-lg);
+  border: var(--border-thin);
+  background-color: var(--bg-light);
+}
+
+/* ==========================================
+   TOOLTIPS (OPCIONAL)
+   ========================================== */
+
+.color-btn[title]:hover::before {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background-color: var(--brutalist-black);
+  color: var(--brutalist-white);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 4px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.color-btn[title]:hover::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--brutalist-black);
+  margin-bottom: -4px;
+  z-index: 1000;
+  pointer-events: none;
+}
+.infinite-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+}
+
+.infinite-carousel::-webkit-scrollbar {
+  display: none;
+}
+/* ===============================
+   RELATED PRODUCTS - INFINITE
+================================ */
+
+/* wrapper do carrossel */
+.related-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+}
+
+/* grid horizontal scrollável */
+#relatedProducts {
+  display: flex;
+  flex-wrap: nowrap;        /* nunca quebrar linha */
+  overflow-x: auto;         /* ativar scroll horizontal */
+  overflow-y: hidden;
+  gap: 16px;                /* espaço entre cards */
+  padding: 8px 0;
+  scroll-behavior: smooth;
+
+  /* esconder scrollbar */
+  -ms-overflow-style: none; /* IE e Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+#relatedProducts::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari e Opera */
+}
+
+/* cada card mantém largura fixa */
+#relatedProducts .homepage-product-card {
+  flex: 0 0 260px;   /* NÃO encolher */
+}
+
+/* ===============================
+   SCROLL BUTTONS
+================================ */
+.related-scroll-btn {
+  margin-top: 190px;
+  position: relative;
+  transform: translateY(-50%);
+  width: 60px;       /* maior largura */
+  height: 320px;      /* maior altura */
+  border: 0px solid #ffffff;
+  
+  background: transparent;
+  cursor: pointer;
+  font-size: 88px;   /* símbolo maior */
+  font-weight: bold;
+  line-height: 60px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.related-scroll-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.related-scroll-btn.left {
+  left: -30px;       /* ajusta distância da esquerda */
+}
+
+.related-scroll-btn.right {
+  right: -30px;      /* ajusta distância da direita */
+}
+
+/* esconder no mobile */
+@media (max-width: 768px) {
+  .related-scroll-btn {
+    display: none;
   }
 }
