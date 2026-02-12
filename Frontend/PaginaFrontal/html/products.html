@@ -18,6 +18,10 @@
         <img src="/Frontend/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
       </a>
     </div>
+      <div id="sideMenu" class="side-menu">
+        <button class="closeBtn" id="closeMenu">×</button>
+        <div id="sideContent"></div>
+      </div>
 
     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -56,10 +60,10 @@
         <p class="dropdown-title" id="dropdownUserName"></p>
         <ul id="dropdownLinks"></ul>
       </div>
-      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
+     <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+    <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
     </div>
   </div>
 </header>
@@ -81,17 +85,30 @@
     <aside class="filters-sidebar" id="filtersSidebar">
       
       <!-- CATEGORIAS -->
-      <div class="filter-section">
-        <div class="filter-section-header">
-          <h3>Categorias</h3>
-        </div>
-         <div class="filter-section-header">
-          <button class="btn-clear" id="clearCategories">Limpar</button>
-        </div>
-        <div id="categoryFilters" class="filter-list">
-          <!-- Categorias carregadas via JS -->
-        </div>
-      </div>
+     <div class="filter-section">
+  <div class="filter-section-header">
+    <h3>Categorias</h3>
+  </div>
+
+  <div class="filter-section-header">
+    <button class="btn-clear" id="clearCategories">Limpar</button>
+  </div>
+
+  <!-- 🔎 SEARCH BOX -->
+  <div class="category-search-box">
+    <input 
+      type="text" 
+      id="categorySearch" 
+      placeholder="Pesquisar categorias..."
+      class="input-category-search"
+    >
+  </div>
+
+  <div id="categoryFilters" class="filter-list">
+    <!-- Categorias carregadas via JS -->
+  </div>
+</div>
+
 
       <!-- FILTROS DINÂMICOS DE ATRIBUTOS -->
       <div id="dynamicAttributeFilters">
@@ -207,9 +224,8 @@
     </div>
   </div>
 </footer>
-
-<script src="../scripts/homePage.js"></script>
 <script src="../scripts/cart.js"></script>
+<script src="../scripts/homePage.js"></script>
 <script src="../scripts/products-page.js"></script>
 </body>
 </html>

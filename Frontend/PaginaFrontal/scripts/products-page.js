@@ -5,7 +5,7 @@ let filteredProducts = [];
 let categories = [];
 let availableAttributes = {};
 let currentPage = 1;
-const productsPerPage = 12;
+const productsPerPage = 56;
 
 // ===== APLICAR CATEGORIA DA URL =====
 function applyCategoryFromURL() {
@@ -124,6 +124,7 @@ async function loadCategories() {
     categories = await res.json();
     renderCategoryFilters();
     applyCategoryFromURL();
+    initCategorySearch(); 
   } catch (err) {
     console.error('Erro ao carregar categorias:', err);
   }
@@ -462,6 +463,29 @@ function applySearchFromURL() {
 
   searchInput.value = search;
   applyFilters();
+}
+function initCategorySearch() {
+  const input = document.getElementById("categorySearch");
+  if (!input) return;
+
+  input.addEventListener("input", function () {
+    const search = this.value.toLowerCase();
+
+    document.querySelectorAll("#categoryFilters .category-container")
+      .forEach(container => {
+
+        const categoryName = container
+          .querySelector("label span")
+          .textContent
+          .toLowerCase();
+
+        if (categoryName.includes(search)) {
+          container.style.display = "";
+        } else {
+          container.style.display = "none";
+        }
+      });
+  });
 }
 
 // ===== EVENT LISTENERS =====

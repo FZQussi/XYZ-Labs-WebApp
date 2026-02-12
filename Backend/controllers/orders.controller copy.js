@@ -48,8 +48,8 @@ function generateInvoicePDFBuffer(order) {
       doc.fontSize(12).fillColor('#333').text('Produtos:', { underline: true });
       const tableTop = doc.y + 5;
 
-      const headers = ['Produto', 'Qtd', 'Especificações', 'Preço'];
-      const positions = [50, 250, 300, 450];
+      const headers = ['Produto', 'Qtd', 'Material', 'Cor', 'Preço'];
+      const positions = [50, 250, 300, 370, 440];
 
       // Cabeçalho tabela
       doc.font('Helvetica-Bold').fillColor('#fff');
@@ -61,41 +61,17 @@ function generateInvoicePDFBuffer(order) {
       // Linhas dos produtos
       doc.font('Helvetica').fillColor('#333');
       let y = tableTop + 25;
-      
       items.forEach((item, idx) => {
-        const materialMultiplier = item.material_multiplier || 1;
-        const colorMultiplier = item.color_multiplier || 1;
-        const basePrice = Number(item.price);
-        const finalPrice = basePrice * materialMultiplier * colorMultiplier;
-        
-        // Background alternado
         if (idx % 2 === 0) {
-          doc.rect(50, y - 2, 495, 40).fillOpacity(0.05).fill('#000').fillOpacity(1);
+          doc.rect(50, y - 2, 495, 20).fillOpacity(0.05).fill('#000').fillOpacity(1);
         }
 
-        // Nome do produto
-        doc.text(item.product_name, 50, y, { width: 190 });
-        
-        // Quantidade
-        doc.text(item.quantity, 250, y);
-        
-        // Especificações (Material e Cor)
-        const specs = `${item.material_name}\n${item.color_name}`;
-        doc.fontSize(8).text(specs, 300, y, { width: 140 });
-        
-        // Preço
-        doc.fontSize(10).text(`€${(finalPrice * item.quantity).toFixed(2)}`, 450, y, { 
-          width: 85, 
-          align: 'right' 
-        });
-        
-        y += 40;
-        
-        // Nova página se necessário
-        if (y > 700) {
-          doc.addPage();
-          y = 50;
-        }
+        doc.text(item.product_name, 50, y)
+          .text(item.quantity, 250, y)
+          .text(item.material_name, 300, y)
+          .text(item.color_name, 370, y)
+          .text(`€${(item.price * item.quantity).toFixed(2)}`, 440, y, { width: 95, align: 'right' });
+        y += 20;
       });
 
       // ===== Total =====
@@ -141,7 +117,6 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ error: 'Dados do pedido incompletos' });
     }
 
-    // Validar que cada item tem material e cor
     items.forEach(item => {
       if (!item.material_id || !item.color_id) {
         throw new Error('Todos os produtos devem ter material e cor selecionados');

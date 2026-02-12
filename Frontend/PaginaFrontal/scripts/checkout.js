@@ -3,6 +3,7 @@ const FREE_SHIPPING_MIN = 50;
 
 let materialOptions = [];
 let colorOptions = [];
+
 document.addEventListener('DOMContentLoaded', () => {
   if (!cart.items.length) {
     alert('O seu carrinho está vazio!');
@@ -10,38 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  loadOrderSummary();
-  prefillUserData();
   loadOptions();
   loadCountries();
+  prefillUserData();
   setupForm();
-
-  const materialSelect = document.getElementById('materialSelect');
-  const colorSelect = document.getElementById('colorSelect');
-
-  if (materialSelect && colorSelect) {
-    // Quando muda o material
-    materialSelect.addEventListener('change', e => {
-      const selectedMaterial = e.target.value;
-
-      // Atualizar resumo do material
-      document.getElementById('summaryMaterial').textContent =
-        e.target.selectedOptions[0].text;
-
-      // Atualizar opções de cores disponíveis
-      updateColorOptions(selectedMaterial);
-
-      calculateFinalTotal();
-    });
-
-    // Quando muda a cor
-    colorSelect.addEventListener('change', e => {
-      document.getElementById('summaryColor').textContent =
-        e.target.selectedOptions[0].text;
-
-      calculateFinalTotal();
-    });
-  }
 });
 
 // ===== LOAD OPTIONS =====
@@ -53,25 +26,8 @@ async function loadOptions() {
     materialOptions = data.materials;
     colorOptions = data.colors;
 
-    const materialSelect = document.getElementById('materialSelect');
-    const colorSelect = document.getElementById('colorSelect');
-
-    // Popular materiais
-    data.materials.forEach(m => {
-      const option = document.createElement('option');
-      option.value = m.id;
-      option.textContent = m.name;
-      materialSelect.appendChild(option);
-    });
-
-    // Opcional: selecionar automaticamente o primeiro material
-    if (materialOptions.length > 0) {
-      materialSelect.value = materialOptions[0].id;
-      document.getElementById('summaryMaterial').textContent = materialOptions[0].name;
-
-      // Atualizar cores para o primeiro material
-      updateColorOptions(materialOptions[0].id);
-    }
+    // Após carregar as opções, renderizar os itens
+    loadOrderSummary();
 
   } catch (err) {
     console.error('Erro ao carregar opções:', err);
@@ -79,9 +35,91 @@ async function loadOptions() {
   }
 }
 
-// ===== ATUALIZAR CORES DISPONÍVEIS =====
-function updateColorOptions(materialId) {
-  const colorSelect = document.getElementById('colorSelect');
+// ===== ORDER SUMMARY =====
+function loadOrderSummary() {
+  const orderItems = document.getElementById('orderItems');
+  
+  orderItems.innerHTML = cart.items.map((item, index) => `
+    <div class="summary-item" data-item-index="${index}">
+      <div class="summary-item-image">
+        ${item.image
+          ? `<img src="${API_BASE}/images/${item.image}" alt="${item.name}">`
+          : '<div class="no-image">📦</div>'}
+      </div>
+      <div class="summary-item-details">
+        <h4>${item.name}</h4>
+        <p>Quantidade: ${item.quantity}</p>
+        <p>Preço base: €${Number(item.price).toFixed(2)} × ${item.quantity}</p>
+        
+        <!-- Seleção de Material -->
+        <div class="product-option">
+          <label for="material-${index}">Material *</label>
+          <select id="material-${index}" class="material-select" data-index="${index}" required>
+            <option value="">-- Escolher material --</option>
+            ${materialOptions.map(m => `
+              <option value="${m.id}" data-multiplier="${m.multiplier}">
+                ${m.name} (${m.multiplier > 1 ? '+' : ''}${((m.multiplier - 1) * 100).toFixed(0)}%)
+              </option>
+            `).join('')}
+          </select>
+        </div>
+
+        <!-- Seleção de Cor -->
+        <div class="product-option">
+          <label for="color-${index}">Cor *</label>
+          <select id="color-${index}" class="color-select" data-index="${index}" required>
+            <option value="">-- Escolher cor --</option>
+          </select>
+        </div>
+      </div>
+      <div class="summary-item-total">
+        <span class="item-total" id="item-total-${index}">€${(item.price * item.quantity).toFixed(2)}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Adicionar event listeners para os selects
+  setupProductSelects();
+  
+  // Calcular total inicial
+  calculateTotals();
+}
+
+// ===== SETUP PRODUCT SELECTS =====
+function setupProductSelects() {
+  const materialSelects = document.querySelectorAll('.material-select');
+  const colorSelects = document.querySelectorAll('.color-select');
+
+  materialSelects.forEach(select => {
+    select.addEventListener('change', (e) => {
+      const index = e.target.dataset.index;
+      const materialId = e.target.value;
+      
+      // Atualizar cores disponíveis
+      updateColorOptions(index, materialId);
+      
+      // Recalcular total
+      calculateTotals();
+    });
+
+    // Selecionar primeiro material automaticamente
+    if (materialOptions.length > 0) {
+      select.value = materialOptions[0].id;
+      const index = select.dataset.index;
+      updateColorOptions(index, materialOptions[0].id);
+    }
+  });
+
+  colorSelects.forEach(select => {
+    select.addEventListener('change', () => {
+      calculateTotals();
+    });
+  });
+}
+
+// ===== ATUALIZAR CORES DISPONÍVEIS POR PRODUTO =====
+function updateColorOptions(itemIndex, materialId) {
+  const colorSelect = document.getElementById(`color-${itemIndex}`);
   if (!colorSelect) return;
 
   // Limpar opções anteriores
@@ -93,74 +131,53 @@ function updateColorOptions(materialId) {
   filteredColors.forEach(c => {
     const option = document.createElement('option');
     option.value = c.id;
-    option.textContent = c.name;
+    option.dataset.multiplier = c.multiplier;
+    option.textContent = `${c.name} (${c.multiplier > 1 ? '+' : ''}${((c.multiplier - 1) * 100).toFixed(0)}%)`;
     colorSelect.appendChild(option);
   });
 
   // Selecionar automaticamente a primeira cor disponível
   if (filteredColors.length > 0) {
     colorSelect.value = filteredColors[0].id;
-    document.getElementById('summaryColor').textContent = filteredColors[0].name;
-  } else {
-    document.getElementById('summaryColor').textContent = '--';
   }
 }
 
+// ===== CALCULAR TOTALS =====
+function calculateTotals() {
+  let totalAmount = 0;
 
-// ===== ORDER SUMMARY =====
-function loadOrderSummary() {
-  const orderItems = document.getElementById('orderItems');
-  const subtotal = cart.getTotal();
+  cart.items.forEach((item, index) => {
+    const materialSelect = document.getElementById(`material-${index}`);
+    const colorSelect = document.getElementById(`color-${index}`);
+    
+    let materialMultiplier = 1;
+    let colorMultiplier = 1;
 
-  orderItems.innerHTML = cart.items.map(item => `
-    <div class="summary-item">
-      <div class="summary-item-image">
-        ${item.image
-          ? `<img src="${API_BASE}/images/${item.image}" alt="${item.name}">`
-          : '<div class="no-image">📦</div>'}
-      </div>
-      <div class="summary-item-details">
-        <h4>${item.name}</h4>
-        <p>Quantidade: ${item.quantity}</p>
-        <p>€${Number(item.price).toFixed(2)} × ${item.quantity}</p>
-      </div>
-      <div class="summary-item-total">
-        €${(item.price * item.quantity).toFixed(2)}
-      </div>
-    </div>
-  `).join('');
+    if (materialSelect && materialSelect.value) {
+      const selectedOption = materialSelect.options[materialSelect.selectedIndex];
+      materialMultiplier = parseFloat(selectedOption.dataset.multiplier) || 1;
+    }
 
-  document.getElementById('orderSubtotal').textContent = `€${subtotal.toFixed(2)}`;
-  document.getElementById('orderTotal').textContent = `€${subtotal.toFixed(2)}`;
+    if (colorSelect && colorSelect.value) {
+      const selectedOption = colorSelect.options[colorSelect.selectedIndex];
+      colorMultiplier = parseFloat(selectedOption.dataset.multiplier) || 1;
+    }
 
-  updateShippingInfo(subtotal);
+    const itemTotal = item.price * item.quantity * materialMultiplier * colorMultiplier;
+    totalAmount += itemTotal;
+
+    // Atualizar total do item
+    const itemTotalEl = document.getElementById(`item-total-${index}`);
+    if (itemTotalEl) {
+      itemTotalEl.textContent = `€${itemTotal.toFixed(2)}`;
+    }
+  });
+
+  document.getElementById('orderSubtotal').textContent = `€${totalAmount.toFixed(2)}`;
+  document.getElementById('orderTotal').textContent = `€${totalAmount.toFixed(2)}`;
+
+  updateShippingInfo(totalAmount);
 }
-
-
-// ===== CALCULAR TOTAL FINAL =====
-function calculateFinalTotal() {
-  const materialId = document.getElementById('materialSelect').value;
-  const colorId = document.getElementById('colorSelect').value;
-
-  const baseSubtotal = cart.getTotal();
-
-  let materialMultiplier = 1;
-  let colorMultiplier = 1;
-
-  const material = materialOptions.find(m => m.id === materialId);
-  if (material) materialMultiplier = material.multiplier;
-
-  const color = colorOptions.find(c => c.id === colorId);
-  if (color) colorMultiplier = color.multiplier;
-
-  const finalTotal = baseSubtotal * materialMultiplier * colorMultiplier;
-
-  document.getElementById('orderTotal').textContent =
-    `€${finalTotal.toFixed(2)}`;
-
-  updateShippingInfo(finalTotal);
-}
-
 
 // ===== SHIPPING INFO =====
 function updateShippingInfo(total) {
@@ -177,7 +194,6 @@ function updateShippingInfo(total) {
   }
 }
 
-
 // ===== PREFILL USER =====
 function prefillUserData() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -186,55 +202,81 @@ function prefillUserData() {
   if (user.email) document.getElementById('customerEmail').value = user.email;
 }
 
-
 // ===== FORM SUBMIT =====
 function setupForm() {
   const form = document.getElementById('checkoutForm');
   const submitBtn = document.getElementById('submitOrderBtn');
 
   form.addEventListener('submit', async e => {
-    e.preventDefault(); // previne reload
+    e.preventDefault();
 
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
     const phone = document.getElementById('customerPhone').value.trim();
     const notes = document.getElementById('orderNotes').value.trim();
-    const material = document.getElementById('materialSelect').value;
-    const color = document.getElementById('colorSelect').value;
     const street = document.getElementById('addressStreet').value.trim();
     const postalCode = document.getElementById('addressPostalCode').value.trim();
     const city = document.getElementById('addressCity').value.trim();
     const country = document.getElementById('addressCountry').value;
 
-    if (!name || !email || !phone || !material || !color || !street || !postalCode || !city || !country) {
+    if (!name || !email || !phone || !street || !postalCode || !city || !country) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
+    // Validar que todos os produtos têm material e cor selecionados
+    const items = [];
+    let hasError = false;
+
+    cart.items.forEach((item, index) => {
+      const materialSelect = document.getElementById(`material-${index}`);
+      const colorSelect = document.getElementById(`color-${index}`);
+
+      if (!materialSelect.value || !colorSelect.value) {
+        alert(`Por favor, selecione material e cor para o produto: ${item.name}`);
+        hasError = true;
+        return;
+      }
+
+      const materialOption = materialSelect.options[materialSelect.selectedIndex];
+      const colorOption = colorSelect.options[colorSelect.selectedIndex];
+
+      items.push({
+        product_id: item.id,
+        product_name: item.name,
+        product_image: item.image,
+        quantity: item.quantity,
+        price: item.price,
+        material_id: materialSelect.value,
+        material_name: materialOption.textContent.split('(')[0].trim(),
+        material_multiplier: parseFloat(materialOption.dataset.multiplier),
+        color_id: colorSelect.value,
+        color_name: colorOption.textContent.split('(')[0].trim(),
+        color_multiplier: parseFloat(colorOption.dataset.multiplier)
+      });
+    });
+
+    if (hasError) return;
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'A enviar...';
+
+    // Calcular total final
+    const totalAmount = items.reduce((sum, item) => {
+      return sum + (item.price * item.quantity * item.material_multiplier * item.color_multiplier);
+    }, 0);
 
     const orderData = {
       customer_name: name,
       customer_email: email,
       customer_phone: phone,
       notes,
-      total_amount: cart.getTotal(),
+      total_amount: totalAmount,
       address_street: street,
       address_postal: postalCode,
       address_city: city,
       address_country: country,
-      items: cart.items.map(item => ({
-        product_id: item.id,
-        product_name: item.name,
-        product_image: item.image,
-        quantity: item.quantity,
-        price: item.price,
-        material_id: material,
-        material_name: document.getElementById('materialSelect').selectedOptions[0].text,
-        color_id: color,
-        color_name: document.getElementById('colorSelect').selectedOptions[0].text
-      }))
+      items: items
     };
 
     try {
@@ -247,14 +289,13 @@ function setupForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
 
-      // ✅ Mostrar modal com o número do pedido
+      // Mostrar modal com o número do pedido
       showSuccessModal(data.order_id);
       
-      // ✅ Limpar carrinho após envio
+      // Limpar carrinho após envio
       cart.clear();
 
-      // ✅ Atualiza botão
-      submitBtn.textContent = '✔ Pedido Enviado';
+      submitBtn.textContent = '✓ Pedido Enviado';
 
     } catch (err) {
       console.error(err);
@@ -264,8 +305,6 @@ function setupForm() {
     }
   });
 }
-
-
 
 // ===== COUNTRIES =====
 async function loadCountries() {
@@ -287,7 +326,6 @@ async function loadCountries() {
     console.error('Erro ao carregar países:', err);
   }
 }
-
 
 // ===== SUCCESS MODAL =====
 function showSuccessModal(orderId) {

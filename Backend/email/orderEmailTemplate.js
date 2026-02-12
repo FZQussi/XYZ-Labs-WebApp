@@ -29,6 +29,7 @@ const orderEmailTemplate = ({
   th, td { border: 2px solid #111; padding: 8px; text-align: left; }
   td img { display: inline-block; vertical-align: middle; margin-right: 8px; }
   th { background: #eee; }
+  .product-specs { font-size: 12px; color: #555; margin-top: 4px; }
   .total { text-align: right; font-size: 18px; font-weight: bold; margin-bottom: 16px; }
   .notes { background: #eee; padding: 12px; border: 2px solid #111; font-size: 14px; white-space: pre-wrap; }
   .footer { background: #111; color: #fff; text-align: center; padding: 16px; font-size: 12px; letter-spacing: 1px; }
@@ -58,24 +59,38 @@ const orderEmailTemplate = ({
         <tr>
           <th>Produto</th>
           <th>Qtd</th>
-          <th>Material</th>
-          <th>Cor</th>
+          <th>Especificações</th>
           <th>Preço</th>
         </tr>
       </thead>
       <tbody>
-        ${items.map(item => `
+        ${items.map(item => {
+          const basePrice = Number(item.price);
+          const materialMultiplier = item.material_multiplier || 1;
+          const colorMultiplier = item.color_multiplier || 1;
+          const finalPrice = basePrice * materialMultiplier * colorMultiplier;
+          
+          return `
           <tr>
             <td>
               ${item.product_image ? `<img src="${process.env.API_BASE_URL}/images/${item.product_image}" width="50" alt="${item.product_name}" />` : ''}
-              ${item.product_name}
+              <strong>${item.product_name}</strong>
+              <div class="product-specs">
+                <div>📦 Material: <strong>${item.material_name}</strong> ${materialMultiplier > 1 ? `(+${((materialMultiplier - 1) * 100).toFixed(0)}%)` : ''}</div>
+                <div>🎨 Cor: <strong>${item.color_name}</strong> ${colorMultiplier > 1 ? `(+${((colorMultiplier - 1) * 100).toFixed(0)}%)` : ''}</div>
+              </div>
             </td>
             <td>${item.quantity}</td>
-            <td>${item.material_name}</td>
-            <td>${item.color_name}</td>
-            <td>€${Number(item.price).toFixed(2)}</td>
+            <td>
+              Preço base: €${basePrice.toFixed(2)}<br>
+              ${materialMultiplier > 1 ? `Material: x${materialMultiplier}<br>` : ''}
+              ${colorMultiplier > 1 ? `Cor: x${colorMultiplier}<br>` : ''}
+              <strong>Final: €${finalPrice.toFixed(2)}</strong>
+            </td>
+            <td><strong>€${(finalPrice * item.quantity).toFixed(2)}</strong></td>
           </tr>
-        `).join('')}
+        `;
+        }).join('')}
       </tbody>
     </table>
 

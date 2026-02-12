@@ -12,7 +12,7 @@ function shuffleArray(array) {
   return shuffled;
 }
 
-// ===== LOAD FEATURED PRODUCTS =====
+// ===== LOAD FEATURED PRODUCTS - CAROUSEL INFINITO =====
 async function loadFeaturedProducts() {
   const container = document.getElementById('featuredProducts');
   
@@ -31,38 +31,9 @@ async function loadFeaturedProducts() {
       return;
     }
     
-    container.innerHTML = featuredProducts.map(product => {
-      const image = product.images && product.images[0] 
-        ? `${API_BASE}/images/${product.images[0]}` 
-        : '/Frontend/images/placeholder.jpg';
-      
-      return `
-        <div class="product-card" data-id="${product.id}">
-          <div class="product-image">
-            <img src="${image}" alt="${product.name}" loading="lazy">
-            ${product.stock <= 0 ? '<div class="out-of-stock">Esgotado</div>' : ''}
-          </div>
-          <div class="product-info">
-            <h3>${product.name}</h3>
-           
-            <div class="product-footer">
-              <span class="product-price">€${Number(product.price).toFixed(2)}</span>
-              <div class="product-actions">
-                <button class="btn-view" onclick="window.location.href='product-details.html?id=${product.id}'">
-                  Ver Detalhes
-                </button>
-                ${product.stock > 0 
-                  ? `<button class="btn-add-cart" onclick="event.stopPropagation(); addProductToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-                       🛒
-                     </button>`
-                  : ''
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+    // Criar HTML do carousel
+    const carouselHTML = createInfiniteCarousel(featuredProducts);
+    container.innerHTML = carouselHTML;
     
     // Adicionar event listeners aos cards
     addHomeCardClickListeners();
@@ -71,6 +42,52 @@ async function loadFeaturedProducts() {
     console.error('Erro ao carregar produtos:', err);
     container.innerHTML = '<p class="error">Erro ao carregar produtos</p>';
   }
+}
+
+// ===== CRIAR CAROUSEL INFINITO =====
+function createInfiniteCarousel(products) {
+  // Duplicar produtos para criar efeito infinito
+  const duplicatedProducts = [...products, ...products];
+  
+  const productsHTML = duplicatedProducts.map(product => {
+    const image = product.images && product.images[0] 
+      ? `${API_BASE}/images/${product.images[0]}` 
+      : '/Frontend/images/placeholder.jpg';
+    
+    return `
+      <div class="product-card" data-id="${product.id}">
+        <div class="product-image">
+          <img src="${image}" alt="${product.name}" loading="lazy">
+          ${product.stock <= 0 ? '<div class="out-of-stock">Esgotado</div>' : ''}
+        </div>
+        <div class="product-info">
+          <h3>${product.name}</h3>
+          <div class="product-footer">
+            <span class="product-price">€${Number(product.price).toFixed(2)}</span>
+            <div class="product-actions">
+              <button class="btn-view" onclick="window.location.href='product-details.html?id=${product.id}'">
+                Ver Detalhes
+              </button>
+              ${product.stock > 0 
+                ? `<button class="btn-add-cart" onclick="event.stopPropagation(); addProductToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                     🛒
+                   </button>`
+                : ''
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  return `
+    <div class="carousel-container">
+      <div class="carousel-track">
+        ${productsHTML}
+      </div>
+    </div>
+  `;
 }
 
 // ===== ADD CARD CLICK LISTENERS (HOMEPAGE) =====
@@ -92,8 +109,12 @@ function addHomeCardClickListeners() {
 
 // ===== ADD PRODUCT TO CART =====
 function addProductToCart(product) {
-  if (cart) {
+  if (typeof cart !== 'undefined' && cart) {
     cart.addItem(product, 1);
+  } else {
+    // Fallback se o cart não estiver disponível
+    console.log('Produto adicionado:', product);
+    alert(`${product.name} adicionado ao carrinho!`);
   }
 }
 
