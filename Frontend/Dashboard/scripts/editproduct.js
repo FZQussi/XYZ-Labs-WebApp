@@ -201,6 +201,41 @@
     }
   }
 
+  // ===== ELIMINAR PRODUTO =====
+  async function deleteProduct() {
+    if (!currentProduct) {
+      return alert('Nenhum produto selecionado');
+    }
+
+    const confirmed = confirm(
+      `Tem a certeza que deseja eliminar o produto "${currentProduct.name}"?\n\nEsta ação não pode ser revertida.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/products/${currentProduct.id}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Erro ao eliminar produto');
+      }
+
+      const data = await res.json();
+      console.log('✅ Produto eliminado:', data);
+      
+      alert('Produto eliminado com sucesso!');
+      hideModal();
+      window.reloadProducts();
+    } catch (err) {
+      console.error('Erro ao eliminar produto:', err);
+      alert(err.message || 'Erro ao eliminar produto');
+    }
+  }
+
   // ===== ABRIR MODAL DE EDIÇÃO =====
   document.addEventListener('openEditProductModal', async (e) => {
     currentProduct = e.detail;
@@ -257,7 +292,11 @@
     showModal();
   });
 
+  // ===== EVENT LISTENERS =====
   editCloseBtn.addEventListener('click', hideModal);
+  
+  // BOTÃO DE ELIMINAR PRODUTO
+  deleteBtn.addEventListener('click', deleteProduct);
 
   // ===== SUBMIT FORM =====
   editForm.addEventListener('submit', async e => {

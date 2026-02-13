@@ -229,6 +229,7 @@
 </div>
 
  <!-- ABA DE PRODUTOS -->
+<!-- ABA DE PRODUTOS - VERSÃO ATUALIZADA COM SELEÇÃO MÚLTIPLA -->
 <section id="products" class="tab hidden">
   <h2>Gestão de Produtos</h2>
 
@@ -245,52 +246,64 @@
       <option value="true">Ativos</option>
       <option value="false">Inativos</option>
     </select>
+    
     <input type="number" id="priceMin" placeholder="Preço min €" />
-<input type="number" id="priceMax" placeholder="Preço max €" />
+    <input type="number" id="priceMax" placeholder="Preço max €" />
 
-<select id="productFilterStock">
-  <option value="">Stock (todos)</option>
-  <option value="true">Com stock</option>
-  <option value="false">Sem stock</option>
-</select>
+    <select id="productFilterStock">
+      <option value="">Stock (Todos)</option>
+      <option value="true">Disponível</option>
+      <option value="false">Indisponível</option>
+    </select>
 
-<input
-  type="text"
-  id="productFilterCategory"
-  placeholder="Categoria..."
-/>
+    <input
+      type="text"
+      id="productFilterCategory"
+      placeholder="Filtrar por categoria..."
+    />
 
-<input
-  type="text"
-  id="productFilterPrimaryCategory"
-  placeholder="Categoria principal..."
-/>
+    <input
+      type="text"
+      id="productFilterPrimaryCategory"
+      placeholder="Categoria principal..."
+    />
 
     <button id="addProductBtn" class="primary-btn">
       + Novo Produto
     </button>
   </div>
 
-  <!-- LISTA / TABELA -->
-  <div class="products-table">
-    <div class="table-header">
-      <span>Nome</span>
-      <span>Preço</span>
-      <span>Stock</span>
-      <span>Tags</span>
-      <span>Estado</span>
+  <!-- BARRA DE AÇÕES EM LOTE -->
+  <div class="bulk-actions-bar">
+    <div class="bulk-actions-left">
+      <label class="select-all-container">
+        <input type="checkbox" id="selectAllProducts">
+        <span>Selecionar todos</span>
+      </label>
+      <span id="selectionCount" class="selection-count"></span>
     </div>
-
-    <div id="productsList" class="table-body">
-      <!-- produtos renderizados via JS -->
+    <div class="bulk-actions-right">
+      <button id="deleteSelectedBtn" class="danger-btn" disabled>
+        🗑️ Eliminar Selecionados
+      </button>
     </div>
   </div>
 
-  <!-- PAGINAÇÃO -->
-  <div class="pagination">
-    <button id="prevPage">←</button>
-    <span id="currentPage">1</span>
-    <button id="nextPage">→</button>
+  <!-- TABELA DE PRODUTOS -->
+  <div class="products-table">
+    <div class="table-header">
+      <span class="header-select"></span>
+      <span>Nome</span>
+      <span>Preço</span>
+      <span>Stock</span>
+      <span>Categorias</span>
+      <span>Estado</span>
+      <span>Ações</span>
+    </div>
+
+    <div id="productsList" class="table-body">
+      <!-- Produtos inseridos via JavaScript -->
+    </div>
   </div>
 </section>
 
