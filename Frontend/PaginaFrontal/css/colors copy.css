@@ -48,7 +48,7 @@
 /* ===== COLORS GRID ===== */
 .colors-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xxl);
 }
@@ -68,70 +68,20 @@
   box-shadow: var(--shadow-large);
 }
 
-/* ===== PREVIEW WRAPPER - Novo Layout ===== */
-.color-preview-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 240px;
-  border-bottom: var(--border-thick);
-  background-color: var(--bg-light);
-}
-
-/* Gradiente/Cor à esquerda */
-.color-gradient {
+.color-sample {
   width: 100%;
-  height: 100%;
+  height: 200px;
+  border-bottom: var(--border-thick);
   position: relative;
   overflow: hidden;
-  border-right: var(--border-thin);
 }
 
 .color-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.05) 100%);
-  pointer-events: none;
+  background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.1) 100%);
 }
 
-/* Imagem de amostra à direita */
-.color-sample-image {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.color-sample-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.sample-label {
-  position: absolute;
-  bottom: var(--spacing-xs);
-  right: var(--spacing-xs);
-  background-color: var(--brutalist-black);
-  color: var(--brutalist-white);
-  padding: 4px 8px;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border: 2px solid var(--brutalist-white);
-}
-
-/* Quando não há imagem de amostra, o gradiente ocupa toda a largura */
-.color-preview-wrapper:not(:has(.color-sample-image)) .color-gradient {
-  grid-column: 1 / -1;
-  border-right: none;
-}
-
-/* ===== COLOR INFO ===== */
 .color-info {
   padding: var(--spacing-lg);
   display: flex;
@@ -208,22 +158,6 @@
   box-shadow: var(--shadow-small);
 }
 
-/* ===== NO RESULTS ===== */
-.no-results {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: var(--spacing-xxl);
-  background-color: var(--brutalist-white);
-  border: var(--border-thick);
-}
-
-.no-results p {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--brutalist-gray);
-  text-transform: uppercase;
-}
-
 /* ===== COLOR INFO SECTION ===== */
 .color-info-section {
   margin: var(--spacing-xxl) 0;
@@ -295,7 +229,6 @@
   line-height: 1.7;
   color: var(--brutalist-gray-dark);
 }
-
 /* ===== CTA SECTION ===== */
 .cta-section {
   text-align: center;
@@ -367,20 +300,15 @@
   transform: translate(-3px, -3px);
   box-shadow: 6px 6px 0 rgba(255, 255, 255, 0.3);
 }
-
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .colors-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: var(--spacing-lg);
   }
 
   .filter-row {
     grid-template-columns: 1fr;
-  }
-
-  .color-preview-wrapper {
-    height: 200px;
   }
 }
 
@@ -389,22 +317,7 @@
     grid-template-columns: 1fr;
   }
 
-  .color-preview-wrapper {
-    height: 180px;
-    grid-template-columns: 1fr;
-  }
-
-  .color-gradient {
-    border-right: none;
-    border-bottom: var(--border-thin);
-  }
-
-  .color-sample-image {
-    display: none;
-  }
-
-  .sample-label {
-    font-size: 8px;
-    padding: 3px 6px;
+  .color-sample {
+    height: 150px;
   }
 }

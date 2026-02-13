@@ -144,7 +144,7 @@ class ProductDetailsApp {
     scoredProducts.sort((a, b) => b.score - a.score);
 
     const relatedProducts = scoredProducts
-      .slice(0, 6)
+      .slice(0, 12)
       .map(item => item.product);
 
     RelatedProductsRenderer.render(relatedProducts);

@@ -21,59 +21,28 @@ function renderMaterialsGrid(materials) {
     card.classList.add('material-card');
     card.dataset.category = mat.category;
 
-    // Determinar como mostrar a visualização do material
-    let visualContent = '';
-    
-    if (mat.image) {
-      // Se tem imagem, mostrar imagem com gradiente de fallback
-      visualContent = `
-        <img src="${mat.image}" 
-             alt="${mat.name}" 
-             class="material-image-photo"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <div class="material-gradient-fallback" 
-             style="background: ${mat.gradient || '#ccc'}; display: none;"></div>
-      `;
-    } else if (mat.gradient) {
-      // Se não tem imagem mas tem gradiente
-      visualContent = `
-        <div class="material-gradient-display" 
-             style="background: ${mat.gradient};"></div>
-      `;
-    } else {
-      // Fallback para cor cinza
-      visualContent = `
-        <div class="material-gradient-display" 
-             style="background: linear-gradient(135deg, #ccc, #999);"></div>
-      `;
-    }
-
     // HTML do cartão
     card.innerHTML = `
       <div class="material-header">
         <h3>${mat.name}</h3>
-        ${mat.badge ? `<span class="material-badge ${mat.badge.toLowerCase().replace(/\s+/g, '-')}">${mat.badge}</span>` : ''}
+        ${mat.badge ? `<span class="material-badge">${mat.badge}</span>` : ''}
       </div>
-      
-      <div class="material-visual">
-        ${visualContent}
-        ${mat.gradient ? `<div class="material-texture-overlay"></div>` : ''}
+      <div class="material-image">
+        ${mat.image
+          ? `<img src="${mat.image}" alt="${mat.name}" class="material-sample" onerror="this.onerror=null;this.style.display='none'; this.nextElementSibling.style.display='block';">`
+          : ''}
+        <div class="material-sample" style="background: ${mat.gradient || '#ccc'}; display: ${mat.image ? 'none' : 'block'};"></div>
       </div>
-      
       <div class="material-info">
         <p class="material-desc">${mat.description}</p>
-        
         <div class="material-properties">
           ${Object.entries(mat.properties).map(([prop, value]) => `
             <div class="property">
               <span class="prop-label">${prop}:</span>
-              <div class="prop-bar">
-                <div class="prop-fill" style="width: ${value}%;"></div>
-              </div>
+              <div class="prop-bar"><div class="prop-fill" style="width: ${value}%;"></div></div>
             </div>
           `).join('')}
         </div>
-        
         <div class="material-specs">
           <h4>Especificações:</h4>
           <ul>
@@ -85,15 +54,6 @@ function renderMaterialsGrid(materials) {
 
     materialsGrid.appendChild(card);
   });
-
-  // Se não houver materiais para mostrar
-  if (materials.length === 0) {
-    materialsGrid.innerHTML = `
-      <div class="no-results">
-        <p>Nenhum material encontrado nesta categoria.</p>
-      </div>
-    `;
-  }
 }
 
 // ===== Filtrar Materiais =====

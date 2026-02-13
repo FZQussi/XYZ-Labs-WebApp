@@ -104,7 +104,6 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   border: 2px solid var(--brutalist-black);
-  white-space: nowrap;
 }
 
 .material-badge.popular {
@@ -112,21 +111,18 @@
   color: var(--brutalist-white);
 }
 
-.material-badge.resistente,
 .material-badge.strong {
   background-color: var(--accent-green);
   color: var(--brutalist-white);
   border-color: var(--accent-green);
 }
 
-.material-badge.versátil,
 .material-badge.versatile {
   background-color: #9c27b0;
   color: var(--brutalist-white);
   border-color: #9c27b0;
 }
 
-.material-badge.flexível,
 .material-badge.flexible {
   background-color: #ff9800;
   color: var(--brutalist-white);
@@ -134,54 +130,22 @@
 }
 
 .material-badge.special,
-.material-badge.especial,
 .material-badge.premium {
   background-color: #795548;
   color: var(--brutalist-white);
   border-color: #795548;
 }
 
-/* ===== MATERIAL VISUAL - Novo Sistema ===== */
-.material-visual {
+.material-image {
   width: 100%;
-  height: 220px;
+  height: 200px;
   border-bottom: var(--border-thick);
   overflow: hidden;
-  position: relative;
-  background-color: var(--bg-light);
 }
 
-/* Imagem fotográfica do material */
-.material-image-photo {
+.material-sample {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-/* Gradiente de fallback quando imagem não carrega */
-.material-gradient-fallback {
-  width: 100%;
-  height: 100%;
-  display: none;
-}
-
-/* Gradiente quando não há imagem */
-.material-gradient-display {
-  width: 100%;
-  height: 100%;
-}
-
-/* Overlay de textura para dar profundidade */
-.material-texture-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    transparent 0%, 
-    rgba(0,0,0,0.05) 50%, 
-    transparent 100%);
-  pointer-events: none;
 }
 
 .material-info {
@@ -195,7 +159,6 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--brutalist-gray-dark);
-  font-weight: 500;
 }
 
 /* ===== PROPERTIES ===== */
@@ -220,7 +183,7 @@
 
 .prop-bar {
   width: 100%;
-  height: 10px;
+  height: 8px;
   background-color: var(--bg-light);
   border: var(--border-thin);
   position: relative;
@@ -230,7 +193,7 @@
 .prop-fill {
   height: 100%;
   background-color: var(--brutalist-black);
-  transition: width 0.5s ease;
+  transition: width 0.3s ease;
 }
 
 /* ===== SPECS ===== */
@@ -259,7 +222,6 @@
   font-weight: 600;
   padding-left: var(--spacing-md);
   position: relative;
-  line-height: 1.5;
 }
 
 .material-specs li::before {
@@ -292,22 +254,6 @@
   color: var(--brutalist-black);
   transform: translate(-3px, -3px);
   box-shadow: var(--shadow-small);
-}
-
-/* ===== NO RESULTS ===== */
-.no-results {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: var(--spacing-xxl);
-  background-color: var(--brutalist-white);
-  border: var(--border-thick);
-}
-
-.no-results p {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--brutalist-gray);
-  text-transform: uppercase;
 }
 
 /* ===== COMPARISON SECTION ===== */
@@ -402,7 +348,6 @@
   cursor: pointer;
   transition: var(--transition-fast);
   letter-spacing: 1px;
-  text-decoration: none;
 }
 
 .btn-cta-primary:hover {
@@ -417,10 +362,6 @@
   .materials-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--spacing-lg);
-  }
-
-  .material-visual {
-    height: 180px;
   }
 
   .comparison-table th,
@@ -441,10 +382,6 @@
 
   .filter-btn {
     width: 100%;
-  }
-
-  .material-visual {
-    height: 160px;
   }
 
   .comparison-table {

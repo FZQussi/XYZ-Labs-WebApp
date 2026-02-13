@@ -36,26 +36,10 @@ function renderColorsGrid(colors) {
     card.dataset.finish = color.finish;
     card.dataset.category = color.category;
 
-    // Determinar o background a usar (gradiente ou cor sólida)
-    const backgroundStyle = color.gradient 
-      ? `background: ${color.gradient};` 
-      : `background: ${color.code};`;
-
     card.innerHTML = `
-      <div class="color-preview-wrapper">
-        <div class="color-gradient" style="${backgroundStyle}">
-          <div class="color-overlay"></div>
-        </div>
-        ${color.sampleImage ? `
-          <div class="color-sample-image">
-            <img src="${color.sampleImage}" 
-                 alt="Amostra ${color.name}" 
-                 onerror="this.parentElement.style.display='none';">
-            <div class="sample-label">AMOSTRA REAL</div>
-          </div>
-        ` : ''}
+      <div class="color-sample" style="background: ${color.code};">
+        <div class="color-overlay"></div>
       </div>
-      
       <div class="color-info">
         <h3>${color.name}</h3>
         <div class="color-details">
@@ -66,20 +50,12 @@ function renderColorsGrid(colors) {
           <span class="tag">${capitalize(color.finish)}</span>
           <span class="tag">${capitalize(color.category)}</span>
         </div>
+        
       </div>
     `;
 
     colorsGrid.appendChild(card);
   });
-
-  // Se não houver cores para mostrar
-  if (colors.length === 0) {
-    colorsGrid.innerHTML = `
-      <div class="no-results">
-        <p>Nenhuma cor encontrada com os filtros selecionados.</p>
-      </div>
-    `;
-  }
 }
 
 // ===== Função auxiliar =====

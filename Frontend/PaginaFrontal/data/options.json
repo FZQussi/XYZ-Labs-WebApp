@@ -1,153 +1,224 @@
 {
-
   "materials": [
-  {
-    "id": "pla",
-    "name": "PLA Standard",
-    "category": "pla",
-    "badge": "Popular",
-    "gradient": "linear-gradient(135deg, #81c784, #4caf50)",
-    "image": "images/PLABasic.webp",
-    "description": "Material ecológico e fácil de imprimir, ideal para a maioria dos projetos.",
-    "multiplier": 1,
-    "properties": {
-      "Resistência": 60,
-      "Flexibilidade": 30,
-      "Durabilidade": 50
+    {
+      "id": "pla",
+      "name": "PLA Standard",
+      "category": "pla",
+      "badge": "Popular",
+      "gradient": "linear-gradient(135deg, #81c784, #4caf50)",
+      "image": "images/PLABasic.webp",
+      "description": "Material ecológico e fácil de imprimir, ideal para a maioria dos projetos.",
+      "multiplier": 1,
+      "properties": {
+        "Resistência": 60,
+        "Flexibilidade": 30,
+        "Durabilidade": 50
+      },
+      "specs": [
+        "Temperatura: 190-220°C",
+        "Biodegradável",
+        "€20-25/kg",
+        "Ideal para: Protótipos, decoração, objetos do dia-a-dia"
+      ]
     },
-    
-    "specs": [
-      "Temperatura: 190-220°C",
-      "Biodegradável",
-      "€20-25/kg",
-      "Ideal para: Protótipos, decoração, objetos do dia-a-dia"
-    ]
-    
-  },
-  {
-    "id": "abs",
-    "name": "ABS",
-    "category": "abs",
-    "badge": "Resistente",
-    "gradient": "linear-gradient(135deg, #64b5f6, #2196f3)",
-    "image": "images/ABS.webp",
-    "description": "Material forte e durável, resistente a altas temperaturas e impactos.",
-    "multiplier": 1.3,
-    "properties": {
-      "Resistência": 85,
-      "Flexibilidade": 40,
-      "Durabilidade": 90
+    {
+      "id": "abs",
+      "name": "ABS",
+      "category": "abs",
+      "badge": "Resistente",
+      "gradient": "linear-gradient(135deg, #64b5f6, #2196f3)",
+      "image": "images/ABS.webp",
+      "description": "Material forte e durável, resistente a altas temperaturas e impactos.",
+      "multiplier": 1.3,
+      "properties": {
+        "Resistência": 85,
+        "Flexibilidade": 40,
+        "Durabilidade": 90
+      },
+      "specs": [
+        "Temperatura: 220-250°C",
+        "Resistente ao calor",
+        "€25-30/kg",
+        "Ideal para: Peças mecânicas, caixas, componentes funcionais"
+      ]
     },
-    "specs": [
-      "Temperatura: 220-250°C",
-      "Resistente ao calor",
-      "€25-30/kg",
-      "Ideal para: Peças mecânicas, caixas, componentes funcionais"
-    ]
-  },
-  {
-    "id": "petg",
-    "name": "PETG",
-    "category": "petg",
-    "badge": "Versátil",
-    "gradient": "linear-gradient(135deg, #ba68c8, #9c27b0)",
-    "image": "images/PETG.webp",
-    "description": "Combina o melhor do PLA e ABS: fácil de imprimir e muito resistente.",
-    "multiplier": 1.2,
-    "properties": {
-      "Resistência": 80,
-      "Flexibilidade": 55,
-      "Durabilidade": 85
+    {
+      "id": "petg",
+      "name": "PETG",
+      "category": "petg",
+      "badge": "Versátil",
+      "gradient": "linear-gradient(135deg, #ba68c8, #9c27b0)",
+      "image": "images/PETG.webp",
+      "description": "Combina o melhor do PLA e ABS: fácil de imprimir e muito resistente.",
+      "multiplier": 1.2,
+      "properties": {
+        "Resistência": 80,
+        "Flexibilidade": 55,
+        "Durabilidade": 85
+      },
+      "specs": [
+        "Temperatura: 220-250°C",
+        "Resistente à humidade",
+        "€28-35/kg",
+        "Ideal para: Embalagens, peças técnicas, uso exterior"
+      ]
+    }
+  ],
+
+  "colors": [
+    {
+      "id": "white_pla",
+      "name": "Branco",
+      "material": "pla",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#FFFFFF",
+      "gradient": "linear-gradient(135deg, #FFFFFF, #F5F5F5)",
+      "sampleImage": "images/samples/white_pla_sample.webp",
+      "multiplier": 1
     },
-    "specs": [
-      "Temperatura: 220-250°C",
-      "Resistente à humidade",
-      "€28-35/kg",
-      "Ideal para: Embalagens, peças técnicas, uso exterior"
-    ]
-  }
-]
-,
-
-"colors": [
- 
-  {
-    "id": "white_pla",
-    "name": "Branco",
-    "material": "pla",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#FFFFFF",
-    "multiplier": 1
-  },
-  {
-    "id": "black_pla",
-    "name": "Preto",
-    "material": "pla",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#000000",
-    "multiplier": 1
-  },
-
-
-  {
-    "id": "white_petg",
-    "name": "Branco",
-    "material": "petg",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#FFFFFF",
-    "multiplier": 1
-  },
-  {
-    "id": "black_petg",
-    "name": "Preto",
-    "material": "petg",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#000000",
-    "multiplier": 1
-  },
-  {
-    "id": "dark_blue_petg",
-    "name": "Azul Escuro",
-    "material": "petg",
-    "finish": "Glossy",
-    "category": "vibrant",
-    "code": "#00008B",
-    "multiplier": 1
-  },
-  {
-    "id": "dark_green_petg",
-    "name": "Verde Escuro",
-    "material": "petg",
-    "finish": "glossy",
-    "category": "vibrant",
-    "code": "#006400",
-    "multiplier": 1
-  },
-  {
-    "id": "cream_petg",
-    "name": "Creme",
-    "material": "petg",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#FFFDD0",
-    "multiplier": 1
-  },
-
- 
-  {
-    "id": "black_abs",
-    "name": "Preto",
-    "material": "abs",
-    "finish": "Glossy",
-    "category": "basic",
-    "code": "#000000",
-    "multiplier": 1
-  }
-]
-
+    {
+      "id": "black_pla",
+      "name": "Preto",
+      "material": "pla",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#000000",
+      "gradient": "linear-gradient(135deg, #000000, #1a1a1a)",
+      "sampleImage": "images/samples/black_pla_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "white_petg",
+      "name": "Branco",
+      "material": "petg",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#FFFFFF",
+      "gradient": "linear-gradient(135deg, #FFFFFF, #F5F5F5)",
+      "sampleImage": "images/samples/white_petg_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "black_petg",
+      "name": "Preto",
+      "material": "petg",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#000000",
+      "gradient": "linear-gradient(135deg, #000000, #1a1a1a)",
+      "sampleImage": "images/samples/black_petg_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "dark_blue_petg",
+      "name": "Azul Escuro",
+      "material": "petg",
+      "finish": "Glossy",
+      "category": "vibrant",
+      "code": "#00008B",
+      "gradient": "linear-gradient(135deg, #00008B, #0000CD)",
+      "sampleImage": "images/samples/dark_blue_petg_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "dark_green_petg",
+      "name": "Verde Escuro",
+      "material": "petg",
+      "finish": "glossy",
+      "category": "vibrant",
+      "code": "#006400",
+      "gradient": "linear-gradient(135deg, #006400, #228B22)",
+      "sampleImage": "images/samples/dark_green_petg_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "cream_petg",
+      "name": "Creme",
+      "material": "petg",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#FFFDD0",
+      "gradient": "linear-gradient(135deg, #FFFDD0, #FFF8DC)",
+      "sampleImage": "images/samples/cream_petg_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "black_abs",
+      "name": "Preto",
+      "material": "abs",
+      "finish": "Glossy",
+      "category": "basic",
+      "code": "#000000",
+      "gradient": "linear-gradient(135deg, #000000, #1a1a1a)",
+      "sampleImage": "images/samples/black_abs_sample.webp",
+      "multiplier": 1
+    },
+    {
+      "id": "tricolor_pla",
+      "name": "Tri-Color",
+      "material": "pla",
+      "finish": "matte",
+      "category": "special",
+      "code": "#FF0000",
+      "gradient": "linear-gradient(135deg, #FF0000 0%, #00FF00 50%, #0000FF 100%)",
+      "sampleImage": "images/samples/tricolor_pla_sample.webp",
+      "multiplier": 1.5
+    },
+    {
+      "id": "gold_metallic_pla",
+      "name": "Dourado Metálico",
+      "material": "pla",
+      "finish": "metallic",
+      "category": "special",
+      "code": "#FFD700",
+      "gradient": "linear-gradient(135deg, #FFD700, #FFA500, #FFD700)",
+      "sampleImage": "images/samples/gold_metallic_sample.webp",
+      "multiplier": 1.8
+    },
+    {
+      "id": "silver_metallic_pla",
+      "name": "Prateado Metálico",
+      "material": "pla",
+      "finish": "metallic",
+      "category": "special",
+      "code": "#C0C0C0",
+      "gradient": "linear-gradient(135deg, #E8E8E8, #A0A0A0, #C0C0C0)",
+      "sampleImage": "images/samples/silver_metallic_sample.webp",
+      "multiplier": 1.8
+    },
+    {
+      "id": "marble_white_pla",
+      "name": "Mármore Branco",
+      "material": "pla",
+      "finish": "matte",
+      "category": "special",
+      "code": "#F5F5F5",
+      "gradient": "linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 25%, #FFFFFF 50%, #D0D0D0 75%, #FFFFFF 100%)",
+      "sampleImage": "images/samples/marble_white_sample.webp",
+      "multiplier": 1.6
+    },
+    {
+      "id": "galaxy_purple_petg",
+      "name": "Galaxy Roxo",
+      "material": "petg",
+      "finish": "transparent",
+      "category": "special",
+      "code": "#6A0DAD",
+      "gradient": "radial-gradient(circle at 30% 40%, #9B30FF 0%, #6A0DAD 40%, #1a0033 80%, #000000 100%)",
+      "sampleImage": "images/samples/galaxy_purple_sample.webp",
+      "multiplier": 2.0
+    },
+    {
+      "id": "galaxy_blue_petg",
+      "name": "Galaxy Azul",
+      "material": "petg",
+      "finish": "transparent",
+      "category": "special",
+      "code": "#1E3A8A",
+      "gradient": "radial-gradient(circle at 30% 40%, #3B82F6 0%, #1E3A8A 40%, #0a1929 80%, #000000 100%)",
+      "sampleImage": "images/samples/galaxy_blue_sample.webp",
+      "multiplier": 2.0
+    }
+  ]
 }
-
