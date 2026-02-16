@@ -4,6 +4,7 @@
 
   let categories = [];
   let currentProduct = null;
+  let imageOrderManager = null;
 
   // ===== ELEMENTOS MODAL DE EDIÇÃO =====
   const editModal = document.getElementById('editProductModal');
@@ -15,7 +16,7 @@
   const editStock = editModal.querySelector('#editStock');
   const editProductName = editModal.querySelector('#editProductName');
 
-  // Categorias (dentro do modal)
+  // Categorias
   const categoriesContainer = editModal.querySelector('#categoriesCheckboxes');
   const primaryCategorySelect = editModal.querySelector('#primaryCategory');
 
@@ -25,16 +26,6 @@
   const editModelFile = editModal.querySelector('#editModelFile');
   const newModelFilename = editModal.querySelector('#newModelFilename');
   const uploadNewModelBtn = editModal.querySelector('#uploadNewModelBtn');
-
-  // Imagens
-  const editImagesGrid = editModal.querySelector('#editImagesGrid');
-  const imageCount = editModal.querySelector('#imageCount');
-  const editNewImages = editModal.querySelector('#editNewImages');
-  const newImagesInfo = editModal.querySelector('#newImagesInfo');
-  const uploadNewImagesBtn = editModal.querySelector('#uploadNewImagesBtn');
-  const editReplaceImages = editModal.querySelector('#editReplaceImages');
-  const replaceImagesInfo = editModal.querySelector('#replaceImagesInfo');
-  const replaceAllImagesBtn = editModal.querySelector('#replaceAllImagesBtn');
 
   // Botões
   const editCloseBtn = editModal.querySelector('[data-close="edit"]');
@@ -99,7 +90,6 @@
       `;
       categoriesContainer.appendChild(div);
 
-      // Popular select de categoria principal
       if (isChecked) {
         const option = document.createElement('option');
         option.value = cat.id;
@@ -108,15 +98,12 @@
       }
     });
 
-    // Restaurar categoria primária
     if (primaryCategoryId) primaryCategorySelect.value = primaryCategoryId;
 
-    // Event listeners dentro do modal
     categoriesContainer.querySelectorAll('.edit-category-checkbox').forEach(checkbox => {
       checkbox.addEventListener('change', updatePrimaryCategoryOptions);
     });
 
-    // Ajusta desabilitado se não houver categorias selecionadas
     primaryCategorySelect.disabled = categoriesContainer.querySelectorAll('.edit-category-checkbox:checked').length === 0;
   }
 
@@ -146,58 +133,208 @@
     }
   }
 
-  // ===== CARREGAR IMAGENS DO PRODUTO =====
+  // ⭐ ===== INICIALIZAR GESTOR DE ORDENAÇÃO DE IMAGENS ===== ⭐
+  function initImageOrderManager() {
+    const container = document.getElementById('editImagesOrderContainer');
+    if (!container) {
+      console.warn('⚠️ Container de ordenação de imagens não encontrado');
+      return false;
+    }
+
+    if (!window.ImageOrderManager) {
+      console.error('❌ Classe ImageOrderManager não está disponível!');
+      return false;
+    }
+
+    try {
+      imageOrderManager = new window.ImageOrderManager('editImagesOrderContainer', {
+        maxImages: 4,
+        onOrderChange: (orderedImages) => {
+          console.log('📸 Ordem alterada:', orderedImages);
+          updateImageCountDisplay();
+        },
+        onImageAdd: (images) => {
+          console.log('📸 Imagens adicionadas:', images);
+          updateImageCountDisplay();
+        },
+        onImageRemove: async (removedImage) => {
+          console.log('📸 Imagem removida:', removedImage);
+          
+          if (removedImage.isExisting && removedImage.filename) {
+            await deleteImage(currentProduct.id, removedImage.filename);
+          }
+          
+          updateImageCountDisplay();
+        }
+      });
+
+      console.log('✅ Gestor de ordenação de imagens inicializado');
+      return true;
+    } catch (err) {
+      console.error('❌ Erro ao inicializar gestor:', err);
+      return false;
+    }
+  }
+
+  function updateImageCountDisplay() {
+    const countEl = document.getElementById('editImageCount');
+    if (countEl && imageOrderManager) {
+      const count = imageOrderManager.getCount();
+      countEl.textContent = `${count}/4 imagens`;
+      countEl.className = `image-order-count ${count >= 4 ? 'full' : ''}`;
+    }
+  }
+
+  // ⭐ ===== CARREGAR IMAGENS DO PRODUTO ===== ⭐
   async function loadProductImages(productId) {
     try {
+      console.log('📸 A carregar imagens do produto:', productId);
+      
       const res = await fetch(`${API_BASE}/products/${productId}`, { headers: authHeaders() });
       const product = await res.json();
       const images = product.images || [];
 
-      imageCount.textContent = images.length;
-      editImagesGrid.innerHTML = '';
+      console.log('📸 Imagens recebidas:', images);
 
-      if (!images.length) {
-        editImagesGrid.innerHTML = '<p class="no-images-edit">Nenhuma imagem</p>';
+      if (!imageOrderManager) {
+        console.warn('⚠️ Gestor de imagens não está inicializado');
         return;
       }
 
-      images.forEach(filename => {
-        const item = document.createElement('div');
-        item.className = 'image-edit-item';
+      if (images.length === 0) {
+        console.log('ℹ️ Produto não tem imagens');
+        imageOrderManager.clear();
+        updateImageCountDisplay();
+        return;
+      }
 
-        const img = document.createElement('img');
-        img.src = `${API_BASE}/images/${filename}`;
-        img.alt = filename;
+      // Converter filenames para URLs completas
+      const imageUrls = images.map(filename => `${API_BASE}/images/${filename}`);
+      
+      console.log('📸 URLs das imagens:', imageUrls);
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'image-delete-btn';
-        deleteBtn.innerHTML = '×';
-        deleteBtn.title = 'Eliminar imagem';
-        deleteBtn.onclick = () => deleteImage(productId, filename);
+      // Carregar no gestor de ordenação
+      imageOrderManager.addExistingImages(imageUrls);
+      updateImageCountDisplay();
 
-        item.appendChild(img);
-        item.appendChild(deleteBtn);
-        editImagesGrid.appendChild(item);
-      });
+      console.log('✅ Imagens carregadas com sucesso');
+
     } catch (err) {
-      console.error('Erro ao carregar imagens:', err);
+      console.error('❌ Erro ao carregar imagens:', err);
     }
   }
 
   // ===== ELIMINAR IMAGEM =====
   async function deleteImage(productId, filename) {
-    if (!confirm('Eliminar esta imagem?')) return;
     try {
       const res = await fetch(`${API_BASE}/products/${productId}/images`, {
         method: 'DELETE',
         headers: { ...authHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename })
       });
+      
       if (!res.ok) throw new Error('Erro ao eliminar imagem');
-      await loadProductImages(productId);
+      
+      console.log('✅ Imagem eliminada do servidor:', filename);
+      return true;
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao eliminar imagem:', err);
       alert('Erro ao eliminar imagem');
+      return false;
+    }
+  }
+
+  // ⭐ ===== GUARDAR NOVA ORDEM DE IMAGENS ===== ⭐
+  async function saveImageOrder() {
+    if (!currentProduct || !imageOrderManager) {
+      console.warn('Produto ou gestor de imagens não disponível');
+      return;
+    }
+
+    try {
+      const orderedFilenames = imageOrderManager.getOrderedFilenames();
+      
+      if (orderedFilenames.length === 0) {
+        alert('Adicione pelo menos uma imagem');
+        return;
+      }
+
+      console.log('💾 A guardar ordem:', orderedFilenames);
+
+      const res = await fetch(`${API_BASE}/products/${currentProduct.id}/images/reorder`, {
+        method: 'PUT',
+        headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: orderedFilenames })
+      });
+
+      if (!res.ok) {
+        throw new Error('Erro ao guardar ordem das imagens');
+      }
+
+      const result = await res.json();
+      console.log('✅ Ordem guardada:', result);
+
+      alert('✅ Ordem das imagens guardada com sucesso!');
+
+    } catch (err) {
+      console.error('Erro ao guardar ordem:', err);
+      alert('Erro ao guardar ordem das imagens: ' + err.message);
+    }
+  }
+
+  // ⭐ ===== ADICIONAR NOVAS IMAGENS ===== ⭐
+  async function addNewImages() {
+    if (!currentProduct) {
+      alert('Nenhum produto selecionado');
+      return;
+    }
+
+    const fileInput = document.getElementById('editNewImagesInput');
+    if (!fileInput) {
+      console.error('Input de imagens não encontrado');
+      return;
+    }
+
+    const files = fileInput.files;
+
+    if (files.length === 0) {
+      alert('Selecione pelo menos uma imagem');
+      return;
+    }
+
+    if (imageOrderManager && imageOrderManager.getCount() + files.length > 4) {
+      alert(`Máximo de 4 imagens. Atualmente tens ${imageOrderManager.getCount()}`);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('images', file);
+      });
+
+      const res = await fetch(`${API_BASE}/products/${currentProduct.id}/images`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Erro ao fazer upload');
+
+      const result = await res.json();
+      console.log('✅ Imagens enviadas:', result);
+
+      await loadProductImages(currentProduct.id);
+      
+      fileInput.value = '';
+      const label = document.getElementById('newImagesLabel');
+      if (label) label.textContent = 'Nenhum ficheiro selecionado';
+
+      alert('✅ Imagens adicionadas com sucesso!');
+
+    } catch (err) {
+      console.error('Erro ao adicionar imagens:', err);
+      alert('Erro ao adicionar imagens: ' + err.message);
     }
   }
 
@@ -241,7 +378,18 @@
     currentProduct = e.detail;
 
     if (!currentProduct) return console.error('Produto inválido para edição');
-    console.log('Produto recebido para edição:', currentProduct);
+    console.log('📦 Produto recebido para edição:', currentProduct);
+
+    // ⭐ Inicializar gestor de imagens se ainda não existe
+    if (!imageOrderManager) {
+      const initialized = initImageOrderManager();
+      if (!initialized) {
+        console.error('❌ Não foi possível inicializar o gestor de imagens');
+      }
+    } else {
+      console.log('🔄 Limpando imagens anteriores...');
+      imageOrderManager.clear();
+    }
 
     // ===== POPULAR CAMPOS PRINCIPAIS =====
     editId.value = currentProduct.id;
@@ -268,21 +416,12 @@
       currentModelFilename.textContent = 'Sem modelo 3D';
     }
 
-    // Limpar inputs de upload de modelo
     editModelFile.value = '';
     newModelFilename.textContent = '';
-    uploadNewModelBtn.disabled = true;
+    if (uploadNewModelBtn) uploadNewModelBtn.disabled = true;
 
-    // ===== IMAGENS =====
-    editNewImages.value = '';
-    newImagesInfo.textContent = '';
-    uploadNewImagesBtn.disabled = true;
-
-    editReplaceImages.value = '';
-    replaceImagesInfo.textContent = '';
-    replaceAllImagesBtn.disabled = true;
-
-    // Carregar imagens atuais
+    // ⭐ ===== CARREGAR IMAGENS NO GESTOR ===== ⭐
+    console.log('📸 Iniciando carregamento de imagens...');
     await loadProductImages(currentProduct.id);
 
     // ===== ATIVAR PRIMEIRA ABA =====
@@ -294,9 +433,37 @@
 
   // ===== EVENT LISTENERS =====
   editCloseBtn.addEventListener('click', hideModal);
-  
-  // BOTÃO DE ELIMINAR PRODUTO
   deleteBtn.addEventListener('click', deleteProduct);
+
+  // ⭐ BOTÃO DE ADICIONAR NOVAS IMAGENS ⭐
+  const btnAddImages = document.getElementById('btnAddNewImages');
+  if (btnAddImages) {
+    btnAddImages.addEventListener('click', addNewImages);
+  } else {
+    console.warn('⚠️ Botão btnAddNewImages não encontrado');
+  }
+
+  // ⭐ BOTÃO DE GUARDAR ORDEM ⭐
+  const btnSaveOrder = document.getElementById('btnSaveImageOrder');
+  if (btnSaveOrder) {
+    btnSaveOrder.addEventListener('click', saveImageOrder);
+  } else {
+    console.warn('⚠️ Botão btnSaveImageOrder não encontrado');
+  }
+
+  // ⭐ INPUT DE NOVAS IMAGENS ⭐
+  const newImagesInput = document.getElementById('editNewImagesInput');
+  if (newImagesInput) {
+    newImagesInput.addEventListener('change', (e) => {
+      const count = e.target.files.length;
+      const label = document.getElementById('newImagesLabel');
+      if (label) {
+        label.textContent = count > 0 ? `${count} ficheiro(s) selecionado(s)` : 'Nenhum ficheiro selecionado';
+      }
+    });
+  } else {
+    console.warn('⚠️ Input editNewImagesInput não encontrado');
+  }
 
   // ===== SUBMIT FORM =====
   editForm.addEventListener('submit', async e => {
@@ -339,5 +506,17 @@
   });
 
   // ===== INICIALIZAÇÃO =====
-  document.addEventListener('DOMContentLoaded', loadCategories);
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCategories();
+    
+    // ⭐ Tentar inicializar gestor de imagens ⭐
+    setTimeout(() => {
+      if (document.getElementById('editImagesOrderContainer')) {
+        initImageOrderManager();
+        console.log('✅ Sistema de ordenação de imagens pronto');
+      } else {
+        console.log('ℹ️ Sistema de ordenação de imagens não disponível (HTML não atualizado)');
+      }
+    }, 100);
+  });
 })();

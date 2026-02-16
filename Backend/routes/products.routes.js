@@ -23,6 +23,8 @@ router.delete('/:id', auth, admin, controller.deleteProduct);
 
 // GET imagens
 router.get('/:id/images', controller.getProductImages);
+// ⭐ REORDENAR imagens (ANTES do PUT genérico)
+router.put('/:id/images/reorder', auth, admin, controller.reorderProductImages);
 
 // ADICIONAR imagens (até 4 novas)
 router.post('/:id/images', auth, admin, uploadImages.array('images', 4), controller.uploadProductImages);

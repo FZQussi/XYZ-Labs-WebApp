@@ -384,4 +384,48 @@ exports.replaceProductImages = async (req, res) => {
     console.error('Erro ao substituir imagens:', err);
     res.status(500).json({ error: 'Erro ao substituir imagens' });
   }
+  
+};
+// ===== REORDER IMAGES =====
+exports.reorderProductImages = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { images } = req.body;
+
+    if (!Array.isArray(images)) {
+      return res.status(400).json({ error: 'Array de imagens inválido' });
+    }
+
+    console.log('🔄 Reordenando imagens do produto', productId);
+    console.log('📸 Nova ordem:', images);
+
+    // Validar que todas as imagens existem
+    const currentProduct = await client.query(
+      'SELECT images FROM products WHERE id = $1',
+      [productId]
+    );
+
+    const currentImages = currentProduct.rows[0]?.images || [];
+    const validImages = images.filter(img => currentImages.includes(img));
+
+    // Atualizar ordem das imagens
+    const result = await client.query(`
+      UPDATE products
+      SET images = $1, updated_at = NOW()
+      WHERE id = $2
+      RETURNING images
+    `, [validImages, productId]);
+
+    console.log('✅ Ordem atualizada:', result.rows[0]?.images);
+
+    res.json({
+      success: true,
+      images: result.rows[0]?.images || [],
+      message: 'Ordem de imagens atualizada com sucesso'
+    });
+
+  } catch (err) {
+    console.error('Erro ao reordenar imagens:', err);
+    res.status(500).json({ error: 'Erro ao reordenar imagens' });
+  }
 };
