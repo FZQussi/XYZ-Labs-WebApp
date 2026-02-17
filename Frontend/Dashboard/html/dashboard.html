@@ -29,6 +29,10 @@
         <span class="nav-icon">📦</span>
         <span>Produtos</span>
       </button>
+      <button data-tab="priceCalculator" class="nav-btn">
+        <span class="nav-icon">🧮</span>
+        <span>Calculadora Preços</span>
+      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -314,6 +318,37 @@
         </div>
       </div>
     </section>
+      <!-- ============ SECÇÃO CALCULADORA DE PREÇOS ============ -->
+<section id="priceCalculator" class="tab hidden">
+  <header class="page-header">
+    <h2 class="page-title">CALCULADORA DE PREÇOS</h2>
+  </header>
+
+  <div class="calculator-container">
+    <p>Insira os valores para calcular o preço final:</p>
+    
+    <div class="form-group">
+      <label>Preço Base (€)</label>
+      <input type="number" id="calcBasePrice" placeholder="Ex: 100" step="0.01">
+    </div>
+
+    <div class="form-group">
+      <label>Margem (%)</label>
+      <input type="number" id="calcMargin" placeholder="Ex: 20" step="0.01">
+    </div>
+
+    <div class="form-group">
+      <label>IVA (%)</label>
+      <input type="number" id="calcTax" placeholder="Ex: 23" step="0.01">
+    </div>
+
+    <button id="calculatePriceBtn" class="btn-primary">Calcular</button>
+
+    <div class="calc-result">
+      <p>Preço Final: €<span id="calcFinalPrice">0.00</span></p>
+    </div>
+  </div>
+</section>
 
   </main>
 

@@ -14,6 +14,7 @@
   const forgotRoutes = require('./routes/forgot.routes');
   const resetRoutes = require('./routes/reset.routes');
  // const attributesRoutes = require('./routes/attributes.routes');
+ const dashboardRoutes = require('./routes/Dashboard.routes');
   const app = express();
   const port = process.env.PORT || 3001;
 
@@ -80,6 +81,7 @@
     res.status(500).json({ error: 'Erro interno do servidor' });
   });
 
+  app.use('/api/dashboard', dashboardRoutes);
   // ===== INICIAR SERVIDOR =====
   app.listen(port, () => {
     console.log(`✅ Servidor a correr em http://localhost:${port}`);
