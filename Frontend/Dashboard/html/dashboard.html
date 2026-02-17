@@ -4,480 +4,761 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - XYZ Labs</title>
-  <link rel="stylesheet" href="../css/base.css">
-  <link rel="stylesheet" href="../css/layout.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
-  <link rel="stylesheet" href="../css/users.css">
-  <link rel="stylesheet" href="../css/products.css">
-  <link rel="stylesheet" href="../css/forms.css">
-  <link rel="stylesheet" href="../css/modals.css">
-  <link rel="stylesheet" href="../css/attributes.css">
-  <link rel="stylesheet" href="../css/image-order-manager.css">
+  <link rel="stylesheet" href="../css/dashboard-brutalist.css">
+  <link rel="stylesheet" href="../css/products-modals.css">
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
 <body>
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <h2>Admin</h2>
-    <button data-tab="users">Utilizadores</button>
-    <button data-tab="products">Produtos</button>
-    <button id="logoutBtn">Logout</button>
+    <div class="sidebar-header">
+      <h1>XYZ LABS</h1>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button data-tab="dashboard" class="nav-btn active">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </button>
+      <button data-tab="users" class="nav-btn">
+        <span class="nav-icon">👥</span>
+        <span>Utilizadores</span>
+      </button>
+      <button data-tab="products" class="nav-btn">
+        <span class="nav-icon">📦</span>
+        <span>Produtos</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar">👤</div>
+        <div class="user-details">
+          <span class="user-name" id="userName">Admin</span>
+          <span class="user-role">Administrator</span>
+        </div>
+      </div>
+      <button id="logoutBtn" class="logout-btn">
+        <span>🚪</span>
+        <span>LOGOUT</span>
+      </button>
+    </div>
   </aside>
 
-  <main>
-    <div id="welcomeMsg" class="welcome"></div>
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <!-- ============ DASHBOARD PRINCIPAL ============ -->
+    <section id="dashboard" class="tab">
+      <header class="page-header">
+        <h2 class="page-title">DASHBOARD</h2>
+        <div class="page-actions">
+          <button id="refreshDashboard" class="btn-icon" title="Atualizar">🔄</button>
+          <span class="last-update">Última atualização: <span id="lastUpdate">--:--</span></span>
+        </div>
+      </header>
 
-    <!-- SECÇÃO DE UTILIZADORES -->
-    <section id="users" class="tab hidden">
-      <h2>Gestão de Utilizadores</h2>
-
-      <!-- ESTATÍSTICAS -->
-      <div class="stats-container">
+      <!-- ESTATÍSTICAS PRINCIPAIS -->
+      <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-info">
+          <div class="stat-header">
+            <span class="stat-icon">📦</span>
+            <span class="stat-trend" id="productsTrend">—</span>
+          </div>
+          <div class="stat-body">
+            <h3 class="stat-value" id="totalProducts">0</h3>
+            <p class="stat-label">Total Produtos</p>
+          </div>
+          <div class="stat-footer">
+            <span id="activeProducts">0</span> ativos
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-icon">👥</span>
+            <span class="stat-trend" id="usersTrend">—</span>
+          </div>
+          <div class="stat-body">
+            <h3 class="stat-value" id="totalUsersStats">0</h3>
+            <p class="stat-label">Utilizadores</p>
+          </div>
+          <div class="stat-footer">
+            <span id="newUsersStats">0</span> novos (30d)
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-icon">📂</span>
+            <span class="stat-trend">—</span>
+          </div>
+          <div class="stat-body">
+            <h3 class="stat-value" id="totalCategories">0</h3>
+            <p class="stat-label">Categorias</p>
+          </div>
+          <div class="stat-footer">
+            Sistema de categorização
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-icon">🔐</span>
+            <span class="stat-trend stat-positive">✓</span>
+          </div>
+          <div class="stat-body">
+            <h3 class="stat-value">ATIVO</h3>
+            <p class="stat-label">Segurança</p>
+          </div>
+          <div class="stat-footer">
+            Sessão segura
+          </div>
+        </div>
+      </div>
+
+      <!-- GRÁFICOS E ATIVIDADE -->
+      <div class="dashboard-grid">
+        
+        <!-- ATIVIDADE RECENTE -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3 class="card-title">ATIVIDADE RECENTE</h3>
+            <button class="btn-card-action">Ver tudo</button>
+          </div>
+          <div class="card-body">
+            <div id="recentActivity" class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon">⏳</div>
+                <div class="activity-details">
+                  <p class="activity-text">A carregar atividades...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUTOS RECENTES -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3 class="card-title">PRODUTOS RECENTES</h3>
+            <button class="btn-card-action">Gerir</button>
+          </div>
+          <div class="card-body">
+            <div id="recentProducts" class="products-preview">
+              <div class="loading-state">A carregar produtos...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTATÍSTICAS DE STOCK -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3 class="card-title">STOCK</h3>
+          </div>
+          <div class="card-body">
+            <div class="stock-stats">
+              <div class="stock-item">
+                <span class="stock-label">Disponível</span>
+                <span class="stock-value stock-available" id="stockAvailable">0</span>
+              </div>
+              <div class="stock-item">
+                <span class="stock-label">Indisponível</span>
+                <span class="stock-value stock-unavailable" id="stockUnavailable">0</span>
+              </div>
+              <div class="stock-progress">
+                <div class="stock-bar" id="stockBar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3 class="card-title">AÇÕES RÁPIDAS</h3>
+          </div>
+          <div class="card-body">
+            <div class="quick-actions">
+              <button class="quick-action-btn" data-action="add-product">
+                <span class="action-icon">➕</span>
+                <span class="action-label">Novo Produto</span>
+              </button>
+              <button class="quick-action-btn" data-action="add-user">
+                <span class="action-icon">👤</span>
+                <span class="action-label">Novo Utilizador</span>
+              </button>
+              <button class="quick-action-btn" data-action="view-products">
+                <span class="action-icon">📦</span>
+                <span class="action-label">Ver Produtos</span>
+              </button>
+              <button class="quick-action-btn" data-action="view-users">
+                <span class="action-icon">👥</span>
+                <span class="action-label">Ver Utilizadores</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SISTEMA DE ALERTAS -->
+      <div class="alerts-section" id="dashboardAlerts">
+        <!-- Alertas dinâmicos aparecerão aqui -->
+      </div>
+
+    </section>
+
+    <!-- ============ SECÇÃO DE UTILIZADORES ============ -->
+    <section id="users" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">GESTÃO DE UTILIZADORES</h2>
+      </header>
+
+      <!-- ESTATÍSTICAS DE UTILIZADORES -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-icon">👥</span>
+          <div>
             <span class="stat-label">Total</span>
             <span class="stat-value" id="totalUsers">0</span>
           </div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">👑</div>
-          <div class="stat-info">
+        <div class="stat-item">
+          <span class="stat-icon">👑</span>
+          <div>
             <span class="stat-label">Admins</span>
             <span class="stat-value" id="totalAdmins">0</span>
           </div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
-          <div class="stat-info">
+        <div class="stat-item">
+          <span class="stat-icon">📅</span>
+          <div>
             <span class="stat-label">Novos (30d)</span>
             <span class="stat-value" id="newUsers">0</span>
           </div>
         </div>
       </div>
 
-      <!-- FILTROS + AÇÕES -->
-      <div class="users-toolbar">
-        <input
-          type="text"
-          id="userSearch"
-          placeholder="Pesquisar por nome ou email..."
-        />
-
-        <select id="userFilterRole">
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <input type="text" id="userSearch" placeholder="Pesquisar por nome ou email..." class="search-input">
+        <select id="userFilterRole" class="filter-select">
           <option value="">Todas as Roles</option>
           <option value="admin">Admin</option>
           <option value="user">User</option>
         </select>
-
-        <button id="addUserBtn" class="primary-btn">
-          + Novo Utilizador
+        <button id="addUserBtn" class="btn-primary">
+          <span>➕</span>
+          <span>NOVO UTILIZADOR</span>
         </button>
       </div>
 
-      <!-- TABELA DE UTILIZADORES -->
-      <div class="users-table">
+      <!-- TABELA -->
+      <div class="data-table">
         <div class="table-header">
-          <span>Nome</span>
-          <span>Email</span>
-          <span>Role</span>
-          <span>Data Registo</span>
-          <span>Ações</span>
+          <span>NOME</span>
+          <span>EMAIL</span>
+          <span>ROLE</span>
+          <span>DATA REGISTO</span>
+          <span>AÇÕES</span>
         </div>
-
         <div id="usersList" class="table-body">
-          <!-- Utilizadores inseridos via JavaScript -->
+          <!-- Carregado via JS -->
         </div>
       </div>
     </section>
 
-    <!-- ============ MODAL: CRIAR UTILIZADOR ============ -->
-    <div id="createUserModal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close" data-close="createUser">&times;</span>
-
-        <h3>Criar Novo Utilizador</h3>
-
-        <form id="createUserForm">
-          <div class="form-group">
-            <label>Nome *</label>
-            <input type="text" id="createUserName" required>
-          </div>
-
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="createUserEmail" required>
-          </div>
-
-          <div class="form-group">
-            <label>Password *</label>
-            <input type="password" id="createUserPassword" required>
-            <ul class="password-reqs">
-              <li id="createLengthReq">≥ 12 caracteres</li>
-              <li id="createUppercaseReq">Uma letra maiúscula</li>
-              <li id="createLowercaseReq">Uma letra minúscula</li>
-              <li id="createNumberReq">Um número</li>
-              <li id="createSpecialReq">Um carácter especial</li>
-            </ul>
-          </div>
-
-          <div class="form-group">
-            <label>Role *</label>
-            <select id="createUserRole" required>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          <button type="submit" class="primary-btn">
-            Criar Utilizador
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- ============ MODAL: VER DETALHES ============ -->
-    <div id="viewUserModal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close" data-close="viewUser">&times;</span>
-
-        <h3>Detalhes do Utilizador</h3>
-
-        <div class="user-details">
-          <div class="detail-row">
-            <span class="detail-label">Nome:</span>
-            <span class="detail-value" id="viewUserName"></span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Email:</span>
-            <span class="detail-value" id="viewUserEmail"></span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Role:</span>
-            <span class="detail-value">
-              <span id="viewUserRole" class="role-badge"></span>
-            </span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Registado em:</span>
-            <span class="detail-value" id="viewUserCreated"></span>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button id="editUserFromViewBtn" class="primary-btn">
-            ✏️ Editar
-          </button>
-          <button id="deleteUserFromViewBtn" class="danger-btn">
-            🗑️ Eliminar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ MODAL: EDITAR UTILIZADOR ============ -->
-    <div id="editUserModal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close" data-close="editUser">&times;</span>
-
-        <h3>Editar Utilizador</h3>
-
-        <form id="editUserForm">
-          <input type="hidden" id="editUserId">
-
-          <div class="form-group">
-            <label>Nome *</label>
-            <input type="text" id="editUserName" required>
-          </div>
-
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="editUserEmail" required>
-          </div>
-
-          <div class="form-group">
-            <label>Role *</label>
-            <select id="editUserRole" required>
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Nova Password (deixar vazio para não alterar)</label>
-            <input type="password" id="editUserPassword" placeholder="********">
-            <ul class="password-reqs">
-              <li id="editLengthReq">≥ 12 caracteres</li>
-              <li id="editUppercaseReq">Uma letra maiúscula</li>
-              <li id="editLowercaseReq">Uma letra minúscula</li>
-              <li id="editNumberReq">Um número</li>
-              <li id="editSpecialReq">Um carácter especial</li>
-            </ul>
-          </div>
-
-          <div class="modal-actions">
-            <button type="submit" class="primary-btn">
-              💾 Guardar Alterações
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- SECÇÃO DE PRODUTOS -->
+    <!-- ============ SECÇÃO DE PRODUTOS ============ -->
     <section id="products" class="tab hidden">
-      <h2>Gestão de Produtos</h2>
+      <header class="page-header">
+        <h2 class="page-title">GESTÃO DE PRODUTOS</h2>
+      </header>
 
-      <!-- FILTROS + AÇÕES -->
-      <div class="products-toolbar">
-        <input type="text" id="productSearch" placeholder="Pesquisar produto..." />
-        <select id="productFilterActive">
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <input type="text" id="productSearch" placeholder="Pesquisar produto..." class="search-input">
+        <select id="productFilterActive" class="filter-select">
           <option value="">Todos</option>
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
         </select>
-        <input type="number" id="priceMin" placeholder="Preço min €" />
-        <input type="number" id="priceMax" placeholder="Preço max €" />
-        <select id="productFilterStock">
+        <input type="number" id="priceMin" placeholder="Preço min €" class="filter-input">
+        <input type="number" id="priceMax" placeholder="Preço max €" class="filter-input">
+        <select id="productFilterStock" class="filter-select">
           <option value="">Stock (Todos)</option>
           <option value="true">Disponível</option>
           <option value="false">Indisponível</option>
         </select>
-        <input type="text" id="productFilterCategory" placeholder="Filtrar por categoria..." />
-        <input type="text" id="productFilterPrimaryCategory" placeholder="Categoria principal..." />
-        <button id="addProductBtn" class="primary-btn">+ Novo Produto</button>
+        <input type="text" id="productFilterCategory" placeholder="Categoria..." class="filter-input">
+        <input type="text" id="productFilterPrimaryCategory" placeholder="Categoria principal..." class="filter-input">
+        <button id="addProductBtn" class="btn-primary">
+          <span>➕</span>
+          <span>NOVO PRODUTO</span>
+        </button>
       </div>
 
-      <!-- TABELA DE PRODUTOS -->
-      <div class="products-table">
+      <!-- TABELA -->
+      <div class="data-table">
         <div class="table-header">
-          <span>Nome</span>
-          <span>Preço</span>
-          <span>Stock</span>
-          <span>Categorias</span>
-          <span>Estado</span>
-          <span>Ações</span>
+          <span>NOME</span>
+          <span>PREÇO</span>
+          <span>STOCK</span>
+          <span>CATEGORIAS</span>
+          <span>ESTADO</span>
+          <span>AÇÕES</span>
         </div>
-        <div id="productsList" class="table-body"></div>
+        <div id="productsList" class="table-body">
+          <!-- Carregado via JS -->
+        </div>
       </div>
     </section>
 
-    <!-- MODAL: CRIAR PRODUTO -->
-    <div id="createProductModal" class="modal hidden">
-      <div class="modal-content">
-        <span class="close" data-close="create">&times;</span>
-        <h3>Criar Novo Produto</h3>
-        <form id="createProductForm">
-          <!-- ... campos do formulário ... -->
-        </form>
+  </main>
+
+  <!-- ============================================
+       MODAIS DE UTILIZADORES
+       ============================================ -->
+  
+  <!-- Modal: Criar Utilizador -->
+  <div id="createUserModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>CRIAR NOVO UTILIZADOR</h3>
+        <button class="modal-close" data-close="createUser">×</button>
       </div>
-    </div>
-
-    <!-- MODAL: EDITAR PRODUTO -->
-    <div id="editProductModal" class="modal hidden">
-      <div class="modal-content modal-large">
-        <span class="close" data-close="edit">&times;</span>
-        <h3>Editar Produto: <span id="editProductName"></span></h3>
-
-        <!-- SISTEMA DE ABAS -->
-        <div class="modal-tabs">
-          <button class="modal-tab-btn active" data-tab="edit-details">📋 Detalhes</button>
-          <button class="modal-tab-btn" data-tab="edit-model">🎨 Modelo 3D</button>
-          <button class="modal-tab-btn" data-tab="edit-images">🖼️ Imagens</button>
+      <form id="createUserForm" class="modal-form">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="createUserName" required>
         </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="createUserEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="createUserPassword" required>
+          <ul class="password-reqs">
+            <li id="createLengthReq">≥ 12 caracteres</li>
+            <li id="createUppercaseReq">Uma letra maiúscula</li>
+            <li id="createLowercaseReq">Uma letra minúscula</li>
+            <li id="createNumberReq">Um número</li>
+            <li id="createSpecialReq">Um carácter especial</li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <select id="createUserRole" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">CRIAR UTILIZADOR</button>
+      </form>
+    </div>
+  </div>
 
-        <!-- CONTEÚDO DAS ABAS -->
-        <div class="modal-tabs-container">
-          
-          <!-- ABA: EDITAR DETALHES -->
-          <div id="tab-edit-details" class="modal-tab-content active">
-            <form id="editProductForm">
-              <input type="hidden" id="editId">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Nome *</label>
-                  <input type="text" id="editName" required>
-                </div>
-                <div class="form-group">
-                  <label>Preço (€) *</label>
-                  <input type="number" id="editPrice" step="0.01" required>
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Descrição *</label>
-                <textarea id="editDescription" rows="4" required></textarea>
-              </div>
-              <div class="form-group">
-                <label>Categorias *</label>
-                <div id="categoriesCheckboxes" class="categories-checkbox-container"></div>
-                <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-                  Seleciona todas as categorias a que este produto pertence
-                </small>
-              </div>
-              <div class="form-group">
-                <label>Categoria Principal *</label>
-                <select id="primaryCategory" disabled>
-                  <option value="">-- Categoria Principal --</option>
-                </select>
-                <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-                  Escolhe qual a categoria principal para breadcrumbs e navegação
-                </small>
-              </div>
-              <div class="form-group">
-                <label>Stock Disponível</label>
-                <input type="checkbox" id="editStock">
-              </div>
-              <div class="modal-actions">
-                <button type="submit" class="primary-btn">💾 Guardar Alterações</button>
-                <button type="button" id="deleteProductBtn" class="danger-btn">🗑️ Eliminar Produto</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- ABA: EDITAR MODELO 3D -->
-          <div id="tab-edit-model" class="modal-tab-content">
-            <div class="model-edit-container">
-              <div class="current-model">
-                <h4>Modelo Atual</h4>
-                <model-viewer
-                  id="editCurrentModel"
-                  src="..."
-                  alt="Modelo 3D Atual"
-                  auto-rotate
-                  camera-controls
-                  shadow-intensity="1"
-                  style="width:100%; height:400px; background-color:#2c2c2c; border-radius:8px;"
-                ></model-viewer>
-                <p class="model-filename" id="currentModelFilename"></p>
-              </div>
-              <div class="upload-model">
-                <h4>Substituir Modelo</h4>
-                <div class="upload-area">
-                  <input type="file" id="editModelFile" accept=".glb" style="display:none;">
-                  <button type="button" class="secondary-btn" onclick="document.getElementById('editModelFile').click()">
-                    📁 Escolher Ficheiro .GLB
-                  </button>
-                  <p id="newModelFilename" class="file-selected"></p>
-                </div>
-                <button type="button" id="uploadNewModelBtn" class="primary-btn" disabled>
-                  ⬆️ Enviar Novo Modelo
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ABA: EDITAR IMAGENS (COM ORDENAÇÃO) -->
-          <div id="tab-edit-images" class="modal-tab-content">
-            <div class="image-order-instructions">
-              <strong>🖼️ Gestão de Imagens</strong>
-              <ul>
-                <li><strong>Arrasta</strong> as imagens para reordenar</li>
-                <li>Usa os <strong>botões ↑ ↓</strong> para mover</li>
-                <li>A <strong>primeira imagem</strong> será a principal</li>
-                <li>Máximo de <strong>4 imagens</strong></li>
-              </ul>
-            </div>
-            <div id="editImagesOrderContainer" class="image-order-container"></div>
-            <div style="margin-top: 12px; text-align: center;">
-              <span id="editImageCount" class="image-order-count">0/4 imagens</span>
-            </div>
-            <hr style="margin: 24px 0; border: 1px solid #ddd;">
-            <div class="upload-images-section">
-              <h4>➕ Adicionar Novas Imagens</h4>
-              <div class="image-order-upload-area">
-                <input type="file" id="editNewImagesInput" accept="image/*" multiple>
-                <label for="editNewImagesInput" class="image-order-upload-btn">📁 Escolher Imagens</label>
-                <span id="newImagesLabel" style="font-size: 13px; color: #666;">Nenhum ficheiro selecionado</span>
-              </div>
-              <button type="button" id="btnAddNewImages" class="primary-btn" style="margin-top: 12px;">⬆️ Enviar Imagens</button>
-            </div>
-            <hr style="margin: 24px 0; border: 1px solid #ddd;">
-            <button type="button" id="btnSaveImageOrder" class="btn-save-image-order">💾 Guardar Ordem das Imagens</button>
-            <small style="display: block; margin-top: 12px; color: #666; text-align: center;">
-              ⚠️ Não te esqueças de guardar a ordem depois de reordenar!
-            </small>
-          </div>
-
+  <!-- Modal: Ver Utilizador -->
+  <div id="viewUserModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>DETALHES DO UTILIZADOR</h3>
+        <button class="modal-close" data-close="viewUser">×</button>
+      </div>
+      <div class="user-details">
+        <div class="detail-row">
+          <span class="detail-label">Nome:</span>
+          <span class="detail-value" id="viewUserName"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value" id="viewUserEmail"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Role:</span>
+          <span class="detail-value">
+            <span id="viewUserRole" class="role-badge"></span>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Registado em:</span>
+          <span class="detail-value" id="viewUserCreated"></span>
         </div>
       </div>
+      <div class="modal-actions">
+        <button id="editUserFromViewBtn" class="btn-primary">✏️ EDITAR</button>
+        <button id="deleteUserFromViewBtn" class="btn-danger">🗑️ ELIMINAR</button>
+      </div>
     </div>
+  </div>
 
-    <!-- MODAL: VER PRODUTO -->
-    <div id="viewProductModal" class="modal hidden">
-      <div class="modal-content modal-large">
-        <span class="close" data-close="view">&times;</span>
-        <h3 id="viewName"></h3>
+  <!-- Modal: Editar Utilizador -->
+  <div id="editUserModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>EDITAR UTILIZADOR</h3>
+        <button class="modal-close" data-close="editUser">×</button>
+      </div>
+      <form id="editUserForm" class="modal-form">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="editUserName" required>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="editUserEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Role *</label>
+          <select id="editUserRole" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nova Password (deixar vazio para não alterar)</label>
+          <input type="password" id="editUserPassword" placeholder="********">
+          <ul class="password-reqs">
+            <li id="editLengthReq">≥ 12 caracteres</li>
+            <li id="editUppercaseReq">Uma letra maiúscula</li>
+            <li id="editLowercaseReq">Uma letra minúscula</li>
+            <li id="editNumberReq">Um número</li>
+            <li id="editSpecialReq">Um carácter especial</li>
+          </ul>
+        </div>
+        <button type="submit" class="btn-primary">💾 GUARDAR ALTERAÇÕES</button>
+      </form>
+    </div>
+  </div>
 
-        <div class="modal-tabs">
-          <button class="modal-tab-btn active" data-tab="details">📋 Detalhes</button>
-          <button class="modal-tab-btn" data-tab="model">🎨 Modelo 3D</button>
-          <button class="modal-tab-btn" data-tab="images">🖼️ Imagens</button>
+  <!-- ============================================
+       MODAIS DE PRODUTOS
+       ============================================ -->
+
+  <!-- Modal: Criar Produto -->
+  <div id="createProductModal" class="modal hidden">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>CRIAR NOVO PRODUTO</h3>
+        <button class="modal-close" data-close="create">×</button>
+      </div>
+
+      <form id="createProductForm" class="modal-form">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="createName" required>
         </div>
 
-        <div class="modal-tabs-container">
-          
-          <div id="tab-details" class="modal-tab-content active">
-            <div class="product-details-grid">
-              <div class="detail-row">
-                <span class="detail-label">Preço:</span>
-                <span class="detail-value">€<span id="viewPrice"></span></span>
+        <div class="form-group">
+          <label>Preço (€) *</label>
+          <input type="number" id="createPrice" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>Descrição *</label>
+          <textarea id="createDescription" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Categorias *</label>
+          <div id="categoriesCheckboxes" class="categories-checkbox-container">
+            <!-- Categorias carregadas via JS -->
+          </div>
+          <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
+            Seleciona todas as categorias a que este produto pertence
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Categoria Principal *</label>
+          <select id="primaryCategory" disabled>
+            <option value="">-- Categoria Principal --</option>
+          </select>
+          <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
+            Escolhe qual a categoria principal para breadcrumbs e navegação
+          </small>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="createStock">
+            Produto disponível
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Ficheiros 3D e Imagens</label>
+          <input type="file" id="createModelFile" name="modelFile" accept=".glb">
+          <input type="file" id="createImages" name="images" accept="image/*" multiple>
+          <small>Podes adicionar até 4 imagens.</small>
+        </div>
+
+        <button type="submit" class="btn-primary">CRIAR PRODUTO</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Produto -->
+  <div id="editProductModal" class="modal hidden">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>EDITAR PRODUTO: <span id="editProductName"></span></h3>
+        <button class="modal-close" data-close="edit">×</button>
+      </div>
+
+      <!-- SISTEMA DE ABAS -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" data-tab="edit-details">
+          📋 Detalhes
+        </button>
+        <button class="modal-tab-btn" data-tab="edit-model">
+          🎨 Modelo 3D
+        </button>
+        <button class="modal-tab-btn" data-tab="edit-images">
+          🖼️ Imagens
+        </button>
+      </div>
+
+      <!-- CONTEÚDO DAS ABAS -->
+      <div class="modal-tabs-container">
+        
+        <!-- ABA: EDITAR DETALHES -->
+        <div id="tab-edit-details" class="modal-tab-content active">
+          <form id="editProductForm">
+            <input type="hidden" id="editId">
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nome *</label>
+                <input type="text" id="editName" required>
               </div>
-              <div class="detail-row">
-                <span class="detail-label">Stock:</span>
-                <span class="detail-value"><span id="viewStock"></span></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Estado:</span>
-                <span class="detail-value"><span id="viewStatus"></span></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Categoria:</span>
-                <span class="detail-value"><span id="viewCategory"></span></span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Subcategoria:</span>
-                <span class="detail-value"><span id="viewSubcategory"></span></span>
-              </div>
-              <div class="detail-row full-width">
-                <span class="detail-label">Descrição:</span>
-                <p class="detail-description" id="viewDescription"></p>
+
+              <div class="form-group">
+                <label>Preço (€) *</label>
+                <input type="number" id="editPrice" step="0.01" required>
               </div>
             </div>
-          </div>
 
-          <div id="tab-model" class="modal-tab-content">
-            <div class="model-viewer-container">
+            <div class="form-group">
+              <label>Descrição *</label>
+              <textarea id="editDescription" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Categorias *</label>
+              <div id="categoriesCheckboxes" class="categories-checkbox-container">
+                <!-- Categorias carregadas via JS -->
+              </div>
+              <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
+                Seleciona todas as categorias a que este produto pertence
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>Categoria Principal *</label>
+              <select id="primaryCategory" disabled>
+                <option value="">-- Categoria Principal --</option>
+              </select>
+              <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
+                Escolhe qual a categoria principal para breadcrumbs e navegação
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>Stock Disponível</label>
+              <input type="checkbox" id="editStock">
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn-primary">
+                💾 GUARDAR ALTERAÇÕES
+              </button>
+              <button type="button" id="deleteProductBtn" class="btn-danger">
+                🗑️ ELIMINAR PRODUTO
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ABA: EDITAR MODELO 3D -->
+        <div id="tab-edit-model" class="modal-tab-content">
+          <div class="model-edit-container">
+            
+            <!-- Modelo Atual -->
+            <div class="current-model">
+              <h4>Modelo Atual</h4>
               <model-viewer
-                id="viewModel"
+                id="editCurrentModel"
                 src="..."
-                alt="Modelo 3D"
+                alt="Modelo 3D Atual"
                 auto-rotate
                 camera-controls
                 shadow-intensity="1"
-                style="width:100%; height:500px; background-color:#2c2c2c; border-radius:8px;"
+                style="width:100%; height:400px; background-color:#2c2c2c; border-radius:8px;"
               ></model-viewer>
-              <div class="model-controls">
-                <p>🖱️ Arrasta para rodar | 🔍 Scroll para zoom</p>
+              <p class="model-filename" id="currentModelFilename"></p>
+            </div>
+
+            <!-- Upload Novo Modelo -->
+            <div class="upload-model">
+              <h4>Substituir Modelo</h4>
+              <div class="upload-area">
+                <input type="file" id="editModelFile" accept=".glb" style="display:none;">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('editModelFile').click()">
+                  📁 Escolher Ficheiro .GLB
+                </button>
+                <p id="newModelFilename" class="file-selected"></p>
               </div>
+              <button type="button" id="uploadNewModelBtn" class="btn-primary" disabled>
+                ⬆️ Enviar Novo Modelo
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ABA: EDITAR IMAGENS -->
+        <div id="tab-edit-images" class="modal-tab-content">
+          
+          <!-- Imagens Atuais -->
+          <div class="current-images-section">
+            <h4>Imagens Atuais (<span id="imageCount">0</span>/4)</h4>
+            <div id="editImagesGrid" class="images-grid-edit">
+              <!-- Imagens inseridas via JS -->
             </div>
           </div>
 
-          <div id="tab-images" class="modal-tab-content">
-            <div id="imagesGrid" class="images-grid"></div>
+          <!-- Upload Novas Imagens -->
+          <div class="upload-images-section">
+            <h4>Adicionar Novas Imagens</h4>
+            <div class="upload-area">
+              <input type="file" id="editNewImages" accept="image/*" multiple style="display:none;">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('editNewImages').click()">
+                📁 Escolher Imagens
+              </button>
+              <p id="newImagesInfo" class="file-selected"></p>
+            </div>
+            <button type="button" id="uploadNewImagesBtn" class="btn-primary" disabled>
+              ⬆️ Adicionar Imagens
+            </button>
+          </div>
+
+          <!-- Substituir Todas -->
+          <div class="replace-images-section">
+            <h4>Substituir Todas as Imagens</h4>
+            <div class="upload-area">
+              <input type="file" id="editReplaceImages" accept="image/*" multiple style="display:none;">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('editReplaceImages').click()">
+                📁 Escolher Novas Imagens (até 4)
+              </button>
+              <p id="replaceImagesInfo" class="file-selected"></p>
+            </div>
+            <button type="button" id="replaceAllImagesBtn" class="btn-danger" disabled>
+              🔄 Substituir Todas
+            </button>
+            <small class="warning-text">⚠️ Isto irá eliminar todas as imagens atuais permanentemente!</small>
           </div>
 
         </div>
+
       </div>
     </div>
+  </div>
 
-  </main>
+  <!-- Modal: Ver Produto -->
+  <div id="viewProductModal" class="modal hidden">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3 id="viewName"></h3>
+        <button class="modal-close" data-close="view">×</button>
+      </div>
+
+      <!-- SISTEMA DE ABAS -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" data-tab="details">
+          📋 Detalhes
+        </button>
+        <button class="modal-tab-btn" data-tab="model">
+          🎨 Modelo 3D
+        </button>
+        <button class="modal-tab-btn" data-tab="images">
+          🖼️ Imagens
+        </button>
+      </div>
+
+      <!-- CONTEÚDO DAS ABAS -->
+      <div class="modal-tabs-container">
+        
+        <!-- ABA: DETALHES -->
+        <div id="tab-details" class="modal-tab-content active">
+          <div class="product-details-grid">
+            <div class="detail-row">
+              <span class="detail-label">Preço:</span>
+              <span class="detail-value">€<span id="viewPrice"></span></span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Stock:</span>
+              <span class="detail-value"><span id="viewStock"></span></span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Estado:</span>
+              <span class="detail-value"><span id="viewStatus"></span></span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Categoria:</span>
+              <span class="detail-value"><span id="viewCategory"></span></span>
+            </div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Subcategoria:</span>
+              <span class="detail-value"><span id="viewSubcategory"></span></span>
+            </div>
+            
+            <div class="detail-row full-width">
+              <span class="detail-label">Descrição:</span>
+              <p class="detail-description" id="viewDescription"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA: MODELO 3D -->
+        <div id="tab-model" class="modal-tab-content">
+          <div class="model-viewer-container">
+            <model-viewer
+              id="viewModel"
+              src="..."
+              alt="Modelo 3D"
+              auto-rotate
+              camera-controls
+              shadow-intensity="1"
+              style="width:100%; height:500px; background-color:#2c2c2c; border-radius:8px;"
+            ></model-viewer>
+            <div class="model-controls">
+              <p>🖱️ Arrasta para rodar | 🔍 Scroll para zoom</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA: IMAGENS -->
+        <div id="tab-images" class="modal-tab-content">
+          <div id="imagesGrid" class="images-grid">
+            <!-- Imagens serão inseridas via JavaScript -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
-  <script src="../scripts/image-order-manager.js"></script>
+  <script src="../scripts/security.js"></script>
+  <script src="../scripts/dashboard-stats.js"></script>
   <script src="../scripts/dashboard.js"></script>
   <script src="../scripts/users.js"></script>
   <script src="../scripts/products.js"></script>
@@ -485,5 +766,6 @@
   <script src="../scripts/createproduct.js"></script>
   <script src="../scripts/editproduct.js"></script>
   <script src="../scripts/viewproduct.js"></script>
+  <script src="../scripts/image-order-manager.js"></script>
 </body>
 </html>

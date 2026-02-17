@@ -18,5 +18,12 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Token inválido ou expirado' });
   }
 }
-
+// Middleware para verificar CSRF token
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const csrfToken = req.headers['x-csrf-token'];
+    // Validar token aqui
+  }
+  next();
+});
 module.exports = authMiddleware;

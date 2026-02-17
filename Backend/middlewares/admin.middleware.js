@@ -4,5 +4,12 @@ function adminOnly(req, res, next) {
   }
   next();
 }
-
+// Middleware para verificar CSRF token
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const csrfToken = req.headers['x-csrf-token'];
+    // Validar token aqui
+  }
+  next();
+});
 module.exports = adminOnly;
