@@ -318,36 +318,375 @@
         </div>
       </div>
     </section>
-      <!-- ============ SECÇÃO CALCULADORA DE PREÇOS ============ -->
-<section id="priceCalculator" class="tab hidden">
+      <section id="priceCalculator" class="tab hidden">
   <header class="page-header">
-    <h2 class="page-title">CALCULADORA DE PREÇOS</h2>
+    <h2 class="page-title">🧮 CALCULADORA DE PREÇOS — IMPRESSÃO 3D</h2>
+    <div class="page-actions">
+      <button id="resetCalcBtn" class="btn-icon" title="Reset">🔄</button>
+    </div>
   </header>
 
-  <div class="calculator-container">
-    <p>Insira os valores para calcular o preço final:</p>
-    
-    <div class="form-group">
-      <label>Preço Base (€)</label>
-      <input type="number" id="calcBasePrice" placeholder="Ex: 100" step="0.01">
-    </div>
+  <div class="calc-layout">
 
-    <div class="form-group">
-      <label>Margem (%)</label>
-      <input type="number" id="calcMargin" placeholder="Ex: 20" step="0.01">
-    </div>
+    <!-- ===== COLUNA ESQUERDA: INPUTS ===== -->
+    <div class="calc-inputs-col">
 
-    <div class="form-group">
-      <label>IVA (%)</label>
-      <input type="number" id="calcTax" placeholder="Ex: 23" step="0.01">
-    </div>
+      <!-- PROJECT DETAILS -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">📋</span>
+          <h3>DETALHES DO PROJETO</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="form-group">
+            <label>Nome da Peça</label>
+            <input type="text" id="calcPartName" placeholder="Ex: Suporte para câmara">
+          </div>
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Perfil de Impressora</label>
+              <select id="calcPrinterProfile">
+                <option value="generic">Generic Printer</option>
+                <option value="prusa_mk4">Prusa MK4</option>
+                <option value="bambu_x1">Bambu Lab X1</option>
+                <option value="ender3">Ender 3</option>
+                <option value="custom">Personalizado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Peso Total (g)</label>
+              <input type="number" id="calcTotalWeight" placeholder="1.00" step="0.01" min="0" value="1">
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <button id="calculatePriceBtn" class="btn-primary">Calcular</button>
+      <!-- FILAMENTS -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">🎨</span>
+          <h3>FILAMENTOS</h3>
+          <div class="calc-card-header-note">Peso Total: <strong id="calcTotalWeightDisplay">1.00g</strong></div>
+        </div>
+        <div class="calc-card-body">
+          <div id="filamentsContainer">
+            <!-- Filament rows inserted by JS -->
+          </div>
+          <button id="addFilamentBtn" class="calc-add-btn">➕ Adicionar Material</button>
+          <div class="calc-upgrade-note">
+            ⬆ Adiciona múltiplos materiais para suporte multi-material
+          </div>
+        </div>
+      </div>
 
-    <div class="calc-result">
-      <p>Preço Final: €<span id="calcFinalPrice">0.00</span></p>
-    </div>
-  </div>
+      <!-- PRINTING & LABOR TIME -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">⏱️</span>
+          <h3>TEMPOS</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Tempo Impressão (h)</label>
+              <input type="number" id="calcPrintHours" value="1" min="0" step="1" class="calc-time-input">
+            </div>
+            <div class="form-group">
+              <label>Minutos</label>
+              <input type="number" id="calcPrintMins" value="1" min="0" max="59" step="1" class="calc-time-input">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:8px">
+            <label>Tempo Mão de Obra (min)</label>
+            <input type="number" id="calcLaborMins" value="1" min="0" step="1" class="calc-time-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- COSTS -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">💰</span>
+          <h3>CUSTOS FIXOS</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Hardware (€)</label>
+              <input type="number" id="calcHardwareCost" value="1" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Embalagem (€)</label>
+              <input type="number" id="calcPackagingCost" value="1" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>IVA (%)</label>
+            <input type="number" id="calcVatRate" value="20" min="0" max="100" step="0.5">
+          </div>
+        </div>
+      </div>
+
+      <!-- ADVANCED SETTINGS -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">⚙️</span>
+          <h3>CONFIGURAÇÕES AVANÇADAS</h3>
+          <label class="calc-toggle-label">
+            <input type="checkbox" id="advancedToggle">
+            <span class="calc-toggle"></span>
+          </label>
+        </div>
+        <div id="advancedSettingsBody" class="calc-card-body calc-advanced-body" style="display:none;">
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Taxa Mão de Obra (€/h)</label>
+              <input type="number" id="calcLaborRate" value="20" min="0" step="0.5">
+            </div>
+            <div class="form-group">
+              <label>Fator Eficiência Material</label>
+              <input type="number" id="calcEfficiency" value="1.1" min="0.1" step="0.05">
+            </div>
+          </div>
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Custo Impressora (€)</label>
+              <input type="number" id="calcPrinterCost" value="749" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Custo Inicial Adicional (€)</label>
+              <input type="number" id="calcUpfrontCost" value="0" min="0" step="1">
+            </div>
+          </div>
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Manutenção Anual (€)</label>
+              <input type="number" id="calcMaintenance" value="75" min="0" step="1">
+            </div>
+            <div class="form-group">
+              <label>Vida Útil (anos)</label>
+              <input type="number" id="calcPrinterLife" value="3" min="1" step="1">
+            </div>
+          </div>
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Uptime (%)</label>
+              <input type="number" id="calcUptime" value="50" min="1" max="100" step="1">
+            </div>
+            <div class="form-group">
+              <label>Consumo Energia (W)</label>
+              <input type="number" id="calcPowerW" value="150" min="0" step="10">
+            </div>
+          </div>
+          <div class="calc-two-col">
+            <div class="form-group">
+              <label>Custo Energia (€/kWh)</label>
+              <input type="number" id="calcEnergyRate" value="0.20" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Fator Buffer</label>
+              <input type="number" id="calcBufferFactor" value="1.3" min="1" step="0.05">
+            </div>
+          </div>
+
+          <!-- CALCULATED METRICS -->
+          <div class="calc-metrics-grid" id="calcMetrics">
+            <div class="calc-metric">
+              <div class="calc-metric-label">Investimento Total</div>
+              <div class="calc-metric-value" id="metricTotalInvestment">749,00 €</div>
+            </div>
+            <div class="calc-metric">
+              <div class="calc-metric-label">Custo de Vida</div>
+              <div class="calc-metric-value" id="metricLifetimeCost">974,00 €</div>
+            </div>
+            <div class="calc-metric">
+              <div class="calc-metric-label">Uptime Estimado</div>
+              <div class="calc-metric-value highlight" id="metricUptime">4380 hrs/ano</div>
+            </div>
+            <div class="calc-metric">
+              <div class="calc-metric-label">Depreciação</div>
+              <div class="calc-metric-value" id="metricDepreciation">0.06 €/hr</div>
+            </div>
+            <div class="calc-metric">
+              <div class="calc-metric-label">Manutenção</div>
+              <div class="calc-metric-value" id="metricMaintenanceCost">0.02 €/hr</div>
+            </div>
+            <div class="calc-metric calc-metric-accent">
+              <div class="calc-metric-label">Custo Total Impressora</div>
+              <div class="calc-metric-value" id="metricPrinterCost">0.14 €/hr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /calc-inputs-col -->
+
+    <!-- ===== COLUNA DIREITA: RESULTADOS ===== -->
+    <div class="calc-results-col">
+
+      <!-- SUGGESTED PRICING -->
+      <div class="calc-card calc-pricing-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">💎</span>
+          <h3>PREÇOS SUGERIDOS</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="calc-pricing-grid">
+            <div class="pricing-tier competitive">
+              <div class="tier-header">
+                <span class="tier-icon">🌿</span>
+                <span class="tier-name">COMPETITIVO</span>
+                <span class="tier-price" id="priceCompetitive">3,32 €</span>
+              </div>
+              <div class="tier-margin">25% margem de lucro</div>
+              <div class="tier-vat" id="vatCompetitive">3,99 € c/ IVA</div>
+            </div>
+            <div class="pricing-tier standard">
+              <div class="tier-header">
+                <span class="tier-icon">⭐</span>
+                <span class="tier-name">STANDARD</span>
+                <span class="tier-price" id="priceStandard">4,15 €</span>
+              </div>
+              <div class="tier-margin">40% margem de lucro</div>
+              <div class="tier-vat" id="vatStandard">4,99 € c/ IVA</div>
+            </div>
+            <div class="pricing-tier premium">
+              <div class="tier-header">
+                <span class="tier-icon">🏆</span>
+                <span class="tier-name">PREMIUM</span>
+                <span class="tier-price" id="pricePremium">6,23 €</span>
+              </div>
+              <div class="tier-margin">60% margem de lucro</div>
+              <div class="tier-vat" id="vatPremium">7,48 € c/ IVA</div>
+            </div>
+            <div class="pricing-tier luxury">
+              <div class="tier-header">
+                <span class="tier-icon">💜</span>
+                <span class="tier-name">LUXURY</span>
+                <span class="tier-price" id="priceLuxury">12,46 €</span>
+              </div>
+              <div class="tier-margin">80% margem de lucro</div>
+              <div class="tier-vat" id="vatLuxury">14,96 € c/ IVA</div>
+            </div>
+          </div>
+
+          <!-- CUSTOM PRICING -->
+          <div class="calc-custom-pricing">
+            <div class="custom-pricing-header">
+              <span class="tier-icon">🎛️</span>
+              <span class="tier-name">PERSONALIZADO</span>
+              <span class="tier-price" id="priceCustom">4,99 €</span>
+            </div>
+            <div class="custom-pricing-desc">Define a tua própria margem de lucro manualmente.</div>
+            <div class="custom-slider-row">
+              <input type="range" id="customMarginSlider" min="0" max="200" value="50" class="calc-slider">
+              <input type="number" id="customMarginInput" value="50" min="0" max="200" class="calc-slider-num">
+              <span class="calc-slider-pct">%</span>
+            </div>
+            <div class="custom-pricing-footer">
+              <span id="customMarginLabel">50% margem de lucro</span>
+              <span id="vatCustom">5,98 € c/ IVA</span>
+            </div>
+          </div>
+
+          <!-- SELECTED / SAVE -->
+          <div class="calc-selected-row">
+            <div class="calc-selected-info">
+              Selecionado: <strong id="selectedPriceDisplay">4,99 € c/ IVA</strong>
+              <span id="selectedMarginDisplay" class="calc-margin-badge">40% margem</span>
+            </div>
+            <div class="calc-save-actions">
+              <button id="saveQuoteBtn" class="btn-primary calc-save-btn">💾 GUARDAR ORÇAMENTO</button>
+              <button id="copyCalcBtn" class="btn-icon" title="Copiar">📋</button>
+              <button id="shareCalcBtn" class="btn-icon" title="Partilhar">↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COST BREAKDOWN -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">📊</span>
+          <h3>DECOMPOSIÇÃO DE CUSTOS</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="breakdown-grid">
+            <div class="breakdown-item">
+              <div class="breakdown-label">Custo Material</div>
+              <div class="breakdown-value" id="breakdownMaterial">0,02 €</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">Custo Hardware</div>
+              <div class="breakdown-value" id="breakdownHardware">1,00 €</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">Custo Embalagem</div>
+              <div class="breakdown-value" id="breakdownPackaging">1,00 €</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">Custo Mão de Obra</div>
+              <div class="breakdown-value" id="breakdownLabor">0,33 €</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">Custo Máquina</div>
+              <div class="breakdown-value" id="breakdownMachine">0,14 €</div>
+            </div>
+            <div class="breakdown-item breakdown-total">
+              <div class="breakdown-label">🔴 Custo Total Landed</div>
+              <div class="breakdown-value breakdown-total-value" id="breakdownTotal">2,49 €</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COST ALLOCATION CHART -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">🥧</span>
+          <h3>ALOCAÇÃO DE CUSTOS</h3>
+        </div>
+        <div class="calc-card-body">
+          <div class="calc-allocation-layout">
+            <!-- Donut Chart -->
+            <div class="calc-donut-wrapper">
+              <svg id="costDonut" viewBox="0 0 200 200" width="200" height="200">
+                <circle id="donut-bg" cx="100" cy="100" r="70" fill="none" stroke="#E0E0E0" stroke-width="30"/>
+                <!-- Segments rendered by JS -->
+              </svg>
+              <div class="donut-center">
+                <div class="donut-total-label">Total</div>
+                <div class="donut-total-value" id="donutTotalValue">2,49 €</div>
+              </div>
+            </div>
+            <!-- Legend -->
+            <div class="calc-legend" id="calcLegend">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="calc-allocation-footer">
+            <span>Custo Total Landed</span>
+            <span id="allocationTotal">2,49 €</span>
+            <span id="allocationLargest" style="font-size:11px;opacity:0.7">Maior: Embalagem (40.1%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAVED QUOTES -->
+      <div class="calc-card">
+        <div class="calc-card-header">
+          <span class="calc-card-icon">📁</span>
+          <h3>ORÇAMENTOS GUARDADOS</h3>
+          <button id="clearQuotesBtn" class="calc-clear-btn">Limpar</button>
+        </div>
+        <div class="calc-card-body" id="savedQuotesList">
+          <div class="calc-empty-state">Nenhum orçamento guardado ainda.</div>
+        </div>
+      </div>
+
+    </div><!-- /calc-results-col -->
+
+  </div><!-- /calc-layout -->
 </section>
 
   </main>
@@ -802,5 +1141,6 @@
   <script src="../scripts/editproduct.js"></script>
   <script src="../scripts/viewproduct.js"></script>
   <script src="../scripts/image-order-manager.js"></script>
+  <script src="../scripts/price-calculator.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
- const express = require('express');
+const express = require('express');
   const cors = require('cors');
   require('dotenv').config();
   const path = require('path');
@@ -49,7 +49,7 @@
       }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     credentials: true,
     optionsSuccessStatus: 200
   }));
@@ -75,13 +75,14 @@
     res.send('Backend a funcionar 🚀');
   });
 
+  app.use('/api/dashboard', dashboardRoutes);
+
   // ===== TRATAMENTO DE ERROS =====
   app.use((err, req, res, next) => {
     console.error('Erro:', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   });
 
-  app.use('/api/dashboard', dashboardRoutes);
   // ===== INICIAR SERVIDOR =====
   app.listen(port, () => {
     console.log(`✅ Servidor a correr em http://localhost:${port}`);
