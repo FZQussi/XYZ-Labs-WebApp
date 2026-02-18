@@ -144,11 +144,15 @@ initializeEventListeners() {
  showCart() {
   const sideMenu = document.getElementById('sideMenu');
   const sideContent = document.getElementById('sideContent');
+  const overlay = document.getElementById('overlay');
 
   if (!sideMenu || !sideContent) {
     console.warn('SideMenu não existe nesta página');
     return;
   }
+
+  // Ativar overlay atrás do side menu
+  if (overlay) overlay.classList.add('active');
 
   if (!this.items.length) {
     sideContent.innerHTML = `

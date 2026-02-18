@@ -123,38 +123,10 @@ function truncateText(text, maxLength) {
   return text && text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
-// ===== MOBILE MENU =====
+// ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   loadFeaturedProducts();
-  
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const headerNav = document.getElementById('headerNav');
-  const overlay = document.getElementById('overlay');
-  
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => {
-      headerNav.classList.toggle('active');
-      overlay.classList.toggle('active');
-    });
-  }
-  
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      headerNav.classList.remove('active');
-      overlay.classList.remove('active');
-      const sideMenu = document.getElementById('sideMenu');
-      if (sideMenu) sideMenu.classList.remove('open');
-    });
-  }
-  
-  // Close menu when clicking on link
-  document.querySelectorAll('.header-nav a').forEach(link => {
-    link.addEventListener('click', () => {
-      headerNav.classList.remove('active');
-      overlay.classList.remove('active');
-    });
-  });
-  
+
   // Newsletter form
   const newsletterForm = document.getElementById('newsletterForm');
   if (newsletterForm) {

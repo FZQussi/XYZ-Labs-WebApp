@@ -134,40 +134,138 @@
   </div>
 </section>
 
-<section class="process-3d">
-  <div class="container">
-    <h2>Do ficheiro ao objeto físico</h2>
-    <p class="process-subtitle">
-      Um processo claro, técnico e controlado do início ao fim.
-    </p>
-
-    <div class="process-steps">
-      <div class="process-step">
-        <div class="step-icon upload"></div>
-        <h3>Ficheiro</h3>
-        <p>Receção e validação do modelo 3D.</p>
-      </div>
-
-      <div class="process-step">
-        <div class="step-icon material"></div>
-        <h3>Material</h3>
-        <p>Seleção do material conforme a aplicação.</p>
-      </div>
-
-      <div class="process-step">
-        <div class="step-icon printing"></div>
-        <h3>Produção</h3>
-        <p>Impressão com controlo dimensional.</p>
-      </div>
-
-      <div class="process-step">
-        <div class="step-icon delivery"></div>
-        <h3>Peça final</h3>
-        <p>Acabamento e envio ao cliente.</p>
-      </div>
-    </div>
+<!-- PROCESS SECTION - Do ficheiro ao objeto físico -->
+<section class="process-scroll-section" id="processSection">
+  
+  <!-- Background fixo com parallax -->
+  <div class="process-bg-layer" aria-hidden="true">
+    <div class="process-bg-image"></div>
+    <div class="process-bg-overlay"></div>
+    <!-- Grid brutalista decorativo -->
+    <div class="process-bg-grid"></div>
   </div>
+
+  <!-- Conteúdo que faz scroll -->
+  <div class="process-scroll-inner">
+
+    <!-- Header fixo enquanto a secção está visível -->
+    <div class="process-header-sticky">
+      <div class="process-header-tag">— PROCESSO —</div>
+      <h2 class="process-main-title">Do ficheiro<br>ao objeto físico</h2>
+      <p class="process-main-sub">Um processo claro, técnico e controlado do início ao fim.</p>
+    </div>
+
+    <!-- Steps empilhados -->
+    <div class="process-steps-stack">
+
+      <div class="process-card-wrapper" data-step="1">
+        <div class="process-card">
+          <div class="process-card-number">01</div>
+          <div class="process-card-content">
+            <div class="process-card-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="8" y="4" width="24" height="32" rx="2" stroke="currentColor" stroke-width="3"/>
+                <path d="M8 36h32v4H8z" fill="currentColor" opacity=".2"/>
+                <path d="M20 4v14l6-4 6 4V4" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M32 4h8v40H8V36" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="process-card-text">
+              <h3>Ficheiro</h3>
+              <p>Recebemos o seu modelo 3D nos formatos STL, STEP ou OBJ. A nossa equipa valida geometria, espessuras de parede e tolerâncias antes de qualquer produção.</p>
+              <ul class="process-card-tags">
+                <li>STL / STEP / OBJ</li>
+                <li>Validação geométrica</li>
+                <li>Análise de viabilidade</li>
+              </ul>
+            </div>
+          </div>
+          <div class="process-card-line" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="process-card-wrapper" data-step="2">
+        <div class="process-card">
+          <div class="process-card-number">02</div>
+          <div class="process-card-content">
+            <div class="process-card-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="3"/>
+                <circle cx="24" cy="24" r="5" fill="currentColor"/>
+                <path d="M24 4v6M24 38v6M4 24h6M38 24h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                <path d="M10 10l4 4M34 34l4 4M10 38l4-4M34 14l4-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="process-card-text">
+              <h3>Material</h3>
+              <p>Selecionamos o material adequado à aplicação: PLA, PETG, ABS, Resina ou Nylon. Cada escolha é feita com base nas propriedades mecânicas, térmicas e estéticas exigidas.</p>
+              <ul class="process-card-tags">
+                <li>PLA / PETG / ABS</li>
+                <li>Resina / Nylon</li>
+                <li>Fichas técnicas</li>
+              </ul>
+            </div>
+          </div>
+          <div class="process-card-line" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="process-card-wrapper" data-step="3">
+        <div class="process-card">
+          <div class="process-card-number">03</div>
+          <div class="process-card-content">
+            <div class="process-card-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="6" y="28" width="36" height="12" rx="2" stroke="currentColor" stroke-width="3"/>
+                <path d="M12 28V20l12-12 12 12v8" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M20 28v-8h8v8" stroke="currentColor" stroke-width="2.5"/>
+                <circle cx="36" cy="34" r="3" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="process-card-text">
+              <h3>Produção</h3>
+              <p>Impressão controlada com monitorização em tempo real da temperatura, velocidade e aderência camada a camada. Cada peça passa por controlo dimensional.</p>
+              <ul class="process-card-tags">
+                <li>FDM / SLA / SLS</li>
+                <li>Controlo dimensional</li>
+                <li>Monitorização contínua</li>
+              </ul>
+            </div>
+          </div>
+          <div class="process-card-line" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="process-card-wrapper" data-step="4">
+        <div class="process-card process-card--last">
+          <div class="process-card-number">04</div>
+          <div class="process-card-content">
+            <div class="process-card-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M8 16l16-8 16 8v16l-16 8-16-8V16z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M8 16l16 8 16-8M24 24v16" stroke="currentColor" stroke-width="3"/>
+                <path d="M16 12l16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="process-card-text">
+              <h3>Peça Final</h3>
+              <p>Acabamento superficial, limpeza, e embalagem protetora. Enviamos com rastreio para todo o país. A sua peça chega pronta a usar.</p>
+              <ul class="process-card-tags">
+                <li>Acabamento superficial</li>
+                <li>Embalagem protetora</li>
+                <li>Envio rastreado</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /process-steps-stack -->
+
+  </div><!-- /process-scroll-inner -->
+
 </section>
+<!-- /PROCESS SECTION -->
 
 
 
@@ -201,7 +299,7 @@
 
       <div class="footer-section">
         <h4>Contacto</h4>
-        <p>📧 info@xyzlabs.pt</p>
+        <p>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0e676068614e767774626f6c7d207e7a">[email&#160;protected]</a></p>
         <p>📞 +351 935310984</p>
       </div>
     </div>
@@ -297,7 +395,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Cookie Consent Manager
 (function() {
   const COOKIE_NAME = 'xyz_cookie_consent';
@@ -461,9 +559,9 @@
 })();
 </script>
 <script src="../scripts/cart.js"></script>
-<script src="../scripts/homePage.js"></script>
+<script src="../scripts/header.js"></script>
+<script src="../scripts/homePage-responsive.js"></script>
 <script src="../scripts/homepage-products.js"></script>
 <script src="../scripts/categories-slider.js"></script>
-<script src="../scripts/homePage-responsive.js"></script>
 </body>
 </html>

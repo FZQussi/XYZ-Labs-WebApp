@@ -414,97 +414,312 @@
   box-shadow: var(--shadow-medium);
 }
 
-/* ===== PROCESS 3D ===== */
-.process-3d {
-  padding: clamp(var(--spacing-xl), 5vw, var(--spacing-xxl)) clamp(var(--spacing-md), 3vw, var(--spacing-lg));
-  background-color: var(--brutalist-white);
-  border-top: var(--border-thicker);
-  border-bottom: var(--border-thicker);
+/* ==========================================
+   PROCESS SCROLL SECTION
+   ========================================== */
+
+.process-scroll-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  border-top: 4px solid #000;
+  border-bottom: 4px solid #000;
 }
 
-.process-3d h2 {
-  text-align: center;
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  margin-bottom: var(--spacing-md);
-  color: var(--brutalist-black);
-  letter-spacing: -1px;
+.process-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
-.process-subtitle {
-  text-align: center;
-  font-size: clamp(0.9rem, 2vw, 1.1rem);
-  color: var(--brutalist-gray);
-  margin-bottom: clamp(var(--spacing-lg), 4vw, var(--spacing-xxl));
-  font-weight: 600;
-  padding: 0 var(--spacing-md);
+.process-bg-image {
+  position: absolute;
+  inset: -10%;
+  background-color: #111;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 41px),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #0d0d0d 100%);
+  will-change: transform;
 }
 
-.process-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-  gap: clamp(var(--spacing-lg), 3vw, var(--spacing-xl));
+.process-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.80) 100%);
 }
 
-.process-step {
-  background-color: var(--bg-light);
-  border: var(--border-thick);
-  padding: clamp(var(--spacing-lg), 4vw, var(--spacing-xl));
-  text-align: center;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-small);
+.process-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(255,255,255,0.04) 79px, rgba(255,255,255,0.04) 80px),
+    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(255,255,255,0.04) 79px, rgba(255,255,255,0.04) 80px);
 }
 
-.process-step:hover {
+.process-scroll-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) clamp(20px, 4vw, 60px);
+}
+
+/* Header sticky lateral */
+.process-header-sticky {
+  position: sticky;
+  top: clamp(80px, 12vh, 120px);
+  width: clamp(260px, 32%, 400px);
+  flex-shrink: 0;
+  padding-right: clamp(24px, 4vw, 56px);
+  color: #fff;
+  align-self: flex-start;
+}
+
+.process-header-tag {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+}
+
+.process-main-title {
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  color: #fff;
+  margin-bottom: 24px;
+  text-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+}
+
+.process-main-sub {
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  font-weight: 500;
+  border-left: 3px solid rgba(255,255,255,0.3);
+  padding-left: 16px;
+}
+
+.process-header-sticky::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 48px;
+  background: rgba(255,255,255,0.2);
+  margin-top: 28px;
+}
+
+/* Stack de cards */
+.process-steps-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 32px);
+  padding-top: clamp(8px, 2vw, 20px);
+}
+
+/* Animação de entrada no scroll */
+.process-card-wrapper {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.process-card-wrapper.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.process-card-wrapper[data-step="1"] { transition-delay: 0s; }
+.process-card-wrapper[data-step="2"] { transition-delay: 0.1s; }
+.process-card-wrapper[data-step="3"] { transition-delay: 0.2s; }
+.process-card-wrapper[data-step="4"] { transition-delay: 0.3s; }
+
+/* Card */
+.process-card {
+  position: relative;
+  background-color: #fff;
+  border: 3px solid #000;
+  box-shadow: 8px 8px 0 #000;
+  padding: clamp(22px, 3vw, 34px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.process-card:hover {
   transform: translate(-4px, -4px);
-  box-shadow: var(--shadow-large);
+  box-shadow: 12px 12px 0 #000;
 }
 
-.step-icon {
-  width: clamp(60px, 12vw, 80px);
-  height: clamp(60px, 12vw, 80px);
-  margin: 0 auto clamp(var(--spacing-md), 3vw, var(--spacing-lg));
-  border: var(--border-thick);
-  background-color: var(--brutalist-white);
+/* Linha conectora entre cards */
+.process-card-line {
+  position: absolute;
+  bottom: calc(-1 * clamp(20px, 3vw, 32px));
+  left: 34px;
+  width: 2px;
+  height: clamp(20px, 3vw, 32px);
+  background: rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+/* Número do step */
+.process-card-number {
+  position: absolute;
+  top: -16px;
+  right: 22px;
+  font-size: clamp(3rem, 5.5vw, 4.5rem);
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+  letter-spacing: -4px;
+  background: #fff;
+  padding: 0 8px;
+  border: 3px solid #000;
+  user-select: none;
+  font-family: 'Courier New', monospace;
+}
+
+/* Conteúdo do card */
+.process-card-content {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 2.5vw, 26px);
+}
+
+/* Ícone */
+.process-card-icon-wrap {
+  width: clamp(46px, 6.5vw, 68px);
+  height: clamp(46px, 6.5vw, 68px);
+  flex-shrink: 0;
+  border: 3px solid #000;
+  background: #000;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(2rem, 4vw, 2.5rem);
-  transition: var(--transition-fast);
+  padding: clamp(10px, 1.4vw, 13px);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.process-step:hover .step-icon {
-  background-color: var(--brutalist-black);
-  transform: rotate(5deg);
+.process-card:hover .process-card-icon-wrap {
+  background: #fff;
+  color: #000;
+  transform: rotate(-5deg);
 }
 
-.step-icon.upload::before {
-  content: "📁";
+.process-card-icon-wrap svg {
+  width: 100%;
+  height: 100%;
 }
 
-.step-icon.material::before {
-  content: "🔧";
+/* Texto */
+.process-card-text {
+  flex: 1;
 }
 
-.step-icon.printing::before {
-  content: "🖨️";
-}
-
-.step-icon.delivery::before {
-  content: "📦";
-}
-
-.process-step h3 {
-  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-  margin-bottom: var(--spacing-md);
-  color: var(--brutalist-black);
+.process-card-text h3 {
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
   font-weight: 900;
   text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: #000;
+  margin-bottom: 10px;
+  line-height: 1.1;
 }
 
-.process-step p {
-  color: var(--brutalist-gray-dark);
-  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
-  line-height: 1.6;
+.process-card-text p {
+  font-size: clamp(0.82rem, 1.4vw, 0.93rem);
+  color: #333;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+/* Tags */
+.process-card-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 0;
+  margin: 0;
+}
+
+.process-card-tags li {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid #000;
+  padding: 3px 9px;
+  color: #000;
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.process-card:hover .process-card-tags li {
+  background: #000;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .process-scroll-inner {
+    flex-direction: column;
+  }
+
+  .process-header-sticky {
+    position: relative;
+    top: 0;
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: clamp(24px, 4vw, 40px);
+    text-align: center;
+  }
+
+  .process-header-sticky::after { display: none; }
+
+  .process-main-sub {
+    border-left: none;
+    border-top: 3px solid rgba(255,255,255,0.3);
+    padding-left: 0;
+    padding-top: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .process-card-line { display: none; }
+}
+
+@media (max-width: 600px) {
+  .process-card-content {
+    flex-direction: column;
+  }
+
+  .process-card-number {
+    font-size: 2.4rem;
+    top: -12px;
+    right: 14px;
+    letter-spacing: -2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .process-card-wrapper {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ===== COOKIE BANNER ===== */
@@ -1000,4 +1215,401 @@
 /* ===== DARK MODE (Se implementado no futuro) ===== */
 @media (prefers-color-scheme: dark) {
   /* Pode adicionar estilos dark mode aqui se necessário */
+}
+
+
+
+
+
+/* ==========================================
+   PROCESS SCROLL SECTION
+   "Do ficheiro ao objeto físico"
+   Brutalista + Scroll Cinematográfico
+   ========================================== */
+
+/* ===== SECTION WRAPPER ===== */
+.process-scroll-section {
+  position: relative;
+  width: 100%;
+  /* altura total = header fixo + cards empilhados com espaço de scroll */
+  min-height: 100vh;
+  overflow: hidden;
+  border-top: 4px solid #000;
+  border-bottom: 4px solid #000;
+}
+
+/* ===== BACKGROUND PARALAX ===== */
+.process-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.process-bg-image {
+  position: absolute;
+  inset: -10%; /* margem extra para parallax */
+  background-image: url('/Frontend/lib/images/process-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  /* Fallback se não houver imagem: padrão industrial */
+  background-color: #111;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.03) 40px,
+      rgba(255,255,255,0.03) 41px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.03) 40px,
+      rgba(255,255,255,0.03) 41px
+    ),
+    linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #0d0d0d 100%);
+  will-change: transform;
+  transition: transform 0.05s linear;
+}
+
+/* Se existir a imagem real, usar background-image real */
+.process-bg-image.has-real-image {
+  background-image: url('/Frontend/lib/images/process-bg.jpg');
+}
+
+.process-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0,0,0,0.75) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.80) 100%
+  );
+}
+
+.process-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 79px,
+      rgba(255,255,255,0.04) 79px,
+      rgba(255,255,255,0.04) 80px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 79px,
+      rgba(255,255,255,0.04) 79px,
+      rgba(255,255,255,0.04) 80px
+    );
+}
+
+/* ===== SCROLL INNER ===== */
+.process-scroll-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(40px, 6vw, 80px) clamp(20px, 4vw, 60px);
+}
+
+/* ===== HEADER STICKY ===== */
+.process-header-sticky {
+  position: sticky;
+  top: clamp(80px, 12vh, 120px);
+  width: clamp(280px, 35%, 420px);
+  flex-shrink: 0;
+  padding-right: clamp(24px, 4vw, 60px);
+  color: #fff;
+  align-self: flex-start;
+}
+
+.process-header-tag {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+}
+
+.process-main-title {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  color: #fff;
+  margin-bottom: 24px;
+  text-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+}
+
+.process-main-title span {
+  color: #fff;
+  display: block;
+}
+
+.process-main-sub {
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  font-weight: 500;
+  max-width: 320px;
+  border-left: 3px solid rgba(255,255,255,0.3);
+  padding-left: 16px;
+}
+
+/* Decoração: linha vertical ligando ao stack */
+.process-header-sticky::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: clamp(40px, 6vw, 60px);
+  background: rgba(255,255,255,0.2);
+  margin-top: 32px;
+}
+
+/* ===== STEPS STACK ===== */
+.process-steps-stack {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 32px);
+  padding-top: clamp(8px, 2vw, 24px);
+}
+
+/* ===== CARD WRAPPER (para animação de scroll) ===== */
+.process-card-wrapper {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.process-card-wrapper.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Delays escalonados */
+.process-card-wrapper[data-step="1"] { transition-delay: 0s; }
+.process-card-wrapper[data-step="2"] { transition-delay: 0.1s; }
+.process-card-wrapper[data-step="3"] { transition-delay: 0.2s; }
+.process-card-wrapper[data-step="4"] { transition-delay: 0.3s; }
+
+/* ===== CARD ===== */
+.process-card {
+  position: relative;
+  background-color: #fff;
+  border: 3px solid #000;
+  box-shadow: 8px 8px 0 #000;
+  padding: clamp(24px, 3vw, 36px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.process-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 #000;
+}
+
+/* Linha conectora entre cards */
+.process-card-line {
+  position: absolute;
+  bottom: -clamp(20px, 3vw, 32px);
+  left: 36px;
+  width: 2px;
+  height: clamp(20px, 3vw, 32px);
+  background: rgba(255,255,255,0.35);
+  pointer-events: none;
+}
+
+.process-card--last .process-card-line {
+  display: none;
+}
+
+/* ===== CARD NÚMERO ===== */
+.process-card-number {
+  position: absolute;
+  top: -16px;
+  right: 24px;
+  font-size: clamp(3.5rem, 6vw, 5rem);
+  font-weight: 900;
+  color: #000;
+  line-height: 1;
+  letter-spacing: -4px;
+  background: #fff;
+  padding: 0 8px;
+  border: 3px solid #000;
+  user-select: none;
+  font-family: 'Courier New', monospace;
+}
+
+/* ===== CARD CONTENT ===== */
+.process-card-content {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+/* ===== ICON ===== */
+.process-card-icon-wrap {
+  width: clamp(48px, 7vw, 72px);
+  height: clamp(48px, 7vw, 72px);
+  flex-shrink: 0;
+  border: 3px solid #000;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 1.5vw, 14px);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.process-card:hover .process-card-icon-wrap {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+  transform: rotate(-5deg);
+}
+
+.process-card-icon-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== CARD TEXT ===== */
+.process-card-text {
+  flex: 1;
+}
+
+.process-card-text h3 {
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: #000;
+  margin-bottom: 12px;
+  line-height: 1.1;
+}
+
+.process-card-text p {
+  font-size: clamp(0.83rem, 1.5vw, 0.95rem);
+  color: #333;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+/* ===== TAGS ===== */
+.process-card-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.process-card-tags li {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid #000;
+  padding: 4px 10px;
+  color: #000;
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.process-card:hover .process-card-tags li {
+  background: #000;
+  color: #fff;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+/* Tablet: layout em coluna */
+@media (max-width: 900px) {
+  .process-scroll-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .process-header-sticky {
+    position: relative;
+    top: 0;
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: clamp(24px, 4vw, 40px);
+    text-align: center;
+  }
+
+  .process-header-sticky::after {
+    display: none;
+  }
+
+  .process-main-sub {
+    max-width: 100%;
+    border-left: none;
+    border-top: 3px solid rgba(255,255,255,0.3);
+    padding-left: 0;
+    padding-top: 16px;
+    margin: 0 auto;
+  }
+
+  .process-card-line {
+    display: none;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .process-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .process-card-number {
+    font-size: 2.5rem;
+    top: -12px;
+    right: 16px;
+    letter-spacing: -2px;
+  }
+
+  .process-card-tags {
+    gap: 6px;
+  }
+
+  .process-card-tags li {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .process-card-wrapper {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  
+  .process-bg-image {
+    will-change: auto;
+  }
 }
