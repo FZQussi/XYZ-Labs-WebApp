@@ -2,59 +2,644 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Perfil</title>
+  <title>Perfil - XYZ Labs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../css/profile.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafafa;
+      --grey: #f0f0f0;
+      --mid-grey: #999;
+      --border: 2px solid var(--black);
+      --shadow: 6px 6px 0 var(--black);
+      --shadow-sm: 4px 4px 0 var(--black);
+      --accent: #e8ff00;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--grey);
+      min-height: 100dvh;
+      padding: 24px 16px;
+      background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px);
+    }
+
+    .profile-shell {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .profile-header {
+      background: var(--black);
+      color: var(--white);
+      padding: 20px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: var(--border);
+    }
+
+    .profile-header-left h1 {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .profile-header-left .welcome {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 5px;
+    }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    .btn-header {
+      border: 2px solid var(--white);
+      background: transparent;
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-header:hover { background: var(--white); color: var(--black); }
+    .btn-header.danger { border-color: #ff4444; color: #ff4444; }
+    .btn-header.danger:hover { background: #ff4444; color: var(--white); }
+
+    /* TABS NAV */
+    .tabs-nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: var(--border);
+      border-top: none;
+      background: var(--white);
+    }
+
+    .tab-btn {
+      background: var(--white);
+      border: none;
+      border-right: var(--border);
+      padding: 14px 8px;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      color: var(--mid-grey);
+      transition: all 0.15s;
+    }
+
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn:hover { color: var(--black); background: #f5f5f5; }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--black);
+    }
+
+    /* CONTENT */
+    .tabs-content {
+      border: var(--border);
+      border-top: none;
+      background: var(--white);
+      min-height: 420px;
+    }
+
+    .tab-panel { display: none; padding: 28px; }
+    .tab-panel.active { display: block; }
+
+    /* SECTION TITLES */
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .section-note {
+      font-size: 0.68rem;
+      color: var(--mid-grey);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      display: block;
+    }
+
+    /* FORM */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; }
+
+    .field label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      color: var(--black);
+    }
+
+    .field input,
+    .field select {
+      border: var(--border);
+      padding: 11px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--white);
+      color: var(--black);
+      outline: none;
+      transition: all 0.15s;
+      width: 100%;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      box-shadow: var(--shadow-sm);
+      transform: translate(-2px, -2px);
+    }
+
+    .field input:disabled {
+      background: var(--grey);
+      color: #555;
+      cursor: not-allowed;
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      border: var(--border);
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary.accent { background: var(--accent); color: var(--black); }
+    .btn-primary.accent:hover { background: #d4e800; }
+    .btn-primary.danger { background: #cc0000; }
+    .btn-primary.danger:hover { background: #aa0000; }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+
+    /* ALERTS */
+    .alert {
+      border: var(--border);
+      padding: 10px 14px;
+      font-size: 0.72rem;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .alert-success { background: var(--accent); color: var(--black); }
+    .alert-error { background: #ff4444; color: var(--white); }
+
+    /* ORDERS STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: var(--border);
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      padding: 14px 16px;
+      border-right: var(--border);
+      text-align: center;
+    }
+
+    .stat-box:last-child { border-right: none; }
+
+    .stat-val {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .stat-key {
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--mid-grey);
+      margin-top: 3px;
+    }
+
+    /* ORDERS */
+    .orders-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .order-card { border: var(--border); }
+
+    .order-card-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .order-num {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .order-date {
+      font-size: 0.68rem;
+      color: #999;
+    }
+
+    .order-status {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border: 2px solid;
+    }
+
+    .status-pending   { background: var(--accent); color: var(--black); border-color: var(--accent); }
+    .status-confirmed { background: #cce0ff; color: #003399; border-color: #003399; }
+    .status-printing  { background: #e8d5ff; color: #5500cc; border-color: #5500cc; }
+    .status-shipped   { background: #ccffe8; color: #006633; border-color: #006633; }
+    .status-delivered { background: #00cc55; color: var(--white); border-color: #00cc55; }
+    .status-cancelled { background: #ff4444; color: var(--white); border-color: #ff4444; }
+
+    .order-card-body { padding: 14px 16px; }
+
+    .order-item-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--grey);
+      font-size: 0.8rem;
+    }
+
+    .order-item-row:last-child { border-bottom: none; }
+
+    .item-name {
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .item-specs {
+      font-size: 0.68rem;
+      color: var(--mid-grey);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    .item-price { font-weight: 700; align-self: center; }
+
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      margin-top: 8px;
+      border-top: var(--border);
+    }
+
+    .order-total-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--mid-grey);
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+
+    .order-total-amount {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .order-addr {
+      font-size: 0.68rem;
+      color: var(--mid-grey);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 6px;
+    }
+
+    .no-orders {
+      text-align: center;
+      padding: 50px 20px;
+      border: 2px dashed #ccc;
+    }
+
+    .no-orders .empty-label {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 900;
+      color: #ddd;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .no-orders p {
+      color: var(--mid-grey);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .no-orders a {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--black);
+      font-weight: 700;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-decoration: none;
+      border-bottom: 2px solid var(--black);
+    }
+
+    /* SECURITY */
+    .last-login-box {
+      background: var(--black);
+      color: var(--white);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      border: var(--border);
+    }
+
+    .last-login-title {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .login-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .info-key {
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .info-val {
+      font-size: 0.82rem;
+      color: var(--white);
+    }
+
+    /* HISTORY TABLE */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+
+    .history-table th {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 10px 12px;
+      background: var(--black);
+      color: var(--white);
+      text-align: left;
+    }
+
+    .history-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e5e5e5;
+      color: #444;
+    }
+
+    .history-table tr:nth-child(even) td { background: #f8f8f8; }
+    .history-table tr:hover td { background: var(--accent); color: var(--black); }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      body { padding: 10px 8px; }
+
+      .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .profile-header-left h1 { font-size: 2.2rem; }
+      .tabs-nav { grid-template-columns: repeat(2, 1fr); }
+      .tab-btn:nth-child(2) { border-right: none; }
+      .tab-btn:nth-child(3) { border-bottom: none; }
+      .tab-btn:nth-child(4) { border-right: none; border-bottom: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .login-info-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .stat-box { border-right: none; border-bottom: var(--border); }
+      .stat-box:last-child { border-bottom: none; }
+      .order-card-header { grid-template-columns: 1fr auto; }
+      .order-date { display: none; }
+      .btn-row { flex-direction: column; }
+      .btn-primary { text-align: center; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="profile-wrapper">
-  <div class="profile-card">
+<div class="profile-shell">
 
-    <h2>Perfil</h2>
-    <p class="subtitle">Dados da tua conta</p>
+  <!-- HEADER -->
+  <div class="profile-header">
+    <div class="profile-header-left">
+      <h1>Perfil</h1>
+      <div class="welcome" id="welcomeMsg">— a carregar...</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-header" id="homeBtn">← Home</button>
+      <button class="btn-header danger" id="logoutBtn">Sair</button>
+    </div>
+  </div>
 
-    <div class="field">
-      <label for="profileUsername">Username</label>
-      <input
-        type="text"
-        id="profileUsername"
-        disabled
-      >
+  <!-- TABS NAV -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" data-tab="dados">01 / Dados</button>
+    <button class="tab-btn" data-tab="morada">02 / Morada</button>
+    <button class="tab-btn" data-tab="encomendas">03 / Encomendas</button>
+    <button class="tab-btn" data-tab="seguranca">04 / Segurança</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="tabs-content">
+
+    <!-- DADOS -->
+    <div class="tab-panel active" id="tab-dados">
+      <div class="section-label">Dados Pessoais</div>
+      <div id="alertDados"></div>
+      <div class="form-grid">
+        <div class="field field-full">
+          <label>Nome</label>
+          <input type="text" id="profileName" placeholder="O teu nome">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="profileEmail" disabled>
+        </div>
+        <div class="field">
+          <label>Membro desde</label>
+          <input type="text" id="profileCreatedAt" disabled>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="saveDadosBtn">Guardar Alterações</button>
+      </div>
     </div>
 
-    <div class="field">
-      <label for="profileEmail">Email</label>
-      <input
-        type="email"
-        id="profileEmail"
-        disabled
-      >
+    <!-- MORADA -->
+    <div class="tab-panel" id="tab-morada">
+      <div class="section-label">Morada de Entrega</div>
+      <span class="section-note">Pré-preenchida automaticamente no checkout</span>
+      <div id="alertMorada"></div>
+      <div class="form-grid">
+        <div class="field field-full">
+          <label>Rua / Morada</label>
+          <input type="text" id="addrStreet" placeholder="Rua Exemplo, nº 123">
+        </div>
+        <div class="field">
+          <label>Código Postal</label>
+          <input type="text" id="addrPostal" placeholder="1234-567">
+        </div>
+        <div class="field">
+          <label>Localidade</label>
+          <input type="text" id="addrCity" placeholder="Lisboa">
+        </div>
+        <div class="field field-full">
+          <label>País</label>
+          <select id="addrCountry">
+            <option value="">-- Selecionar país --</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="saveMoradaBtn">Guardar Morada</button>
+      </div>
     </div>
 
-    <button
-      id="changePasswordBtn"
-      class="btn-primary"
-      type="button"
-    >
-      Alterar Password
-    </button>
+    <!-- ENCOMENDAS -->
+    <div class="tab-panel" id="tab-encomendas">
+      <div class="section-label">As Minhas Encomendas</div>
+      <div id="orderStatsRow" style="display:none">
+        <div class="stats-row" id="orderStatsBox"></div>
+      </div>
+      <div id="ordersContainer">
+        <p style="color:#999;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px">A carregar...</p>
+      </div>
+    </div>
 
-    <!-- opcional, mas útil -->
-    <button
-      id="logoutBtn"
-      class="btn-secondary"
-      type="button"
-    >
-      Logout
-    </button>
-        <button id="homeBtn" class="btn-secondary" type="button">
-      Voltar para a Homepage
-    </button>
+    <!-- SEGURANÇA -->
+    <div class="tab-panel" id="tab-seguranca">
+      <div class="section-label">Segurança</div>
+
+      <div class="last-login-box" id="lastLoginInfo" style="display:none">
+        <div class="last-login-title">▸ Último acesso registado</div>
+        <div class="login-info-grid">
+          <div>
+            <div class="info-key">Data</div>
+            <div class="info-val" id="lastLoginDate">–</div>
+          </div>
+          <div>
+            <div class="info-key">IP</div>
+            <div class="info-val" id="lastLoginIp">–</div>
+          </div>
+          <div>
+            <div class="info-key">Localização</div>
+            <div class="info-val" id="lastLoginLocation">–</div>
+          </div>
+          <div>
+            <div class="info-key">Total de sessões</div>
+            <div class="info-val" id="loginCount">–</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-bottom:28px">
+        <button class="btn-primary accent" id="changePasswordBtn">🔑 Alterar Password</button>
+        <button class="btn-primary danger" id="logoutBtnSec">Terminar Sessão</button>
+      </div>
+
+      <div class="section-label" style="font-size:1rem">Histórico de Acessos</div>
+      <div id="loginHistoryContainer">
+        <p style="color:#999;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px">A carregar...</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script src="../scripts/profile.js"></script>
 </body>
 </html>
-

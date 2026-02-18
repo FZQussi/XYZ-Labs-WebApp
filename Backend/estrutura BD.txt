@@ -1,89 +1,391 @@
-
-
-Estrutura BD.
 printstore=# \dt
                    List of tables
  Schema |         Name          | Type  |   Owner
 --------+-----------------------+-------+------------
  public | categories            | table | postgres
+ public | categories_backup     | table | postgres
+ public | categories_old        | table | postgres
+ public | category_attributes   | table | postgres
  public | colors                | table | postgres
  public | files                 | table | printstore
  public | materials             | table | postgres
  public | order_items           | table | postgres
  public | orders                | table | postgres
  public | password_reset_tokens | table | postgres
+ public | product_attributes    | table | postgres
+ public | product_categories    | table | postgres
  public | product_materials     | table | postgres
  public | products              | table | printstore
- public | products_backup       | table | postgres
- public | subcategories         | table | postgres
  public | users                 | table | postgres
-(12 rows)
+(15 rows)
 
 
-printstore=# \d products
-                                          Table "public.products"
-     Column     |            Type             | Collation | Nullable |               Default
-----------------+-----------------------------+-----------+----------+--------------------------------------
- id             | integer                     |           | not null | nextval('products_id_seq'::regclass)
- name           | character varying(255)      |           | not null |
- description    | text                        |           | not null |
- price          | numeric(10,2)               |           | not null |
- model_file     | character varying(255)      |           | not null |
- created_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP
- updated_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP
- subcategory_id | integer                     |           |          |
- slug           | character varying(255)      |           |          |
- is_active      | boolean                     |           |          | true
- category_id    | integer                     |           |          |
- images         | text[]                      |           |          |
- stock          | boolean                     |           | not null | false
+printstore=# \d+ categories\d+ categories_backup\d+ categories_old\d+ category_attributes\d+ colors\d+ files\d+ materials\d+ order_items\d+ orders\d+ password_reset_tokens\d+ product_attributes\d+ product_categories\d+ product_material
+s\d+ products\d+ users
+                                                                       Table "public.categories"
+      Column      |            Type             | Collation | Nullable |                 Default                 | Storage  | Compression | Stats target | Description
+------------------+-----------------------------+-----------+----------+-----------------------------------------+----------+-------------+--------------+-------------
+ id               | integer                     |           | not null | nextval('categories_id_seq1'::regclass) | plain    |             |              |
+ name             | character varying(150)      |           | not null |                                         | extended |             |              |
+ slug             | character varying(255)      |           | not null |                                         | extended |             |              |
+ description      | text                        |           |          |                                         | extended |             |              |
+ parent_id        | integer                     |           |          |                                         | plain    |             |              |
+ level            | integer                     |           | not null | 0                                       | plain    |             |              |
+ display_order    | integer                     |           |          | 0                                       | plain    |             |              |
+ is_active        | boolean                     |           |          | true                                    | plain    |             |              |
+ category_type    | character varying(50)       |           |          | 'standard'::character varying           | extended |             |              |
+ icon             | character varying(255)      |           |          |                                         | extended |             |              |
+ image            | character varying(255)      |           |          |                                         | extended |             |              |
+ meta_title       | character varying(255)      |           |          |                                         | extended |             |              |
+ meta_description | text                        |           |          |                                         | extended |             |              |
+ created_at       | timestamp without time zone |           |          | CURRENT_TIMESTAMP                       | plain    |             |              |
+ updated_at       | timestamp without time zone |           |          | CURRENT_TIMESTAMP                       | plain    |             |              |
 Indexes:
-    "products_pkey" PRIMARY KEY, btree (id)
-    "idx_products_active" btree (is_active)
-    "idx_products_category" btree (category_id)
-    "idx_products_subcategory" btree (subcategory_id)
-    "products_slug_key" UNIQUE CONSTRAINT, btree (slug)
+    "categories_pkey1" PRIMARY KEY, btree (id)
+    "categories_slug_key" UNIQUE CONSTRAINT, btree (slug)
+    "idx_categories_active" btree (is_active)
+    "idx_categories_level" btree (level)
+    "idx_categories_parent" btree (parent_id)
+    "idx_categories_slug" btree (slug)
+    "idx_categories_type" btree (category_type)
 Foreign-key constraints:
-    "fk_products_category" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-    "fk_products_subcategory" FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE SET NULL
+    "categories_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
 Referenced by:
-    TABLE "order_items" CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-    TABLE "product_materials" CONSTRAINT "product_materials_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELE
-TE CASCADE
+    TABLE "categories" CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "category_attributes" CONSTRAINT "category_attributes_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    TABLE "product_categories" CONSTRAINT "product_categories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+Not-null constraints:
+    "categories_id_not_null1" NOT NULL "id"
+    "categories_name_not_null1" NOT NULL "name"
+    "categories_slug_not_null" NOT NULL "slug"
+    "categories_level_not_null" NOT NULL "level"
 Triggers:
-    update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+    update_categories_timestamp BEFORE UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION update_categories_updated_at()
+Access method: heap
 
 
-printstore=# \d categories
-                                        Table "public.categories"
-   Column   |            Type             | Collation | Nullable |                Default
-------------+-----------------------------+-----------+----------+----------------------------------------
- id         | integer                     |           | not null | nextval('categories_id_seq'::regclass)
- name       | character varying(150)      |           | not null |
- created_at | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+                                                Table "public.categories_backup"
+   Column   |            Type             | Collation | Nullable | Default | Storage  | Compression | Stats target | Description
+------------+-----------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ id         | integer                     |           |          |         | plain    |             |              |
+ name       | character varying(150)      |           |          |         | extended |             |              |
+ created_at | timestamp without time zone |           |          |         | plain    |             |              |
+Access method: heap
+
+
+                                                                 Table "public.categories_old"
+   Column   |            Type             | Collation | Nullable |                Default                 | Storage  | Compression | Stats target | Description
+------------+-----------------------------+-----------+----------+----------------------------------------+----------+-------------+--------------+-------------
+ id         | integer                     |           | not null | nextval('categories_id_seq'::regclass) | plain    |             |              |
+ name       | character varying(150)      |           | not null |                                        | extended |             |              |
+ created_at | timestamp without time zone |           |          | CURRENT_TIMESTAMP                      | plain    |             |              |
 Indexes:
     "categories_pkey" PRIMARY KEY, btree (id)
     "categories_name_key" UNIQUE CONSTRAINT, btree (name)
-Referenced by:
-    TABLE "products" CONSTRAINT "fk_products_category" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-    TABLE "subcategories" CONSTRAINT "subcategories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE C
-ASCADE
+Not-null constraints:
+    "categories_id_not_null" NOT NULL "id"
+    "categories_name_not_null" NOT NULL "name"
+Access method: heap
 
 
-printstore=# \d subcategories
-                                         Table "public.subcategories"
-   Column    |            Type             | Collation | Nullable |                  Default
--------------+-----------------------------+-----------+----------+-------------------------------------------
- id          | integer                     |           | not null | nextval('subcategories_id_seq'::regclass)
- category_id | integer                     |           | not null |
- name        | character varying(150)      |           | not null |
- created_at  | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+                                                                       Table "public.category_attributes"
+      Column       |            Type             | Collation | Nullable |                     Default                     | Storage  | Compression | Stats target | Description
+-------------------+-----------------------------+-----------+----------+-------------------------------------------------+----------+-------------+--------------+-------------
+ id                | integer                     |           | not null | nextval('category_attributes_id_seq'::regclass) | plain    |             |              |
+ category_id       | integer                     |           | not null |                                                 | plain    |             |              |
+ attribute_name    | character varying(100)      |           | not null |                                                 | extended |             |              |
+ attribute_type    | character varying(50)       |           | not null | 'text'::character varying                       | extended |             |              |
+ attribute_options | text                        |           |          |                                                 | extended |             |              |
+ is_required       | boolean                     |           |          | false                                           | plain    |             |              |
+ display_order     | integer                     |           |          | 0                                               | plain    |             |              |
+ created_at        | timestamp without time zone |           |          | CURRENT_TIMESTAMP                               | plain    |             |              |
 Indexes:
-    "subcategories_pkey" PRIMARY KEY, btree (id)
-    "subcategories_category_id_name_key" UNIQUE CONSTRAINT, btree (category_id, name)
+    "subcategory_attributes_pkey" PRIMARY KEY, btree (id)
+    "category_attributes_category_id_attribute_name_key" UNIQUE CONSTRAINT, btree (category_id, attribute_name)
+    "idx_category_attributes_category" btree (category_id)
 Foreign-key constraints:
-    "subcategories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    "category_attributes_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 Referenced by:
-    TABLE "products" CONSTRAINT "fk_products_subcategory" FOREIGN KEY (subcategory_id) REFERENCES subcategories(id) ON DELETE SET NUL
-L
+    TABLE "product_attributes" CONSTRAINT "product_attributes_attribute_id_fkey" FOREIGN KEY (attribute_id) REFERENCES category_attributes(id) ON DELETE CASCADE
+Not-null constraints:
+    "subcategory_attributes_id_not_null" NOT NULL "id"
+    "subcategory_attributes_subcategory_id_not_null" NOT NULL "category_id"
+    "subcategory_attributes_attribute_name_not_null" NOT NULL "attribute_name"
+    "subcategory_attributes_attribute_type_not_null" NOT NULL "attribute_type"
+Access method: heap
 
+
+                                                                    Table "public.colors"
+   Column    |            Type             | Collation | Nullable |              Default               | Storage  | Compression | Stats target | Description
+-------------+-----------------------------+-----------+----------+------------------------------------+----------+-------------+--------------+-------------
+ id          | integer                     |           | not null | nextval('colors_id_seq'::regclass) | plain    |             |              |
+ name        | character varying(100)      |           | not null |                                    | extended |             |              |
+ hex_code    | character varying(7)        |           | not null |                                    | extended |             |              |
+ finish      | character varying(50)       |           |          |                                    | extended |             |              |
+ category    | character varying(50)       |           |          |                                    | extended |             |              |
+ material_id | integer                     |           |          |                                    | plain    |             |              |
+ is_active   | boolean                     |           |          | true                               | plain    |             |              |
+ created_at  | timestamp without time zone |           |          | now()                              | plain    |             |              |
+ updated_at  | timestamp without time zone |           |          | now()                              | plain    |             |              |
+Indexes:
+    "colors_pkey" PRIMARY KEY, btree (id)
+    "idx_colors_active" btree (is_active)
+    "idx_colors_material" btree (material_id)
+Foreign-key constraints:
+    "colors_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "order_items" CONSTRAINT "order_items_color_id_fkey" FOREIGN KEY (color_id) REFERENCES colors(id)
+Not-null constraints:
+    "colors_id_not_null" NOT NULL "id"
+    "colors_name_not_null" NOT NULL "name"
+    "colors_hex_code_not_null" NOT NULL "hex_code"
+Access method: heap
+
+
+                                                                    Table "public.files"
+   Column    |            Type             | Collation | Nullable |              Default              | Storage  | Compression | Stats target | Description
+-------------+-----------------------------+-----------+----------+-----------------------------------+----------+-------------+--------------+-------------
+ id          | integer                     |           | not null | nextval('files_id_seq'::regclass) | plain    |             |              |
+ product_id  | integer                     |           |          |                                   | plain    |             |              |
+ filename    | character varying(255)      |           | not null |                                   | extended |             |              |
+ file_type   | character varying(10)       |           | not null |                                   | extended |             |              |
+ file_path   | text                        |           | not null |                                   | extended |             |              |
+ uploaded_at | timestamp without time zone |           |          | CURRENT_TIMESTAMP                 | plain    |             |              |
+Indexes:
+    "files_pkey" PRIMARY KEY, btree (id)
+Not-null constraints:
+    "files_id_not_null" NOT NULL "id"
+    "files_filename_not_null" NOT NULL "filename"
+    "files_file_type_not_null" NOT NULL "file_type"
+    "files_file_path_not_null" NOT NULL "file_path"
+Access method: heap
+
+
+                                                                     Table "public.materials"
+     Column     |            Type             | Collation | Nullable |                Default                | Storage  | Compression | Stats target | Description
+----------------+-----------------------------+-----------+----------+---------------------------------------+----------+-------------+--------------+-------------
+ id             | integer                     |           | not null | nextval('materials_id_seq'::regclass) | plain    |             |              |
+ name           | character varying(100)      |           | not null |                                       | extended |             |              |
+ description    | text                        |           |          |                                       | extended |             |              |
+ properties     | jsonb                       |           |          |                                       | extended |             |              |
+ specifications | text                        |           |          |                                       | extended |             |              |
+ price_per_kg   | numeric(10,2)               |           |          |                                       | main     |             |              |
+ is_active      | boolean                     |           |          | true                                  | plain    |             |              |
+ image          | character varying(255)      |           |          |                                       | extended |             |              |
+ created_at     | timestamp without time zone |           |          | now()                                 | plain    |             |              |
+ updated_at     | timestamp without time zone |           |          | now()                                 | plain    |             |              |
+Indexes:
+    "materials_pkey" PRIMARY KEY, btree (id)
+    "idx_materials_active" btree (is_active)
+Referenced by:
+    TABLE "colors" CONSTRAINT "colors_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE
+    TABLE "order_items" CONSTRAINT "order_items_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id)
+    TABLE "product_materials" CONSTRAINT "product_materials_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE
+Not-null constraints:
+    "materials_id_not_null" NOT NULL "id"
+    "materials_name_not_null" NOT NULL "name"
+Access method: heap
+
+
+                                                                   Table "public.order_items"
+   Column    |            Type             | Collation | Nullable |                 Default                 | Storage | Compression | Stats target | Description
+-------------+-----------------------------+-----------+----------+-----------------------------------------+---------+-------------+--------------+-------------
+ id          | integer                     |           | not null | nextval('order_items_id_seq'::regclass) | plain   |             |              |
+ order_id    | integer                     |           | not null |                                         | plain   |             |              |
+ product_id  | integer                     |           | not null |                                         | plain   |             |              |
+ quantity    | integer                     |           | not null | 1                                       | plain   |             |              |
+ price       | numeric(10,2)               |           | not null |                                         | main    |             |              |
+ created_at  | timestamp without time zone |           |          | CURRENT_TIMESTAMP                       | plain   |             |              |
+ material_id | integer                     |           |          |                                         | plain   |             |              |
+ color_id    | integer                     |           |          |                                         | plain   |             |              |
+Indexes:
+    "order_items_pkey" PRIMARY KEY, btree (id)
+    "idx_order_items_order_id" btree (order_id)
+Foreign-key constraints:
+    "order_items_color_id_fkey" FOREIGN KEY (color_id) REFERENCES colors(id)
+    "order_items_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id)
+    "order_items_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    "order_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+Not-null constraints:
+    "order_items_id_not_null" NOT NULL "id"
+    "order_items_order_id_not_null" NOT NULL "order_id"
+    "order_items_product_id_not_null" NOT NULL "product_id"
+    "order_items_quantity_not_null" NOT NULL "quantity"
+    "order_items_price_not_null" NOT NULL "price"
+Access method: heap
+
+
+                                                                     Table "public.orders"
+     Column     |            Type             | Collation | Nullable |              Default               | Storage  | Compression | Stats target | Description
+----------------+-----------------------------+-----------+----------+------------------------------------+----------+-------------+--------------+-------------
+ id             | integer                     |           | not null | nextval('orders_id_seq'::regclass) | plain    |             |              |
+ user_id        | integer                     |           |          |                                    | plain    |             |              |
+ customer_name  | character varying(255)      |           | not null |                                    | extended |             |              |
+ customer_email | character varying(255)      |           | not null |                                    | extended |             |              |
+ customer_phone | character varying(50)       |           |          |                                    | extended |             |              |
+ notes          | text                        |           |          |                                    | extended |             |              |
+ total_amount   | numeric(10,2)               |           | not null |                                    | main     |             |              |
+ status         | character varying(50)       |           |          | 'pending'::character varying       | extended |             |              |
+ created_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP                  | plain    |             |              |
+ updated_at     | timestamp without time zone |           |          | CURRENT_TIMESTAMP                  | plain    |             |              |
+Indexes:
+    "orders_pkey" PRIMARY KEY, btree (id)
+    "idx_orders_created_at" btree (created_at DESC)
+    "idx_orders_status" btree (status)
+Foreign-key constraints:
+    "orders_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+Referenced by:
+    TABLE "order_items" CONSTRAINT "order_items_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+Not-null constraints:
+    "orders_id_not_null" NOT NULL "id"
+    "orders_customer_name_not_null" NOT NULL "customer_name"
+    "orders_customer_email_not_null" NOT NULL "customer_email"
+    "orders_total_amount_not_null" NOT NULL "total_amount"
+Triggers:
+    update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_orders_updated_at()
+Access method: heap
+
+
+                                                                   Table "public.password_reset_tokens"
+   Column   |            Type             | Collation | Nullable |                      Default                      | Storage  | Compression | Stats target | Description
+------------+-----------------------------+-----------+----------+---------------------------------------------------+----------+-------------+--------------+-------------
+ id         | integer                     |           | not null | nextval('password_reset_tokens_id_seq'::regclass) | plain    |             |              |
+ user_id    | integer                     |           |          |                                                   | plain    |             |              |
+ token      | text                        |           | not null |                                                   | extended |             |              |
+ expires    | timestamp without time zone |           | not null |                                                   | plain    |             |              |
+ created_at | timestamp without time zone |           |          | now()                                             | plain    |             |              |
+Indexes:
+    "password_reset_tokens_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "password_reset_tokens_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Not-null constraints:
+    "password_reset_tokens_id_not_null" NOT NULL "id"
+    "password_reset_tokens_token_not_null" NOT NULL "token"
+    "password_reset_tokens_expires_not_null" NOT NULL "expires"
+Access method: heap
+
+
+                                                                      Table "public.product_attributes"
+     Column      |            Type             | Collation | Nullable |                    Default                     | Storage  | Compression | Stats target | Description
+-----------------+-----------------------------+-----------+----------+------------------------------------------------+----------+-------------+--------------+-------------
+ id              | integer                     |           | not null | nextval('product_attributes_id_seq'::regclass) | plain    |             |              |
+ product_id      | integer                     |           | not null |                                                | plain    |             |              |
+ attribute_id    | integer                     |           | not null |                                                | plain    |             |              |
+ attribute_value | text                        |           | not null |                                                | extended |             |              |
+ created_at      | timestamp without time zone |           |          | CURRENT_TIMESTAMP                              | plain    |             |              |
+Indexes:
+    "product_attributes_pkey" PRIMARY KEY, btree (id)
+    "idx_product_attributes_attribute" btree (attribute_id)
+    "idx_product_attributes_product" btree (product_id)
+    "product_attributes_product_id_attribute_id_key" UNIQUE CONSTRAINT, btree (product_id, attribute_id)
+Foreign-key constraints:
+    "product_attributes_attribute_id_fkey" FOREIGN KEY (attribute_id) REFERENCES category_attributes(id) ON DELETE CASCADE
+    "product_attributes_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+Not-null constraints:
+    "product_attributes_id_not_null" NOT NULL "id"
+    "product_attributes_product_id_not_null" NOT NULL "product_id"
+    "product_attributes_attribute_id_not_null" NOT NULL "attribute_id"
+    "product_attributes_attribute_value_not_null" NOT NULL "attribute_value"
+Access method: heap
+
+
+                                                                    Table "public.product_categories"
+    Column     |            Type             | Collation | Nullable |                    Default                     | Storage | Compression | Stats target | Description
+---------------+-----------------------------+-----------+----------+------------------------------------------------+---------+-------------+--------------+-------------
+ id            | integer                     |           | not null | nextval('product_categories_id_seq'::regclass) | plain   |             |              |
+ product_id    | integer                     |           | not null |                                                | plain   |             |              |
+ category_id   | integer                     |           | not null |                                                | plain   |             |              |
+ is_primary    | boolean                     |           |          | false                                          | plain   |             |              |
+ display_order | integer                     |           |          | 0                                              | plain   |             |              |
+ created_at    | timestamp without time zone |           |          | CURRENT_TIMESTAMP                              | plain   |             |              |
+Indexes:
+    "product_categories_pkey" PRIMARY KEY, btree (id)
+    "idx_product_categories_category" btree (category_id)
+    "idx_product_categories_primary" btree (is_primary)
+    "idx_product_categories_product" btree (product_id)
+    "unique_product_category" UNIQUE CONSTRAINT, btree (product_id, category_id)
+Foreign-key constraints:
+    "product_categories_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    "product_categories_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+Not-null constraints:
+    "product_categories_id_not_null" NOT NULL "id"
+    "product_categories_product_id_not_null" NOT NULL "product_id"
+    "product_categories_category_id_not_null" NOT NULL "category_id"
+Access method: heap
+
+
+                                                         Table "public.product_materials"
+   Column    |  Type   | Collation | Nullable |                    Default                    | Storage | Compression | Stats target | Description
+-------------+---------+-----------+----------+-----------------------------------------------+---------+-------------+--------------+-------------
+ id          | integer |           | not null | nextval('product_materials_id_seq'::regclass) | plain   |             |              |
+ product_id  | integer |           |          |                                               | plain   |             |              |
+ material_id | integer |           |          |                                               | plain   |             |              |
+Indexes:
+    "product_materials_pkey" PRIMARY KEY, btree (id)
+    "product_materials_product_id_material_id_key" UNIQUE CONSTRAINT, btree (product_id, material_id)
+Foreign-key constraints:
+    "product_materials_material_id_fkey" FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE
+    "product_materials_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+Not-null constraints:
+    "product_materials_id_not_null" NOT NULL "id"
+Access method: heap
+
+
+                                                                    Table "public.products"
+   Column    |            Type             | Collation | Nullable |               Default                | Storage  | Compression | Stats target | Description
+-------------+-----------------------------+-----------+----------+--------------------------------------+----------+-------------+--------------+-------------
+ id          | integer                     |           | not null | nextval('products_id_seq'::regclass) | plain    |             |              |
+ name        | character varying(255)      |           | not null |                                      | extended |             |              |
+ description | text                        |           | not null |                                      | extended |             |              |
+ price       | numeric(10,2)               |           | not null |                                      | main     |             |              |
+ model_file  | character varying(255)      |           | not null |                                      | extended |             |              |
+ created_at  | timestamp without time zone |           |          | CURRENT_TIMESTAMP                    | plain    |             |              |
+ updated_at  | timestamp without time zone |           |          | CURRENT_TIMESTAMP                    | plain    |             |              |
+ slug        | character varying(255)      |           |          |                                      | extended |             |              |
+ is_active   | boolean                     |           |          | true                                 | plain    |             |              |
+ images      | text[]                      |           |          |                                      | extended |             |              |
+ stock       | boolean                     |           | not null | false                                | plain    |             |              |
+Indexes:
+    "products_pkey" PRIMARY KEY, btree (id)
+    "idx_products_active" btree (is_active)
+    "products_slug_key" UNIQUE CONSTRAINT, btree (slug)
+Referenced by:
+    TABLE "order_items" CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    TABLE "product_attributes" CONSTRAINT "product_attributes_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    TABLE "product_categories" CONSTRAINT "product_categories_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    TABLE "product_materials" CONSTRAINT "product_materials_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+Not-null constraints:
+    "products_id_not_null" NOT NULL "id"
+    "products_name_not_null" NOT NULL "name"
+    "products_description_not_null" NOT NULL "description"
+    "products_price_not_null" NOT NULL "price"
+    "products_model_file_not_null" NOT NULL "model_file"
+    "products_stock_not_null" NOT NULL "stock"
+Triggers:
+    update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+Access method: heap
+
+
+                                                                         Table "public.users"
+         Column         |            Type             | Collation | Nullable |              Default              | Storage  | Compression | Stats target | Description
+------------------------+-----------------------------+-----------+----------+-----------------------------------+----------+-------------+--------------+-------------
+ id                     | integer                     |           | not null | nextval('users_id_seq'::regclass) | plain    |             |              |
+ name                   | character varying(100)      |           | not null |                                   | extended |             |              |
+ email                  | character varying(150)      |           | not null |                                   | extended |             |              |
+ password_hash          | text                        |           | not null |                                   | extended |             |              |
+ role                   | character varying(20)       |           |          | 'user'::character varying         | extended |             |              |
+ created_at             | timestamp without time zone |           |          | CURRENT_TIMESTAMP                 | plain    |             |              |
+ password_reset_token   | text                        |           |          |                                   | extended |             |              |
+ password_reset_expires | timestamp without time zone |           |          |                                   | plain    |             |              |
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+Referenced by:
+    TABLE "orders" CONSTRAINT "orders_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    TABLE "password_reset_tokens" CONSTRAINT "password_reset_tokens_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Not-null constraints:
+    "users_id_not_null" NOT NULL "id"
+    "users_name_not_null" NOT NULL "name"
+    "users_email_not_null" NOT NULL "email"
+    "users_password_hash_not_null" NOT NULL "password_hash"
+Access method: heap

@@ -22,13 +22,9 @@ async function loadOptions() {
   try {
     const res = await fetch('../data/options.json');
     const data = await res.json();
-
     materialOptions = data.materials;
     colorOptions = data.colors;
-
-    // Após carregar as opções, renderizar os itens
     loadOrderSummary();
-
   } catch (err) {
     console.error('Erro ao carregar opções:', err);
     alert('Erro ao carregar materiais e cores.');
@@ -38,7 +34,7 @@ async function loadOptions() {
 // ===== ORDER SUMMARY =====
 function loadOrderSummary() {
   const orderItems = document.getElementById('orderItems');
-  
+
   orderItems.innerHTML = cart.items.map((item, index) => `
     <div class="summary-item" data-item-index="${index}">
       <div class="summary-item-image">
@@ -50,8 +46,7 @@ function loadOrderSummary() {
         <h4>${item.name}</h4>
         <p>Quantidade: ${item.quantity}</p>
         <p>Preço base: €${Number(item.price).toFixed(2)} × ${item.quantity}</p>
-        
-        <!-- Seleção de Material -->
+
         <div class="product-option">
           <label for="material-${index}">Material *</label>
           <select id="material-${index}" class="material-select" data-index="${index}" required>
@@ -64,7 +59,6 @@ function loadOrderSummary() {
           </select>
         </div>
 
-        <!-- Seleção de Cor -->
         <div class="product-option">
           <label for="color-${index}">Cor *</label>
           <select id="color-${index}" class="color-select" data-index="${index}" required>
@@ -78,10 +72,7 @@ function loadOrderSummary() {
     </div>
   `).join('');
 
-  // Adicionar event listeners para os selects
   setupProductSelects();
-  
-  // Calcular total inicial
   calculateTotals();
 }
 
@@ -94,15 +85,10 @@ function setupProductSelects() {
     select.addEventListener('change', (e) => {
       const index = e.target.dataset.index;
       const materialId = e.target.value;
-      
-      // Atualizar cores disponíveis
       updateColorOptions(index, materialId);
-      
-      // Recalcular total
       calculateTotals();
     });
 
-    // Selecionar primeiro material automaticamente
     if (materialOptions.length > 0) {
       select.value = materialOptions[0].id;
       const index = select.dataset.index;
@@ -111,23 +97,18 @@ function setupProductSelects() {
   });
 
   colorSelects.forEach(select => {
-    select.addEventListener('change', () => {
-      calculateTotals();
-    });
+    select.addEventListener('change', () => { calculateTotals(); });
   });
 }
 
-// ===== ATUALIZAR CORES DISPONÍVEIS POR PRODUTO =====
+// ===== ATUALIZAR CORES =====
 function updateColorOptions(itemIndex, materialId) {
   const colorSelect = document.getElementById(`color-${itemIndex}`);
   if (!colorSelect) return;
 
-  // Limpar opções anteriores
   colorSelect.innerHTML = '<option value="">-- Escolher cor --</option>';
 
-  // Filtrar cores disponíveis para o material selecionado
   const filteredColors = colorOptions.filter(c => c.material === materialId);
-
   filteredColors.forEach(c => {
     const option = document.createElement('option');
     option.value = c.id;
@@ -136,70 +117,108 @@ function updateColorOptions(itemIndex, materialId) {
     colorSelect.appendChild(option);
   });
 
-  // Selecionar automaticamente a primeira cor disponível
-  if (filteredColors.length > 0) {
-    colorSelect.value = filteredColors[0].id;
-  }
+  if (filteredColors.length > 0) colorSelect.value = filteredColors[0].id;
 }
 
-// ===== CALCULAR TOTALS =====
+// ===== CALCULAR TOTAIS =====
 function calculateTotals() {
   let totalAmount = 0;
 
   cart.items.forEach((item, index) => {
     const materialSelect = document.getElementById(`material-${index}`);
     const colorSelect = document.getElementById(`color-${index}`);
-    
+
     let materialMultiplier = 1;
     let colorMultiplier = 1;
 
     if (materialSelect && materialSelect.value) {
-      const selectedOption = materialSelect.options[materialSelect.selectedIndex];
-      materialMultiplier = parseFloat(selectedOption.dataset.multiplier) || 1;
+      materialMultiplier = parseFloat(materialSelect.options[materialSelect.selectedIndex].dataset.multiplier) || 1;
     }
-
     if (colorSelect && colorSelect.value) {
-      const selectedOption = colorSelect.options[colorSelect.selectedIndex];
-      colorMultiplier = parseFloat(selectedOption.dataset.multiplier) || 1;
+      colorMultiplier = parseFloat(colorSelect.options[colorSelect.selectedIndex].dataset.multiplier) || 1;
     }
 
     const itemTotal = item.price * item.quantity * materialMultiplier * colorMultiplier;
     totalAmount += itemTotal;
 
-    // Atualizar total do item
     const itemTotalEl = document.getElementById(`item-total-${index}`);
-    if (itemTotalEl) {
-      itemTotalEl.textContent = `€${itemTotal.toFixed(2)}`;
-    }
+    if (itemTotalEl) itemTotalEl.textContent = `€${itemTotal.toFixed(2)}`;
   });
 
   document.getElementById('orderSubtotal').textContent = `€${totalAmount.toFixed(2)}`;
   document.getElementById('orderTotal').textContent = `€${totalAmount.toFixed(2)}`;
-
   updateShippingInfo(totalAmount);
 }
 
 // ===== SHIPPING INFO =====
 function updateShippingInfo(total) {
   const shippingInfo = document.getElementById('shippingInfo');
-
   if (total >= FREE_SHIPPING_MIN) {
     shippingInfo.textContent = 'Portes: 0€ (encomenda ≥ 50€)';
     shippingInfo.classList.remove('warning');
   } else {
     const missing = (FREE_SHIPPING_MIN - total).toFixed(2);
-    shippingInfo.textContent =
-      `Portes: grátis a partir de 50€ (faltam ${missing}€)`;
+    shippingInfo.textContent = `Portes: grátis a partir de 50€ (faltam ${missing}€)`;
     shippingInfo.classList.add('warning');
   }
 }
 
-// ===== PREFILL USER =====
-function prefillUserData() {
+// ===== PREFILL USER DATA (nome, email + morada guardada no perfil) =====
+async function prefillUserData() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('token');
 
   if (user.name) document.getElementById('customerName').value = user.name;
   if (user.email) document.getElementById('customerEmail').value = user.email;
+
+  // Tentar buscar a morada guardada no perfil
+  if (token) {
+    try {
+      const res = await fetch(`${API_BASE}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const profile = await res.json();
+        if (profile.address_street) document.getElementById('addressStreet').value = profile.address_street;
+        if (profile.address_postal) document.getElementById('addressPostalCode').value = profile.address_postal;
+        if (profile.address_city) document.getElementById('addressCity').value = profile.address_city;
+        if (profile.address_country) {
+          // Esperar que o select de países carregue
+          const setCountry = () => {
+            const sel = document.getElementById('addressCountry');
+            if (sel.options.length > 1) {
+              sel.value = profile.address_country;
+            } else {
+              setTimeout(setCountry, 200);
+            }
+          };
+          setCountry();
+        }
+
+        // Mostrar banner se a morada foi pré-preenchida
+        if (profile.address_street) {
+          showAddressBanner();
+        }
+      }
+    } catch (err) {
+      console.warn('Não foi possível carregar morada do perfil:', err);
+    }
+  }
+}
+
+function showAddressBanner() {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    background: #d1fae5; border: 1px solid #6ee7b7; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 16px; font-size: 0.88rem; color: #065f46;
+    display: flex; justify-content: space-between; align-items: center;
+  `;
+  banner.innerHTML = `
+    <span>✅ Morada pré-preenchida do teu perfil.</span>
+    
+  `;
+  const form = document.getElementById('checkoutForm');
+  form.insertBefore(banner, form.firstChild);
 }
 
 // ===== FORM SUBMIT =====
@@ -210,21 +229,20 @@ function setupForm() {
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const name = document.getElementById('customerName').value.trim();
-    const email = document.getElementById('customerEmail').value.trim();
-    const phone = document.getElementById('customerPhone').value.trim();
-    const notes = document.getElementById('orderNotes').value.trim();
-    const street = document.getElementById('addressStreet').value.trim();
+    const name      = document.getElementById('customerName').value.trim();
+    const email     = document.getElementById('customerEmail').value.trim();
+    const phone     = document.getElementById('customerPhone').value.trim();
+    const notes     = document.getElementById('orderNotes').value.trim();
+    const street    = document.getElementById('addressStreet').value.trim();
     const postalCode = document.getElementById('addressPostalCode').value.trim();
-    const city = document.getElementById('addressCity').value.trim();
-    const country = document.getElementById('addressCountry').value;
+    const city      = document.getElementById('addressCity').value.trim();
+    const country   = document.getElementById('addressCountry').value;
 
     if (!name || !email || !phone || !street || !postalCode || !city || !country) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
-    // Validar que todos os produtos têm material e cor selecionados
     const items = [];
     let hasError = false;
 
@@ -261,7 +279,6 @@ function setupForm() {
     submitBtn.disabled = true;
     submitBtn.textContent = 'A enviar...';
 
-    // Calcular total final
     const totalAmount = items.reduce((sum, item) => {
       return sum + (item.price * item.quantity * item.material_multiplier * item.color_multiplier);
     }, 0);
@@ -276,32 +293,32 @@ function setupForm() {
       address_postal: postalCode,
       address_city: city,
       address_country: country,
-      items: items
+      items
     };
 
     try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const res = await fetch(`${API_BASE}/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(orderData)
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
 
-      // Mostrar modal com o número do pedido
       showSuccessModal(data.order_id);
-      
-      // Limpar carrinho após envio
       cart.clear();
-
-      submitBtn.textContent = '✓ Pedido Enviado';
+      submitBtn.textContent = '✔ Pedido Enviado';
 
     } catch (err) {
       console.error(err);
       alert('Erro ao enviar pedido.');
       submitBtn.disabled = false;
-      submitBtn.textContent = '📧 Enviar Pedido';
+      submitBtn.textContent = '🖧 Enviar Pedido';
     }
   });
 }
@@ -311,7 +328,6 @@ async function loadCountries() {
   try {
     const res = await fetch('../data/countries.json');
     const countries = await res.json();
-
     const countrySelect = document.getElementById('addressCountry');
 
     countries.forEach(country => {
@@ -321,7 +337,6 @@ async function loadCountries() {
       if (country.code === 'PT') option.selected = true;
       countrySelect.appendChild(option);
     });
-
   } catch (err) {
     console.error('Erro ao carregar países:', err);
   }

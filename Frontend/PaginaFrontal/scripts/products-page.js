@@ -446,9 +446,17 @@ function clearCategoriesOnly() {
 function toggleFilters() {
   const sidebar = document.getElementById('filtersSidebar');
   const overlay = document.getElementById('overlay');
-  
-  sidebar.classList.toggle('active');
-  overlay.classList.toggle('active');
+  const isOpen  = sidebar.classList.toggle('active');
+  if (overlay)  overlay.classList.toggle('active', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function closeFilters() {
+  const sidebar = document.getElementById('filtersSidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.remove('active');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 // ===== APPLY SEARCH FROM URL =====
@@ -501,17 +509,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('maxPrice').addEventListener('input', applyFilters);
   document.getElementById('filterStock').addEventListener('change', applyFilters);
   document.getElementById('searchInput').addEventListener('input', applyFilters);
-  
+
   // Clear buttons
   document.getElementById('clearFilters').addEventListener('click', clearFilters);
   document.getElementById('clearCategories').addEventListener('click', clearCategoriesOnly);
-  
-  // Toggle filters (mobile)
+
+  // Toggle filtros (mobile) — abre sidebar
   document.getElementById('toggleFilters').addEventListener('click', toggleFilters);
-  
-  // Close sidebar when clicking overlay
+
+  // Botão fechar dentro da sidebar
+  const closeFiltersBtn = document.getElementById('closeFilters');
+  if (closeFiltersBtn) closeFiltersBtn.addEventListener('click', closeFilters);
+
+  // Fechar sidebar ao clicar no overlay
+  // (o header.js também usa o overlay — aqui só tratamos o caso dos filtros)
   document.getElementById('overlay').addEventListener('click', () => {
-    document.getElementById('filtersSidebar').classList.remove('active');
-    document.getElementById('overlay').classList.remove('active');
+    const sidebar = document.getElementById('filtersSidebar');
+    if (sidebar && sidebar.classList.contains('active')) {
+      closeFilters();
+    }
   });
 });

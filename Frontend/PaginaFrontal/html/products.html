@@ -18,10 +18,6 @@
         <img src="/Frontend/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
       </a>
     </div>
-      <div id="sideMenu" class="side-menu">
-        <button class="closeBtn" id="closeMenu">×</button>
-        <div id="sideContent"></div>
-      </div>
 
     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -60,14 +56,21 @@
         <p class="dropdown-title" id="dropdownUserName"></p>
         <ul id="dropdownLinks"></ul>
       </div>
-     <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-    <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-    <span class="cart-badge" id="cartBadge">0</span>
-  </button>
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
     </div>
   </div>
 </header>
 
+<!-- Side menu fora do header -->
+<div id="sideMenu" class="side-menu">
+  <button class="closeBtn" id="closeMenu">×</button>
+  <div id="sideContent"></div>
+</div>
+
+<!-- Overlay partilhado: header nav + side menu + filtros -->
 <div class="overlay" id="overlay"></div>
 
 <!-- BREADCRUMB -->
@@ -83,32 +86,32 @@
 
     <!-- SIDEBAR DE FILTROS -->
     <aside class="filters-sidebar" id="filtersSidebar">
-      
+
+      <!-- Botão fechar filtros (mobile) -->
+      <button class="btn-close-filters" id="closeFilters">× Fechar Filtros</button>
+
       <!-- CATEGORIAS -->
-     <div class="filter-section">
-  <div class="filter-section-header">
-    <h3>Categorias</h3>
-  </div>
+      <div class="filter-section">
+        <div class="filter-section-header">
+          <h3>Categorias</h3>
+        </div>
+                <div class="filter-section-header">
+          
+          <button class="btn-clear" id="clearCategories">Limpar</button>
+        </div>
+        <div class="category-search-box">
+          <input
+            type="text"
+            id="categorySearch"
+            placeholder="Pesquisar categorias..."
+            class="input-category-search"
+          >
+        </div>
 
-  <div class="filter-section-header">
-    <button class="btn-clear" id="clearCategories">Limpar</button>
-  </div>
-
-  <!-- 🔎 SEARCH BOX -->
-  <div class="category-search-box">
-    <input 
-      type="text" 
-      id="categorySearch" 
-      placeholder="Pesquisar categorias..."
-      class="input-category-search"
-    >
-  </div>
-
-  <div id="categoryFilters" class="filter-list">
-    <!-- Categorias carregadas via JS -->
-  </div>
-</div>
-
+        <div id="categoryFilters" class="filter-list">
+          <!-- Categorias carregadas via JS -->
+        </div>
+      </div>
 
       <!-- FILTROS DINÂMICOS DE ATRIBUTOS -->
       <div id="dynamicAttributeFilters">
@@ -122,12 +125,12 @@
 
       <!-- TOOLBAR -->
       <div class="products-toolbar">
-        
+
         <!-- LINHA 1: Contador e Toggle Filtros -->
         <div class="toolbar-row toolbar-top">
           <div class="toolbar-left">
             <button class="btn-toggle-filters" id="toggleFilters">
-              <span>📋</span> Filtros
+              <span>☰</span> Filtros
             </button>
             <span class="products-count" id="productsCount">0 produtos</span>
           </div>
@@ -136,8 +139,7 @@
 
         <!-- LINHA 2: Filtros e Ordenação -->
         <div class="toolbar-row toolbar-filters">
-          
-          <!-- Filtros de Preço -->
+
           <div class="filter-group-inline">
             <label>Preço</label>
             <div class="price-inputs">
@@ -147,7 +149,6 @@
             </div>
           </div>
 
-          <!-- Filtro de Stock -->
           <div class="filter-group-inline">
             <label>Stock</label>
             <select id="filterStock" class="select-filter">
@@ -157,7 +158,6 @@
             </select>
           </div>
 
-          <!-- Ordenação -->
           <div class="filter-group-inline">
             <label>Ordenar</label>
             <select id="sortBy" class="select-filter">
@@ -169,7 +169,6 @@
           </div>
 
         </div>
-
       </div>
 
       <!-- GRID DE PRODUTOS -->
@@ -192,7 +191,6 @@
         <h3>XYZ Labs</h3>
         <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
       </div>
-      
       <div class="footer-section">
         <h4>Links Rápidos</h4>
         <ul>
@@ -202,7 +200,6 @@
           <li><a href="contact.html">Contacto</a></li>
         </ul>
       </div>
-
       <div class="footer-section">
         <h4>Suporte</h4>
         <ul>
@@ -211,22 +208,20 @@
           <li><a href="Privacy.html">Política de Privacidade</a></li>
         </ul>
       </div>
-
       <div class="footer-section">
         <h4>Contacto</h4>
         <p>📧 info@xyzlabs.pt</p>
         <p>📞 +351 935310984</p>
       </div>
     </div>
-    
     <div class="footer-bottom">
       <p>&copy; 2026 XYZ Labs. Todos os direitos reservados.</p>
     </div>
   </div>
 </footer>
-<script src="../scripts/header.js"></script>
+
 <script src="../scripts/cart.js"></script>
-<script src="../scripts/homePage.js"></script>
+<script src="../scripts/header.js"></script>
 <script src="../scripts/products-page.js"></script>
 </body>
 </html>
