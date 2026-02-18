@@ -147,8 +147,10 @@ function calculateFullPrice(params) {
 
 // ── Helpers privados ──────────────────────────────────────────
 function _priceFromMargin(landed, margin) {
-  if (margin >= 100) throw new Error('Margem de lucro não pode ser >= 100%.');
-  return landed / (1 - margin / 100);
+  // Markup sobre o custo: preço = custo × (1 + margem/100)
+  // Exemplo: custo 4€ com 50% margem = 4 × 1.5 = 6€ de lucro de 2€
+  // (não confundir com "margem sobre preço de venda" que daria 8€)
+  return landed * (1 + margin / 100);
 }
 
 function _withVat(price, vatRate) {
