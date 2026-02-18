@@ -19,12 +19,7 @@ function optionalAuth(req, res, next) {
   }
   next();
 }
-console.log('createOrder:', typeof ordersController.createOrder);
-console.log('getAllOrders:', typeof ordersController.getAllOrders);
-console.log('getOrderById:', typeof ordersController.getOrderById);
-console.log('updateOrderStatus:', typeof ordersController.updateOrderStatus);
-console.log('updateOrderTracking:', typeof ordersController.updateOrderTracking);
-console.log('getOrderStats:', typeof ordersController.getOrderStats);
+
 
 // ────────────────────────────────────────────────
 // PÚBLICAS / pedidos de cliente (criar encomenda)

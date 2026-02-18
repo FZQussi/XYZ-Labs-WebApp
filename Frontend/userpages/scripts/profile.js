@@ -233,17 +233,30 @@ function renderOrderCard(order) {
         <div class="order-date">${date}</div>
         <span class="order-status status-${order.status}">${statusLabel}</span>
       </div>
+
       <div class="order-card-body">
         ${itemsHTML}
+
         <div class="order-footer">
           <div class="order-total-label">Total</div>
           <div class="order-total-amount">€${Number(order.total_amount).toFixed(2)}</div>
         </div>
+
         ${addr}
         ${order.notes ? `<div class="order-addr">📝 ${order.notes}</div>` : ''}
+
+        ${
+          order.status === 'shipped' && order.tracking_code
+            ? `<div style="margin-top:12px;font-size:0.9rem;color:#333;">
+                 <strong>🚚 Código de envio:</strong> <span style="font-family: var(--font-mono);">${order.tracking_code}</span><br/>
+                 ${order.tracking_carrier ? `<strong>Transportadora:</strong> ${order.tracking_carrier}` : ''}
+               </div>`
+            : ''
+        }
       </div>
     </div>`;
 }
+
 
 // ===== LOGIN HISTORY =====
 async function loadLoginHistory(token) {

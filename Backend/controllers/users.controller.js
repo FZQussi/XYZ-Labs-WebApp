@@ -122,11 +122,24 @@ exports.getMyOrders = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // Obter encomendas do utilizador incluindo dados de envio
     const ordersResult = await client.query(`
       SELECT 
-        o.id, o.status, o.total_amount, o.created_at, o.updated_at,
-        o.customer_name, o.customer_email, o.customer_phone, o.notes,
-        o.address_street, o.address_postal, o.address_city, o.address_country
+        o.id,
+        o.status,
+        o.total_amount,
+        o.created_at,
+        o.updated_at,
+        o.customer_name,
+        o.customer_email,
+        o.customer_phone,
+        o.notes,
+        o.address_street,
+        o.address_postal,
+        o.address_city,
+        o.address_country,
+        o.tracking_code,
+        o.tracking_carrier
       FROM orders o
       WHERE o.user_id = $1
       ORDER BY o.created_at DESC
@@ -146,7 +159,10 @@ exports.getMyOrders = async (req, res) => {
         WHERE oi.order_id = $1
       `, [order.id]);
 
-      return { ...order, items: itemsResult.rows };
+      return {
+        ...order,
+        items: itemsResult.rows
+      };
     }));
 
     res.json(orders);
@@ -155,6 +171,7 @@ exports.getMyOrders = async (req, res) => {
     res.status(500).json({ error: 'Erro ao obter encomendas' });
   }
 };
+
 
 // ===== GET LOGIN HISTORY =====
 exports.getMyLoginHistory = async (req, res) => {
