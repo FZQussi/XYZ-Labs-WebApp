@@ -1,31 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 const auth = require('../middlewares/auth.middleware');
+const { orderLimiter } = require('../middlewares/rateLimiter.middleware');
 const admin = require('../middlewares/admin.middleware');
 const ordersController = require('../controllers/orders.controller');
 
-// Middleware que tenta autenticar mas não falha se não houver token
+// ─── Optional auth middleware (reuses shared JWT_SECRET) ─────────────
+// Uses the same authMiddleware logic but does NOT block on missing token.
+// Extracted here (no inline require) for consistency with the rest of the app.
 function optionalAuth(req, res, next) {
   const authHeader = req.headers['authorization'];
-  if (!authHeader) return next(); // guest, segue sem user
+  if (!authHeader) return next(); // guest — continue without user
 
-  const jwt = require('jsonwebtoken');
   const token = authHeader.split(' ')[1];
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET);
   } catch (_) {
-    // token inválido, trata como guest
+    // Invalid token treated as guest — not a hard error
   }
   next();
 }
 
-
 // ────────────────────────────────────────────────
 // PÚBLICAS / pedidos de cliente (criar encomenda)
-// (Autenticação opcional — guest pode criar)
+// Autenticação opcional — guest pode criar — 20 por hora por IP
 // ────────────────────────────────────────────────
-router.post('/', optionalAuth, ordersController.createOrder);
+router.post('/', orderLimiter, optionalAuth, ordersController.createOrder);
 
 // ────────────────────────────────────────────────
 // ROTAS ADMIN

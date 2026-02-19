@@ -2,6 +2,9 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const client = require('./db');
+const { loginLimiter, registerLimiter } = require('./middlewares/rateLimiter.middleware');
+const { recordFailure, clearAttempts, isLocked, getRemainingSeconds } = require('./middlewares/loginTracker.middleware');
+const MAX_ATTEMPTS = 5; // must match loginTracker.middleware.js
 
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET;
@@ -36,12 +39,12 @@ async function getIPLocation(ip) {
     if (data.status === 'success') {
       return { country: data.country, city: data.city };
     }
-  } catch (_) {}
+  } catch (_) { }
   return { country: 'Desconhecido', city: 'Desconhecido' };
 }
 
 // ===== REGISTER =====
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -72,23 +75,63 @@ router.post('/register', async (req, res) => {
 });
 
 // ===== LOGIN =====
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { identifier, password } = req.body;
+
+    if (!identifier || !password)
+      return res.status(400).json({ error: 'Campos obrigatórios em falta' });
+
+    const ip = getClientIP(req);
+
+    // ─── Account lockout check (by IP + by identifier) ───────────────
+    const ipKey = `ip:${ip}`;
+    const idKey = `id:${identifier.toLowerCase()}`;
+
+    if (isLocked(ipKey)) {
+      return res.status(429).json({
+        error: `Demasiadas tentativas. Conta bloqueada por ${getRemainingSeconds(ipKey)}s.`
+      });
+    }
+    if (isLocked(idKey)) {
+      return res.status(429).json({
+        error: `Demasiadas tentativas. Conta bloqueada por ${getRemainingSeconds(idKey)}s.`
+      });
+    }
 
     const result = await client.query(
       'SELECT * FROM users WHERE email=$1 OR name=$1',
       [identifier]
     );
 
-    if (!result.rows.length)
+    // ─── Wrong identifier ─────────────────────────────────────────────
+    if (!result.rows.length) {
+      recordFailure(ipKey);
+      recordFailure(idKey);
+      // Generic error — don't reveal whether the user exists
       return res.status(401).json({ error: 'Credenciais inválidas' });
+    }
 
     const user = result.rows[0];
-
     const match = await bcrypt.compare(password, user.password_hash);
-    if (!match)
-      return res.status(401).json({ error: 'Credenciais inválidas' });
+
+    // ─── Wrong password ───────────────────────────────────────────────
+    if (!match) {
+      const afterIP = recordFailure(ipKey);
+      const afterID = recordFailure(idKey);
+      const remaining = MAX_ATTEMPTS - afterIP.count;
+      const willLock = afterIP.count >= MAX_ATTEMPTS || afterID.count >= MAX_ATTEMPTS;
+
+      return res.status(401).json({
+        error: willLock
+          ? `Conta bloqueada por 15 minutos após demasiadas tentativas.`
+          : `Credenciais inválidas. ${remaining > 0 ? remaining + ' tentativas restantes.' : ''}`
+      });
+    }
+
+    // ─── Success — clear lockout counters ─────────────────────────────
+    clearAttempts(ipKey);
+    clearAttempts(idKey);
 
     const token = jwt.sign(
       { id: user.id, name: user.name, role: user.role },
@@ -96,15 +139,13 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    // Tracking de login em background
-    const ip = getClientIP(req);
+    // ─── Login tracking in background ────────────────────────────────
     const userAgent = req.headers['user-agent'] || '';
 
     setImmediate(async () => {
       try {
         const location = await getIPLocation(ip);
 
-        // Atualizar campos de último login no user
         await client.query(`
           UPDATE users SET
             last_login_at      = NOW(),
@@ -115,7 +156,6 @@ router.post('/login', async (req, res) => {
           WHERE id = $4
         `, [ip, location.country, location.city, user.id]);
 
-        // Guardar no histórico
         await client.query(`
           INSERT INTO login_history (user_id, ip, country, city, user_agent)
           VALUES ($1, $2, $3, $4, $5)

@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const controller = require('../controllers/contact.controller');
+const { contactLimiter } = require('../middlewares/rateLimiter.middleware');
 
 const router = express.Router();
 
@@ -30,8 +31,8 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|pdf|stl|obj|3mf/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype) || 
-                     file.mimetype === 'application/octet-stream'; // Para .stl, .obj
+    const mimetype = allowedTypes.test(file.mimetype) ||
+      file.mimetype === 'application/octet-stream'; // Para .stl, .obj
 
     if (mimetype && extname) {
       return cb(null, true);
@@ -40,7 +41,7 @@ const upload = multer({
   }
 });
 
-// POST /contact - Enviar mensagem de contacto
-router.post('/', upload.array('files', 5), controller.sendContactMessage);
+// POST /contact - Enviar mensagem de contacto (5 por hora por IP)
+router.post('/', contactLimiter, upload.array('files', 5), controller.sendContactMessage);
 
 module.exports = router;

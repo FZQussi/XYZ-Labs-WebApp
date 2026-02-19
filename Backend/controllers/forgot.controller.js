@@ -13,23 +13,25 @@ function isStrongPassword(password) {
     number: /[0-9]/.test(password),
     special: /[^A-Za-z0-9]/.test(password)
   };
-  const allValid = Object.values(rules).every(Boolean);
-  console.log('Password validação:', rules, '->', allValid);
-  return allValid;
+  return Object.values(rules).every(Boolean);
+}
+
+// ===== HASH TOKEN (SHA-256) =====
+// The raw token is sent in the email link. Only a SHA-256 hash is stored in
+// the database so that even a full DB dump cannot be used to trigger resets.
+function hashToken(rawToken) {
+  return crypto.createHash('sha256').update(rawToken).digest('hex');
 }
 
 // ===== ENVIO DE EMAIL =====
-async function sendRecoveryEmail(email, token, origin) {
+async function sendRecoveryEmail(email, rawToken, origin) {
   try {
-    console.log('Preparando envio de email para:', email);
-
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
     });
 
-    const resetLink = `${origin}/Frontend/userpages/html/reset-password.html?token=${token}&email=${email}`;
-    console.log('Reset link:', resetLink);
+    const resetLink = `${origin}/Frontend/userpages/html/reset-password.html?token=${rawToken}&email=${email}`;
 
     const mailOptions = {
       from: `"XYZ Labs" <${process.env.EMAIL_USER}>`,
@@ -44,9 +46,9 @@ async function sendRecoveryEmail(email, token, origin) {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log('Email enviado com sucesso para:', email);
+    console.log('Email de recuperação enviado para:', email);
   } catch (err) {
-    console.error('Erro ao enviar email:', err);
+    console.error('Erro ao enviar email de recuperação:', err);
     throw err;
   }
 }
@@ -54,8 +56,6 @@ async function sendRecoveryEmail(email, token, origin) {
 // ===== CONTROLADOR FORGOT PASSWORD =====
 exports.forgotPassword = async (req, res) => {
   try {
-    console.log('Pedido de forgot password recebido:', req.body);
-
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email é obrigatório' });
 
@@ -64,29 +64,31 @@ exports.forgotPassword = async (req, res) => {
       [email]
     );
 
-    if (!userResult.rows.length) {
-      console.log('Email não encontrado:', email);
-      return res.status(404).json({ error: 'Email não encontrado' });
+    // ─── SECURITY: Always return same response (no user enumeration) ──
+    if (userResult.rows.length) {
+      const userId = userResult.rows[0].id;
+
+      // Generate raw token (sent in email) and hashed token (stored in DB)
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = hashToken(rawToken);
+      const expires = Date.now() + 3600_000; // 1 hour
+
+      // Store only the HASH — raw token never touches the DB
+      await client.query(
+        `INSERT INTO password_reset_tokens (user_id, token, expires)
+         VALUES ($1, $2, to_timestamp($3 / 1000.0))`,
+        [userId, tokenHash, expires]
+      );
+
+      const origin = req.headers.origin || 'http://127.0.0.1:5500';
+      await sendRecoveryEmail(email, rawToken, origin);
+    } else {
+      // Timing-safe delay — prevents enumeration via response time difference
+      await new Promise(resolve => setTimeout(resolve, 300));
     }
 
-    const userId = userResult.rows[0].id;
-    console.log('Utilizador encontrado:', userId);
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = Date.now() + 3600_000; // 1 hora
-    console.log('Token gerado:', token);
-
-    await client.query(
-      `INSERT INTO password_reset_tokens (user_id, token, expires)
-       VALUES ($1, $2, to_timestamp($3 / 1000.0))`,
-      [userId, token, expires]
-    );
-    console.log('Token guardado na base de dados');
-
-    const origin = req.headers.origin || 'http://127.0.0.1:58857';
-    await sendRecoveryEmail(email, token, origin);
-
-    res.json({ message: 'Instruções enviadas para o teu email' });
+    // Always the same response — attacker cannot know if email exists
+    res.json({ message: 'Se esse email estiver registado, receberás instruções em breve.' });
   } catch (err) {
     console.error('Erro forgot password:', err);
     res.status(500).json({ error: 'Erro ao processar pedido' });
@@ -96,32 +98,30 @@ exports.forgotPassword = async (req, res) => {
 // ===== CONTROLADOR RESET PASSWORD =====
 exports.resetPassword = async (req, res) => {
   try {
-    console.log('Pedido de reset password recebido:', req.body);
-
     const { token, password } = req.body;
     if (!token || !password)
       return res.status(400).json({ error: 'Campos obrigatórios em falta' });
 
     if (!isStrongPassword(password)) {
       return res.status(400).json({
-        error:
-          'Password fraca. Mínimo 12 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 carácter especial'
+        error: 'Password fraca. Mínimo 12 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 carácter especial'
       });
     }
 
+    // Hash the incoming token and look up the hash — never query with raw token
+    const tokenHash = hashToken(token);
+
     const tokenResult = await client.query(
       'SELECT user_id, expires FROM password_reset_tokens WHERE token = $1',
-      [token]
+      [tokenHash]
     );
 
     if (!tokenResult.rows.length) {
-      console.log('Token inválido ou expirado:', token);
       return res.status(400).json({ error: 'Token inválido ou expirado' });
     }
 
     const { user_id, expires } = tokenResult.rows[0];
     if (new Date() > new Date(expires)) {
-      console.log('Token expirado:', token);
       return res.status(400).json({ error: 'Token expirado' });
     }
 
@@ -130,12 +130,10 @@ exports.resetPassword = async (req, res) => {
       password_hash,
       user_id
     ]);
-    console.log('Password atualizada para o user:', user_id);
 
-    await client.query('DELETE FROM password_reset_tokens WHERE token = $1', [
-      token
-    ]);
-    console.log('Token eliminado da base de dados:', token);
+    // Delete hash after one-time use
+    await client.query('DELETE FROM password_reset_tokens WHERE token = $1', [tokenHash]);
+    console.log('Password redefinida para user_id:', user_id);
 
     res.json({ message: 'Password redefinida com sucesso' });
   } catch (err) {
@@ -143,4 +141,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: 'Erro ao redefinir password' });
   }
 };
-
