@@ -1,5 +1,5 @@
 (() => {
-  const API = 'http://localhost:3001/reset-password';
+  const API = '/reset-password';
 
   document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
@@ -91,4 +91,3 @@
     });
   });
 })();
-    

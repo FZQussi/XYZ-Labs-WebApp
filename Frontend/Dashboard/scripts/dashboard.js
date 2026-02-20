@@ -2,7 +2,7 @@
 // DASHBOARD.JS - Controlador Principal
 // ============================================
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 
 // ===== FUNÇÃO PARA INICIALIZAR DASHBOARD =====
 async function initDashboard() {
@@ -16,7 +16,7 @@ async function initDashboard() {
   if (!token || user.role !== 'admin') {
     console.warn('⚠️ Acesso não autorizado');
     alert('Acesso não autorizado. Apenas administradores podem aceder ao dashboard.');
-    window.location.href = '/Frontend/userpages/html/login.html';
+    window.location.href = '/userpages/html/login.html';
     return;
   }
 
@@ -132,7 +132,7 @@ function initLogout() {
           localStorage.removeItem('user');
           localStorage.removeItem('tokenTimestamp');
           sessionStorage.clear();
-          window.location.href = '/Frontend/userpages/html/login.html';
+          window.location.href = '/userpages/html/login.html';
         }
       }
     });

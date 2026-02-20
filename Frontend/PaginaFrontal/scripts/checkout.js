@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 const FREE_SHIPPING_MIN = 50;
 
 let materialOptions = [];

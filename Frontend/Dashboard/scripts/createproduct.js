@@ -1,6 +1,6 @@
 // Frontend/Dashboard/scripts/createproduct.js
 (() => {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = '';
   const token = localStorage.getItem('token');
 
   // ===== ELEMENTOS MODAL =====

@@ -3,7 +3,7 @@
 // ============================================
 
 (() => {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = '';
   
   // ===== CONFIGURAÇÕES DE SEGURANÇA =====
   const SECURITY_CONFIG = {
@@ -357,7 +357,7 @@
     }
 
     redirectToLogin() {
-      window.location.href = '/Frontend/userpages/html/login.html';
+      window.location.href = '/userpages/html/login.html';
     }
 
     // ===== LIMPEZA =====

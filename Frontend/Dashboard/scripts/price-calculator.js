@@ -12,7 +12,7 @@
   //   antes de carregar este ficheiro.
   const API_BASE = (typeof window.API_BASE !== 'undefined' && window.API_BASE)
     ? window.API_BASE
-    : 'http://localhost:3001';
+    : '';
 
   // ===== STATE =====
   let filaments    = [{ id: 1, material: 'PLA', costPerKg: 19.99, weight: 1 }];

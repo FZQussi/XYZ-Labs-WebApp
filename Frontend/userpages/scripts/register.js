@@ -1,5 +1,5 @@
 (() => {
-  const API = 'http://localhost:3001/auth/register';
+  const API = '/auth/register';
 
   document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');

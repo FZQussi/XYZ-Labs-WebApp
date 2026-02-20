@@ -77,10 +77,10 @@ initializeEventListeners() {
         <h3>🔒 Login Necessário</h3>
         <p>Para adicionar produtos ao carrinho, precisa de iniciar sessão.</p>
         <div class="auth-modal-buttons">
-          <button class="btn-login" onclick="window.location.href='../../userpages/html/login.html'">
+          <button class="btn-login" onclick="window.location.href='/userpages/html/login.html'">
             Fazer Login
           </button>
-          <button class="btn-register" onclick="window.location.href='../../userpages/html/register.html'">
+          <button class="btn-register" onclick="window.location.href='/userpages/html/register.html'">
             Criar Conta
           </button>
           <button class="btn-cancel" onclick="this.closest('.auth-modal').remove()">

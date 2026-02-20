@@ -1,5 +1,5 @@
 (() => {
-  const API = 'http://localhost:3001/auth/forgot-password';
+  const API = '/auth/forgot-password';
 
   document.addEventListener('DOMContentLoaded', () => {
     const forgotForm = document.getElementById('forgotForm');

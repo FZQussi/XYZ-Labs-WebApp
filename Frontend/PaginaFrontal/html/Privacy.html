@@ -143,15 +143,17 @@
       </a>
     </div>
 
+    <!-- Menu Hamburger (Mobile) -->
     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
       <span></span>
       <span></span>
       <span></span>
     </button>
 
+    <!-- Navegação -->
     <nav class="header-nav" id="headerNav">
       <ul>
-        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="HomePage.html" class="active">Home</a></li>
         <li><a href="products.html">Produtos</a></li>
         <li><a href="materials.html">Materiais</a></li>
         <li><a href="colors.html">Cores</a></li>
@@ -162,33 +164,44 @@
   </div>
 
   <div class="header-right">
-    <div class="header-search">
-      <span class="search-icon" id="searchBtn">
-        <img src="/Frontend/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
-      </span>
-      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
-    </div>
+    <!-- Search Bar -->
+  <div class="header-search">
+  <span class="search-icon" id="searchBtn">
+    <img src="/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+  </span>
+  <input
+    type="text"
+    placeholder="Pesquisar produtos..."
+    id="searchInput"
+  >
+</div>
 
+
+    <!-- Botões quando não logado -->
     <div id="authButtons">
       <button id="signInBtn" class="btn-secondary">Sign In</button>
+      
       <button id="signUpBtn" class="btn-primary">Sign Up</button>
     </div>
 
+    <!-- Ícones quando logado -->
     <div id="userIcons" style="display:none; position: relative;">
-      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
-        <img src="/Frontend/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
-      </button>
+  <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+    <img src="/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+  </button>
 
-      <div id="userDropdown" class="user-dropdown hidden">
-        <p class="dropdown-title" id="dropdownUserName"></p>
-        <ul id="dropdownLinks"></ul>
-      </div>
+  <!-- 🔽 DROPDOWN USER -->
+  <div id="userDropdown" class="user-dropdown hidden">
+    <p class="dropdown-title" id="dropdownUserName"></p>
+    <ul id="dropdownLinks"></ul>
+  </div>
 
-      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-        <img src="/Frontend/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-        <span class="cart-badge" id="cartBadge">0</span>
-      </button>
-    </div>
+  <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+    <img src="/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</div>
+
   </div>
 </header>
 

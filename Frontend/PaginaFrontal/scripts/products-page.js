@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 
 let allProducts = [];
 let filteredProducts = [];
@@ -286,7 +286,7 @@ function renderProducts() {
   grid.innerHTML = paginatedProducts.map(product => {
     const image = product.images && product.images[0] 
       ? `${API_BASE}/images/${product.images[0]}` 
-      : '/Frontend/images/placeholder.jpg';
+      : '/lib/images/placeholder.jpg';
 
     let attributesHTML = '';
     if (product.attributes && Object.keys(product.attributes).length > 0) {

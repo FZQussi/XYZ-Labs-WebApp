@@ -144,13 +144,14 @@ class ModernBrutalistLoginForm {
             // Guardar sessão
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('tokenTimestamp', Date.now().toString());
 
             // Sucesso visual
             this.showSuccess();
 
             // Redirecionar
             setTimeout(() => {
-                window.location.href = '../../PaginaFrontal/html/HomePage.html';
+                window.location.href = '/PaginaFrontal/html/HomePage.html';
             }, 2500);
 
         } catch (err) {

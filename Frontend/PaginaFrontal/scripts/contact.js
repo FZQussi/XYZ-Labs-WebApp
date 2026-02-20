@@ -1,6 +1,6 @@
 // Frontend/PaginaFrontal/scripts/contact.js
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 let selectedFiles = [];
 
 document.addEventListener('DOMContentLoaded', () => {

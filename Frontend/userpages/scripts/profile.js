@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('logoutBtnSec').addEventListener('click', logout);
 
   document.getElementById('homeBtn').addEventListener('click', () => {
-    window.location.href = '../../PaginaFrontal/html/HomePage.html';
+    window.location.href = '/PaginaFrontal/html/HomePage.html';
   });
 });
 
@@ -161,7 +161,7 @@ async function loadOrders(token) {
         <div class="no-orders">
           <span class="empty-label">Vazio</span>
           <p>Ainda não tens encomendas.</p>
-          <a href="../../PaginaFrontal/html/products.html">Ver Produtos →</a>
+          <a href="/PaginaFrontal/html/products.html">Ver Produtos →</a>
         </div>`;
       return;
     }
@@ -298,7 +298,7 @@ async function loadLoginHistory(token) {
 // ===== PAÍSES =====
 async function loadCountries() {
   try {
-    const res = await fetch('../../PaginaFrontal/data/countries.json');
+    const res = await fetch('/data/countries.json');
     const countries = await res.json();
     const select = document.getElementById('addrCountry');
     countries.forEach(c => {

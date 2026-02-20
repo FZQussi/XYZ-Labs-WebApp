@@ -2,7 +2,7 @@
 
 (() => {
 
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = '';
 
   const modal = document.getElementById('viewProductModal');
 

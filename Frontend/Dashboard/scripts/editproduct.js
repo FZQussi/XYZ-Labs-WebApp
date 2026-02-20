@@ -1,6 +1,6 @@
 // Frontend/Dashboard/scripts/editproduct.js - COMPLETO
 (() => {
-  const API_BASE = 'http://localhost:3001';
+  const API_BASE = '';
   const token = localStorage.getItem('token');
 
   let categories = [];

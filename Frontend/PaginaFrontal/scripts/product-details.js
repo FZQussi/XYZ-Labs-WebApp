@@ -5,7 +5,7 @@
  * Inclui seletores de material e cor no modal 3D
  */
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 
 // ==========================================
 // ESTADO GLOBAL
@@ -50,7 +50,7 @@ class ProductDetailsApp {
 
   async loadOptions() {
     try {
-      const response = await fetch('../data/options.json');
+      const response = await fetch('/data/options.json');
       State.options = await response.json();
       console.log('✓ Options carregadas:', State.options);
     } catch (error) {
@@ -495,7 +495,7 @@ class GalleryManager {
 
   static getImageUrl(image) {
     if (image === 'placeholder.jpg') {
-      return '/Frontend/images/placeholder.jpg';
+      return '/lib/images/placeholder.jpg';
     }
     if (image && image.startsWith('http')) {
       return image;
@@ -503,7 +503,7 @@ class GalleryManager {
     if (image) {
       return `${API_BASE}/images/${image}`;
     }
-    return '/Frontend/images/placeholder.jpg';
+    return '/lib/images/placeholder.jpg';
   }
 
   static renderThumbnails() {
@@ -535,7 +535,7 @@ class GalleryManager {
     img.src = this.getImageUrl(image);
     img.alt = `${State.currentProduct.name} - Imagem ${index + 1}`;
     img.loading = 'lazy';
-    img.onerror = () => img.src = '/Frontend/images/placeholder.jpg';
+    img.onerror = () => img.src = '/lib/images/placeholder.jpg';
 
     thumbnail.appendChild(img);
     thumbnail.addEventListener('click', () => {
@@ -896,7 +896,7 @@ class RelatedProductsRenderer {
   static createProductCard(product) {
     const image = product.images && product.images[0] 
       ? `${API_BASE}/images/${product.images[0]}` 
-      : '/Frontend/images/placeholder.jpg';
+      : '/lib/images/placeholder.jpg';
 
     const outOfStock = product.stock <= 0 
       ? '<div class="homepage-out-of-stock">Esgotado</div>' 
