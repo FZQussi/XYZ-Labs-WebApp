@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001/auth/login';
+const API = '/auth/login';
 
 // Modern Brutalist Login Form JavaScript
 class ModernBrutalistLoginForm {
@@ -191,6 +191,3 @@ class ModernBrutalistLoginForm {
 document.addEventListener('DOMContentLoaded', () => {
     new ModernBrutalistLoginForm();
 });
-
-
-

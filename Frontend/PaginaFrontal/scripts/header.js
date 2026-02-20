@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  const API_VALIDATE = 'http://localhost:3001/auth/validate';
+  const API_VALIDATE = '/auth/validate';
 
   // ==========================================
   // INICIALIZAÇÃO
@@ -142,12 +142,12 @@
     // Botões Sign In / Sign Up
     if (signInBtn) {
       signInBtn.addEventListener('click', () => {
-        window.location.href = '../../userpages/html/login.html';
+        window.location.href = '/userpages/html/login.html';
       });
     }
     if (signUpBtn) {
       signUpBtn.addEventListener('click', () => {
-        window.location.href = '../../userpages/html/register.html';
+        window.location.href = '/userpages/html/register.html';
       });
     }
 
@@ -166,12 +166,12 @@
 
     if (dropdownLinks) {
       const adminLink = user.role === 'admin'
-        ? `<li><a href="../../Dashboard/html/dashboard.html">Dashboard</a></li>`
+        ? `<li><a href="/Dashboard/html/dashboard.html">Dashboard</a></li>`
         : '';
 
       dropdownLinks.innerHTML = `
         ${adminLink}
-        <li><a href="../../userpages/html/profile.html">Perfil</a></li>
+        <li><a href="/userpages/html/profile.html">Perfil</a></li>
         <li><a href="#" id="dropdownLogout">Logout</a></li>
       `;
 
@@ -207,7 +207,7 @@
       const query = searchInput.value.trim();
       if (!query) return;
       window.location.href =
-        `/Frontend/PaginaFrontal/html/products.html?search=${encodeURIComponent(query)}`;
+        `/PaginaFrontal/html/products.html?search=${encodeURIComponent(query)}`;
     }
 
     searchInput.addEventListener('keydown', (e) => {
