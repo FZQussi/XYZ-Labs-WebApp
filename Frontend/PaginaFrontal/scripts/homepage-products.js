@@ -1,6 +1,6 @@
 // Frontend/PaginaFrontal/scripts/homepage-products.js
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = '';
 
 // ===== FUNÇÃO PARA EMBARALHAR ARRAY (FISHER-YATES SHUFFLE) =====
 function shuffleArray(array) {
@@ -18,7 +18,8 @@ async function loadFeaturedProducts() {
   
   try {
     const res = await fetch(`${API_BASE}/products`);
-    const allProducts = await res.json();
+    const raw = await res.json();
+    const allProducts = Array.isArray(raw) ? raw : (raw.data ?? raw.products ?? []);
     
     // Embaralhar produtos aleatoriamente
     const shuffledProducts = shuffleArray(allProducts);
@@ -52,7 +53,7 @@ function createInfiniteCarousel(products) {
   const productsHTML = duplicatedProducts.map(product => {
     const image = product.images && product.images[0] 
       ? `${API_BASE}/images/${product.images[0]}` 
-      : '/Frontend/images/placeholder.jpg';
+      : '/lib/images/placeholder.jpg';
     
     return `
       <div class="product-card" data-id="${product.id}">

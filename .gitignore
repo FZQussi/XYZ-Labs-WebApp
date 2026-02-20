@@ -1,24 +1,28 @@
-# Compiled class file
-*.class
+# ─── Node.js ─────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Log file
+# ─── Ambiente (NUNCA fazer commit destas!) ────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Uploads / ficheiros gerados ─────────────────────────────────────────────
+uploads/
+*.pdf
+coverage/
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
 *.log
+logs/
 
-# BlueJ files
-*.ctxt
+# ─── Sistemas Operativos ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# ─── Editores ────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp

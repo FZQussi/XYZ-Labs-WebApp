@@ -1,0 +1,53 @@
+services:
+
+  # ─── Base de Dados PostgreSQL ───────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: printstore_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: printstore
+      POSTGRES_PASSWORD: derpwuant69
+      POSTGRES_DB: printstore
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U printstore -d printstore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Backend Node.js ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: printstore_backend
+    restart: unless-stopped
+    env_file:
+      - ./Backend/.env
+    # porta 3001 não exposta — só acessível internamente via Nginx
+    expose:
+      - "3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./Frontend/images:/app/Frontend/images
+      - ./Frontend/models:/app/Frontend/models
+
+  # ─── Frontend (Nginx serve HTML/CSS/JS) ──────────────────────────────────────
+  frontend:
+    image: nginx:alpine
+    container_name: printstore_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./Frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

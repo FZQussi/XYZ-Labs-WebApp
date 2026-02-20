@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', async () => {
   const slider = document.getElementById('categoriesSlider');
   if (!slider) return;
@@ -29,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!categoryId) return;
 
         // Redireciona para products.html com query string category=<id>
-        window.location.href = `/Frontend/PaginaFrontal/html/products.html?category=${encodeURIComponent(categoryId)}`;
+        window.location.href = `/PaginaFrontal/html/products.html?category=${encodeURIComponent(categoryId)}`;
       });
     });
 
@@ -38,4 +36,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     slider.innerHTML = '<p>Erro ao carregar categorias</p>';
   }
 });
-

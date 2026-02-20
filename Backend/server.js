@@ -76,8 +76,8 @@ app.use(cors({
 
 // ===== MIDDLEWARE =====
 app.use(express.json({ limit: '10kb' }));
-app.use('/images', express.static(path.join(__dirname, '../Frontend/images')));
-app.use('/models', express.static(path.join(__dirname, '../Frontend/models')));
+app.use('/images', express.static(path.join(__dirname, 'Frontend/images')));
+app.use('/models', express.static(path.join(__dirname, 'Frontend/models')));
 app.use('/forgot-password', forgotRoutes);
 app.use('/reset-password', resetRoutes);
 
