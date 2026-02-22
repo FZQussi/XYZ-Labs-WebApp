@@ -38,9 +38,10 @@ function loadOrderSummary() {
   orderItems.innerHTML = cart.items.map((item, index) => `
     <div class="summary-item" data-item-index="${index}">
       <div class="summary-item-image">
-        ${item.image
-          ? `<img src="${API_BASE}/images/${item.image}" alt="${item.name}">`
-          : '<div class="no-image">📦</div>'}
+       ${item.image 
+          ? `<img src="${item.image}" alt="${item.name}">`
+          : '<div class="no-image">📦</div>'
+        }
       </div>
       <div class="summary-item-details">
         <h4>${item.name}</h4>

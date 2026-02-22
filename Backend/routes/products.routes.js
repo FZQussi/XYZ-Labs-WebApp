@@ -1,5 +1,6 @@
 const express = require('express');
-const { uploadModels, uploadImages } = require('../utils/upload');
+const { uploadModels } = require('../utils/upload');           // modelos 3D ficam em disco
+const uploadImages = require('../utils/multerCloudinary');
 const auth = require('../middlewares/auth.middleware');
 const admin = require('../middlewares/admin.middleware');
 const controller = require('../controllers/products.controller');
@@ -7,15 +8,15 @@ const controller = require('../controllers/products.controller');
 const router = express.Router();
 
 // === CATEGORIAS PRIMÁRIAS (ANTES de /:id para evitar conflito) ===
-router.get('/primary-categories',          controller.getPrimaryCategories);
-router.post('/primary-categories',         auth, admin, controller.createPrimaryCategory);
-router.put('/primary-categories/:catId',   auth, admin, controller.updatePrimaryCategory);
+router.get('/primary-categories', controller.getPrimaryCategories);
+router.post('/primary-categories', auth, admin, controller.createPrimaryCategory);
+router.put('/primary-categories/:catId', auth, admin, controller.updatePrimaryCategory);
 router.delete('/primary-categories/:catId', auth, admin, controller.deletePrimaryCategory);
 
 // === CATEGORIAS SECUNDÁRIAS (ANTES de /:id para evitar conflito) ===
-router.get('/secondary-categories',          controller.getSecondaryCategories);
-router.post('/secondary-categories',         auth, admin, controller.createSecondaryCategory);
-router.put('/secondary-categories/:catId',   auth, admin, controller.updateSecondaryCategory);
+router.get('/secondary-categories', controller.getSecondaryCategories);
+router.post('/secondary-categories', auth, admin, controller.createSecondaryCategory);
+router.put('/secondary-categories/:catId', auth, admin, controller.updateSecondaryCategory);
 router.delete('/secondary-categories/:catId', auth, admin, controller.deleteSecondaryCategory);
 
 // === PRODUTOS ===

@@ -108,17 +108,35 @@
       const newProduct = await res.json();
 
       // Upload de imagens
-      if (createImages?.files.length) {
-        const imgData = new FormData();
-        for (let i = 0; i < Math.min(4, createImages.files.length); i++) {
-          imgData.append('images', createImages.files[i]);
-        }
-        await fetch(`${API_BASE}/products/${newProduct.id}/images`, {
-          method: 'POST',
-          headers: authHeaders(),
-          body: imgData
-        });
-      }
+// Upload de imagens
+if (createImages?.files.length) {
+  const imgData = new FormData();
+  for (let i = 0; i < Math.min(4, createImages.files.length); i++) {
+    imgData.append('images', createImages.files[i]);
+  }
+
+  console.log('📤 A enviar imagens para:', `${API_BASE}/products/${newProduct.id}/images`);
+  console.log('📦 Número de imagens:', createImages.files.length);
+  for (let i = 0; i < createImages.files.length; i++) {
+    console.log(`  Imagem ${i+1}:`, createImages.files[i].name, createImages.files[i].size, 'bytes');
+  }
+
+  const imgRes = await fetch(`${API_BASE}/products/${newProduct.id}/images`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: imgData
+  });
+
+  const imgBody = await imgRes.json();
+  console.log('📥 Resposta do servidor:', imgRes.status, imgBody);
+
+  if (!imgRes.ok) {
+    console.error('❌ Erro no upload de imagens:', imgBody);
+    alert(`Produto criado mas erro nas imagens: ${imgBody.error || 'Erro desconhecido'}`);
+  } else {
+    console.log('✅ Imagens enviadas com sucesso:', imgBody);
+  }
+}
 
       createModal?.classList.add('hidden');
       window.reloadProducts?.();

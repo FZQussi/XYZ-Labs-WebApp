@@ -52,7 +52,7 @@ function createInfiniteCarousel(products) {
   
   const productsHTML = duplicatedProducts.map(product => {
     const image = product.images && product.images[0] 
-      ? `${API_BASE}/images/${product.images[0]}` 
+      ? product.images[0] 
       : '/lib/images/placeholder.jpg';
     
     return `

@@ -899,9 +899,9 @@ class RelatedProductsRenderer {
   }
 
   static createProductCard(product) {
-    const image = product.images && product.images[0] 
-      ? `${API_BASE}/images/${product.images[0]}` 
-      : '/lib/images/placeholder.jpg';
+const image = product.images && product.images[0] 
+  ? product.images[0]
+  : '/lib/images/placeholder.jpg';
 
     const outOfStock = product.stock <= 0 
       ? '<div class="homepage-out-of-stock">Esgotado</div>' 

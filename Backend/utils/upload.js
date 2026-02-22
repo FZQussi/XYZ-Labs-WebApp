@@ -13,7 +13,7 @@ function sanitizeFilename(name) {
 // MODELO 3D
 const storageModels = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../../Frontend/models');
+    const dir = path.join(__dirname, '../Frontend/models');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },

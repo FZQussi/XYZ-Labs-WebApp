@@ -36,15 +36,15 @@ router.put('/:id/images', auth, admin, uploadImages.array('images', 4), controll
 router.delete('/:id/images', auth, admin, controller.deleteProductImage);
 
 // === CATEGORIAS PRIMÁRIAS ===
-router.get('/primary-categories',          controller.getPrimaryCategories);
-router.post('/primary-categories',         auth, admin, controller.createPrimaryCategory);
-router.put('/primary-categories/:id',      auth, admin, controller.updatePrimaryCategory);
-router.delete('/primary-categories/:id',   auth, admin, controller.deletePrimaryCategory);
+router.get('/primary-categories', controller.getPrimaryCategories);
+router.post('/primary-categories', auth, admin, controller.createPrimaryCategory);
+router.put('/primary-categories/:id', auth, admin, controller.updatePrimaryCategory);
+router.delete('/primary-categories/:id', auth, admin, controller.deletePrimaryCategory);
 
 // === CATEGORIAS SECUNDÁRIAS ===
-router.get('/secondary-categories',        controller.getSecondaryCategories);
-router.post('/secondary-categories',       auth, admin, controller.createSecondaryCategory);
-router.put('/secondary-categories/:id',    auth, admin, controller.updateSecondaryCategory);
+router.get('/secondary-categories', controller.getSecondaryCategories);
+router.post('/secondary-categories', auth, admin, controller.createSecondaryCategory);
+router.put('/secondary-categories/:id', auth, admin, controller.updateSecondaryCategory);
 router.delete('/secondary-categories/:id', auth, admin, controller.deleteSecondaryCategory);
 
 module.exports = router;

@@ -80,7 +80,7 @@
           const div = document.createElement('div');
           div.className = 'image-item';
           const img = document.createElement('img');
-          img.src     = `${API_BASE}/images/${filename}`;
+          img.src = filename;
           img.alt     = `Imagem ${index + 1}`;
           img.loading = 'lazy';
           img.onclick = () => openLightbox(img.src);

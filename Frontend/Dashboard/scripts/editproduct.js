@@ -105,7 +105,7 @@
         item.className = 'image-edit-item';
 
         const img = document.createElement('img');
-        img.src = `${API_BASE}/images/${filename}`;
+        img.src = filename;
         img.alt = filename;
 
         const delBtn = document.createElement('button');

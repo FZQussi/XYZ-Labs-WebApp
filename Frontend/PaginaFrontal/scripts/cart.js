@@ -170,7 +170,7 @@ initializeEventListeners() {
     <div class="cart-item">
       <div class="cart-item-image">
         ${item.image 
-          ? `<img src="/images/${item.image}" alt="${item.name}">` 
+          ? `<img src="${item.image}" alt="${item.name}">`
           : '<div class="no-image">📦</div>'
         }
       </div>

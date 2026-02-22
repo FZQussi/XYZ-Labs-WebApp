@@ -14,7 +14,7 @@
     TOKEN_EXPIRATION: 60 * 60 * 1000,
     
     // Rate limiting - máximo de requisições por minuto
-    MAX_REQUESTS_PER_MINUTE: 60,
+    MAX_REQUESTS_PER_MINUTE: 6000,
     
     // Lista de eventos considerados "atividade"
     ACTIVITY_EVENTS: ['mousedown', 'keydown', 'scroll', 'touchstart'],

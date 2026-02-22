@@ -15,7 +15,22 @@ function deleteFile(filename, folder = 'images') {
     console.error(`❌ Erro ao eliminar ficheiro ${filename}:`, err);
   }
 }
+// APAGAR — substitui a função deleteFile para imagens
+const cloudinary = require('../utils/cloudinary'); // ajusta o path
 
+async function deleteCloudinaryImage(url) {
+  try {
+    // Extrair public_id a partir da URL
+    // URL exemplo: https://res.cloudinary.com/demo/image/upload/v123/products/abc.jpg
+    // public_id = "products/abc"
+    const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
+    if (matches) {
+      await cloudinary.uploader.destroy(matches[1]);
+    }
+  } catch (err) {
+    console.error('Erro ao apagar imagem do Cloudinary:', err);
+  }
+}
 // ===== GET ALL PRODUCTS =====
 exports.getProducts = async (req, res) => {
   try {
@@ -433,12 +448,14 @@ exports.uploadProductImages = async (req, res) => {
     const files = req.files || [];
     if (!files.length) return res.status(400).json({ error: 'Nenhuma imagem enviada' });
 
-    const filenames = files.map(f => f.filename);
+    // Com multer-storage-cloudinary, a URL fica em f.path
+    const urls = files.map(f => f.path);
+
     const result = await client.query(`
       UPDATE products
       SET images = COALESCE(images, '{}') || $1, updated_at = NOW()
       WHERE id = $2 RETURNING images
-    `, [filenames, productId]);
+    `, [urls, productId]);
 
     res.json(result.rows[0]);
   } catch (err) {
@@ -449,8 +466,9 @@ exports.uploadProductImages = async (req, res) => {
 exports.deleteProductImage = async (req, res) => {
   try {
     const productId = req.params.id;
-    const { filename } = req.body;
-    if (!filename) return res.status(400).json({ error: 'Nome do ficheiro não fornecido' });
+    const { filename } = req.body; // agora é a URL completa, o nome da variável pode ser "url"
+
+    if (!filename) return res.status(400).json({ error: 'URL da imagem não fornecida' });
 
     const result = await client.query(`
       UPDATE products
@@ -458,7 +476,8 @@ exports.deleteProductImage = async (req, res) => {
       WHERE id = $2 RETURNING images
     `, [filename, productId]);
 
-    deleteFile(filename, 'images');
+    await deleteCloudinaryImage(filename); // apaga do Cloudinary
+
     res.json({ success: true, images: result.rows[0]?.images || [] });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao eliminar imagem' });
@@ -471,12 +490,15 @@ exports.replaceProductImages = async (req, res) => {
     const files = req.files || [];
 
     const current = await client.query('SELECT images FROM products WHERE id = $1', [productId]);
-    (current.rows[0]?.images || []).forEach(img => deleteFile(img, 'images'));
+    // Apagar todas as antigas do Cloudinary
+    for (const url of (current.rows[0]?.images || [])) {
+      await deleteCloudinaryImage(url);
+    }
 
-    const newFilenames = files.map(f => f.filename);
+    const newUrls = files.map(f => f.path);
     const result = await client.query(`
       UPDATE products SET images = $1, updated_at = NOW() WHERE id = $2 RETURNING images
-    `, [newFilenames, productId]);
+    `, [newUrls, productId]);
 
     res.json({ success: true, images: result.rows[0]?.images || [] });
   } catch (err) {

@@ -105,9 +105,7 @@ function renderProducts() {
   }
 
   grid.innerHTML = paginated.map(product => {
-    const image = product.images?.[0]
-      ? `${API_BASE}/images/${product.images[0]}`
-      : '/lib/images/placeholder.jpg';
+const image = product.images?.[0] || '/lib/images/placeholder.jpg';
 
     const primaryTag = product.primary_category
       ? `<span class="tag tag-primary">${product.primary_category.name}</span>`
