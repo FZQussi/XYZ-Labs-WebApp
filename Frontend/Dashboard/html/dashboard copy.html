@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - XYZ Labs</title>
-  <link rel="stylesheet" href="../css/dashboard-brutalist.css">
-  <link rel="stylesheet" href="../css/products-modals.css">
+  <link rel="stylesheet" href="/Dashboard/css/dashboard-brutalist.css">
+  <link rel="stylesheet" href="/Dashboard/css/products-modals.css">
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
 <body>
@@ -28,6 +28,10 @@
       <button data-tab="products" class="nav-btn">
         <span class="nav-icon">📦</span>
         <span>Produtos</span>
+      </button>
+      <button data-tab="orders" class="nav-btn">
+        <span class="nav-icon">📋</span>
+        <span>Encomendas</span>
       </button>
       <button data-tab="priceCalculator" class="nav-btn">
         <span class="nav-icon">🧮</span>
@@ -318,6 +322,217 @@
         </div>
       </div>
     </section>
+    <!-- ============ SECÇÃO DE ENCOMENDAS ============ -->
+    <section id="orders" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">GESTÃO DE ENCOMENDAS</h2>
+        <div class="page-actions">
+          <button id="ordersRefreshBtn" class="btn-icon" title="Atualizar">🔄</button>
+        </div>
+      </header>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar" style="margin-bottom:24px">
+        <div class="stat-item">
+          <span class="stat-icon">📋</span>
+          <div>
+            <span class="stat-label">Total</span>
+            <span class="stat-value" id="ordersStatTotal">—</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⏳</span>
+          <div>
+            <span class="stat-label">Pendentes</span>
+            <span class="stat-value" id="ordersStatPending">—</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💶</span>
+          <div>
+            <span class="stat-label">Receita Total</span>
+            <span class="stat-value" id="ordersStatRevenue">—</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">📅</span>
+          <div>
+            <span class="stat-label">Este Mês</span>
+            <span class="stat-value" id="ordersStatMonth">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <input type="text" id="orderSearch" placeholder="Pesquisar por nome, email ou #id..." class="search-input">
+        <select id="orderStatusFilter" class="filter-select" style="min-width:160px;flex:0">
+          <option value="">Todos os estados</option>
+          <option value="pending">Pendente</option>
+          <option value="confirmed">Confirmado</option>
+          <option value="printing">Em Impressão</option>
+          <option value="shipped">Enviado</option>
+          <option value="delivered">Entregue</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+        <input type="date" id="orderDateFrom" class="filter-input" style="flex:0;min-width:140px" title="De">
+        <input type="date" id="orderDateTo" class="filter-input" style="flex:0;min-width:140px" title="Até">
+      </div>
+
+      <!-- TABELA DE ENCOMENDAS -->
+      <div class="data-table">
+        <div class="table-header orders-table-header">
+          <span>#ID</span>
+          <span>CLIENTE</span>
+          <span>DATA</span>
+          <span>ESTADO</span>
+          <span>TOTAL</span>
+          <span>TRACKING</span>
+          <span>AÇÕES</span>
+        </div>
+        <div id="ordersList" class="table-body">
+          <div class="orders-loading">A carregar encomendas...</div>
+        </div>
+      </div>
+
+      <!-- PAGINAÇÃO -->
+      <div id="ordersPagination" class="orders-pagination"></div>
+    </section>
+
+    <!-- ============ MODAL: GERIR ENCOMENDA ============ -->
+    <div id="orderModal" class="modal hidden">
+      <div class="modal-content modal-order">
+
+        <!-- HEADER DINÂMICO (muda de cor com o status) -->
+        <div class="modal-header order-modal-header" id="mModalHeader">
+          <div class="order-modal-header-left">
+            <span class="order-modal-id" id="mOrderId">#—</span>
+            <span class="order-modal-date" id="mOrderDate">—</span>
+            <span class="order-modal-status-label" id="mStatusLabel">—</span>
+          </div>
+          <button class="modal-close" id="orderModalClose">×</button>
+        </div>
+
+        <div class="order-modal-body">
+
+          <!-- COLUNA ESQUERDA: info + itens -->
+          <div class="order-modal-left">
+
+            <!-- CLIENTE -->
+            <div class="order-section">
+              <div class="order-section-title">👤 CLIENTE</div>
+              <div class="order-info-grid">
+                <div class="order-info-row">
+                  <span class="order-info-key">Nome</span>
+                  <span class="order-info-val" id="mCustomerName">—</span>
+                </div>
+                <div class="order-info-row">
+                  <span class="order-info-key">Email</span>
+                  <span class="order-info-val" id="mCustomerEmail">—</span>
+                </div>
+                <div class="order-info-row">
+                  <span class="order-info-key">Telefone</span>
+                  <span class="order-info-val" id="mCustomerPhone">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- MORADA -->
+            <div class="order-section">
+              <div class="order-section-title">📍 MORADA DE ENTREGA</div>
+              <div class="order-info-row">
+                <span class="order-info-val" id="mAddress">—</span>
+              </div>
+            </div>
+
+            <!-- NOTAS -->
+            <div class="order-section">
+              <div class="order-section-title">📝 NOTAS</div>
+              <div class="order-notes-box" id="mNotes">—</div>
+            </div>
+
+            <!-- ITENS DA ENCOMENDA -->
+            <div class="order-section">
+              <div class="order-section-title">📦 ITENS</div>
+              <div id="mItemsList" class="modal-items-list"></div>
+              <div class="modal-order-total">
+                <span>TOTAL</span>
+                <span id="mTotal">—</span>
+              </div>
+            </div>
+
+            <!-- HISTÓRICO DE STATUS -->
+            <div class="order-section">
+              <div class="order-section-title">🕒 HISTÓRICO</div>
+              <div id="mStatusHistory" class="status-history"></div>
+            </div>
+
+          </div>
+
+          <!-- COLUNA DIREITA: ações de gestão -->
+          <div class="order-modal-right">
+
+            <!-- ALTERAR ESTADO -->
+            <div class="order-section order-action-box">
+              <div class="order-section-title">⚙️ ALTERAR ESTADO</div>
+              <select id="mStatusSelect" class="order-status-select">
+                <option value="pending">⏳ Pendente</option>
+                <option value="confirmed">✅ Confirmado</option>
+                <option value="printing">🖨️ Em Impressão</option>
+                <option value="shipped">🚚 Enviado</option>
+                <option value="delivered">📬 Entregue</option>
+                <option value="cancelled">❌ Cancelado</option>
+              </select>
+              <div class="order-status-hint" id="mStatusHint"></div>
+            </div>
+
+            <!-- CÓDIGO DE ENVIO -->
+            <div class="order-section order-action-box" id="mTrackingSection">
+              <div class="order-section-title">🚚 ENVIO / TRACKING</div>
+              <div class="form-group" style="margin-bottom:12px">
+                <label>Transportadora</label>
+                <select id="mTrackingCarrier" class="order-carrier-select">
+                  <option value="">— Selecionar —</option>
+                  <option value="CTT">CTT</option>
+                  <option value="CTT Expresso">CTT Expresso</option>
+                  <option value="DHL">DHL</option>
+                  <option value="DPD">DPD</option>
+                  <option value="FedEx">FedEx</option>
+                  <option value="GLS">GLS</option>
+                  <option value="TNT">TNT</option>
+                  <option value="UPS">UPS</option>
+                  <option value="MRW">MRW</option>
+                  <option value="Nacex">Nacex</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label>Código de Rastreamento</label>
+                <input type="text" id="mTrackingCode" placeholder="Ex: CT123456789PT" class="order-tracking-input">
+              </div>
+              <div id="mTrackingLink" class="tracking-link-preview" style="display:none">
+                <a id="mTrackingLinkAnchor" href="#" target="_blank" rel="noopener">
+                  🔗 Rastrear envio →
+                </a>
+              </div>
+            </div>
+
+            <!-- GUARDAR -->
+            <button class="btn-primary order-save-btn" id="mSaveBtn">
+              💾 GUARDAR ALTERAÇÕES
+            </button>
+
+            <!-- AVISO ENVIO -->
+            <div class="order-ship-warning hidden" id="mShipWarning">
+              ⚠️ Para marcar como "Enviado" é necessário inserir o código de rastreamento.
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
       <section id="priceCalculator" class="tab hidden">
   <header class="page-header">
     <h2 class="page-title">🧮 CALCULADORA DE PREÇOS — IMPRESSÃO 3D</h2>
@@ -1131,16 +1346,17 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../scripts/security.js"></script>
-  <script src="../scripts/dashboard-stats.js"></script>
-  <script src="../scripts/dashboard.js"></script>
-  <script src="../scripts/users.js"></script>
-  <script src="../scripts/products.js"></script>
-  <script src="../scripts/categories.js"></script>
-  <script src="../scripts/createproduct.js"></script>
-  <script src="../scripts/editproduct.js"></script>
-  <script src="../scripts/viewproduct.js"></script>
-  <script src="../scripts/image-order-manager.js"></script>
-  <script src="../scripts/price-calculator.js"></script>
+  <script src="/Dashboard/scripts/security.js"></script>
+  <script src="/Dashboard/scripts/dashboard-stats.js"></script>
+  <script src="/Dashboard/scripts/dashboard.js"></script>
+  <script src="/Dashboard/scripts/users.js"></script>
+  <script src="/Dashboard/scripts/products.js"></script>
+  <script src="/Dashboard/scripts/categories.js"></script>
+  <script src="/Dashboard/scripts/createproduct.js"></script>
+  <script src="/Dashboard/scripts/editproduct.js"></script>
+  <script src="/Dashboard/scripts/viewproduct.js"></script>
+  <script src="/Dashboard/scripts/image-order-manager.js"></script>
+  <script src="/Dashboard/scripts/price-calculator.js"></script>
+  <script src="/Dashboard/scripts/orders.js"></script>
 </body>
 </html>

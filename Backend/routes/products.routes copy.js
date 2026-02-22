@@ -6,30 +6,45 @@ const controller = require('../controllers/products.controller');
 
 const router = express.Router();
 
-// === CATEGORIAS PRIMÁRIAS (ANTES de /:id para evitar conflito) ===
-router.get('/primary-categories',          controller.getPrimaryCategories);
-router.post('/primary-categories',         auth, admin, controller.createPrimaryCategory);
-router.put('/primary-categories/:catId',   auth, admin, controller.updatePrimaryCategory);
-router.delete('/primary-categories/:catId', auth, admin, controller.deletePrimaryCategory);
-
-// === CATEGORIAS SECUNDÁRIAS (ANTES de /:id para evitar conflito) ===
-router.get('/secondary-categories',          controller.getSecondaryCategories);
-router.post('/secondary-categories',         auth, admin, controller.createSecondaryCategory);
-router.put('/secondary-categories/:catId',   auth, admin, controller.updateSecondaryCategory);
-router.delete('/secondary-categories/:catId', auth, admin, controller.deleteSecondaryCategory);
-
-// === PRODUTOS ===
+// GET produtos
 router.get('/', controller.getProducts);
 router.get('/:id', controller.getProductById);
+
+// CREATE produto
 router.post('/', auth, admin, uploadModels.single('modelFile'), controller.createProduct);
+
+// UPDATE produto (dados + modelo 3D)
 router.put('/:id', auth, admin, uploadModels.single('modelFile'), controller.updateProduct);
+
+// DELETE produto
 router.delete('/:id', auth, admin, controller.deleteProduct);
 
 // === GESTÃO DE IMAGENS ===
+
+// GET imagens
 router.get('/:id/images', controller.getProductImages);
+// ⭐ REORDENAR imagens (ANTES do PUT genérico)
 router.put('/:id/images/reorder', auth, admin, controller.reorderProductImages);
+
+// ADICIONAR imagens (até 4 novas)
 router.post('/:id/images', auth, admin, uploadImages.array('images', 4), controller.uploadProductImages);
+
+// SUBSTITUIR todas as imagens
 router.put('/:id/images', auth, admin, uploadImages.array('images', 4), controller.replaceProductImages);
+
+// ELIMINAR uma imagem específica
 router.delete('/:id/images', auth, admin, controller.deleteProductImage);
+
+// === CATEGORIAS PRIMÁRIAS ===
+router.get('/primary-categories',          controller.getPrimaryCategories);
+router.post('/primary-categories',         auth, admin, controller.createPrimaryCategory);
+router.put('/primary-categories/:id',      auth, admin, controller.updatePrimaryCategory);
+router.delete('/primary-categories/:id',   auth, admin, controller.deletePrimaryCategory);
+
+// === CATEGORIAS SECUNDÁRIAS ===
+router.get('/secondary-categories',        controller.getSecondaryCategories);
+router.post('/secondary-categories',       auth, admin, controller.createSecondaryCategory);
+router.put('/secondary-categories/:id',    auth, admin, controller.updateSecondaryCategory);
+router.delete('/secondary-categories/:id', auth, admin, controller.deleteSecondaryCategory);
 
 module.exports = router;

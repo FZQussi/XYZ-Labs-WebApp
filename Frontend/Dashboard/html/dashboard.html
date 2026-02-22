@@ -7,6 +7,182 @@
   <link rel="stylesheet" href="/Dashboard/css/dashboard-brutalist.css">
   <link rel="stylesheet" href="/Dashboard/css/products-modals.css">
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    /* ===== RICH TEXT EDITOR ===== */
+    .rich-editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px;
+      background: #f5f5f5;
+      border: 2px solid #000;
+      border-bottom: none;
+    }
+    .rich-editor-toolbar button {
+      padding: 4px 10px;
+      background: #fff;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .rich-editor-toolbar button:hover { background: #000; color: #fff; }
+    .rich-editor-toolbar .separator { width: 1px; background: #ccc; margin: 0 4px; }
+    .rich-editor-content {
+      min-height: 180px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 12px;
+      border: 2px solid #000;
+      font-size: 14px;
+      line-height: 1.6;
+      outline: none;
+      background: #fff;
+    }
+    .rich-editor-content:focus { border-color: #2563eb; }
+    .rich-editor-content h2 { font-size: 1.3em; margin: 8px 0 4px; }
+    .rich-editor-content h3 { font-size: 1.1em; margin: 8px 0 4px; }
+    .rich-editor-content ul, .rich-editor-content ol { padding-left: 24px; margin: 6px 0; }
+    .rich-editor-content blockquote {
+      border-left: 4px solid #2563eb;
+      margin: 8px 0;
+      padding: 6px 12px;
+      background: #eff6ff;
+      font-style: italic;
+    }
+    .rich-editor-preview {
+      border: 2px solid #e5e7eb;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 13px;
+      background: #fafafa;
+      line-height: 1.6;
+    }
+    .rich-editor-preview h2 { font-size: 1.2em; margin: 6px 0; }
+    .rich-editor-preview h3 { font-size: 1.05em; margin: 5px 0; }
+    .rich-editor-preview blockquote {
+      border-left: 4px solid #2563eb;
+      padding: 4px 12px;
+      margin: 6px 0;
+      background: #eff6ff;
+      font-style: italic;
+    }
+
+    /* ===== CATEGORY SELECTORS ===== */
+    .primary-cat-select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      background: #fff;
+      cursor: pointer;
+    }
+    .primary-cat-select:focus { border-color: #2563eb; outline: none; }
+
+    .secondary-cats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sec-cat-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .sec-cat-checkbox input { display: none; }
+    .sec-cat-badge {
+      padding: 5px 12px;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.1s;
+      user-select: none;
+    }
+    .sec-cat-checkbox input:checked + .sec-cat-badge {
+      background: #000;
+      color: #fff;
+    }
+    .sec-cat-badge.role-tag { border-style: dashed; }
+
+    /* ===== CATEGORIES TAB ===== */
+    .categories-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 900px) { .categories-layout { grid-template-columns: 1fr; } }
+    .cat-section-card {
+      border: 3px solid #000;
+      background: #fff;
+      box-shadow: 4px 4px 0 #000;
+    }
+    .cat-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .category-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #eee;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+    .category-row:last-child { border-bottom: none; }
+    .cat-icon { font-size: 20px; min-width: 28px; text-align: center; }
+    .cat-name { font-weight: bold; flex: 1; }
+    .cat-desc { color: #666; font-size: 12px; flex: 2; }
+    .cat-order { color: #aaa; font-size: 11px; min-width: 32px; }
+    .cat-actions { display: flex; gap: 6px; }
+    .cat-role-badge {
+      padding: 3px 8px;
+      border: 2px solid #000;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .role-tag { border-style: dashed; background: #fefce8; }
+    .role-secondary { background: #eff6ff; }
+
+    /* Description render in view modal */
+    .desc-rendered { line-height: 1.7; font-size: 14px; }
+    .desc-rendered h2 { font-size: 1.2em; margin: 8px 0 4px; }
+    .desc-rendered h3 { font-size: 1.05em; margin: 6px 0 3px; }
+    .desc-rendered blockquote {
+      border-left: 4px solid #2563eb;
+      padding: 4px 12px;
+      margin: 8px 0;
+      background: #eff6ff;
+      font-style: italic;
+    }
+    .desc-rendered ul, .desc-rendered ol { padding-left: 22px; margin: 6px 0; }
+
+    /* Secondary cats in view */
+    .sec-cats-view { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .sec-cats-view .sec-cat-badge {
+      padding: 3px 10px;
+      font-size: 12px;
+      background: #f5f5f5;
+    }
+  </style>
 </head>
 <body>
   <!-- SIDEBAR -->
@@ -28,6 +204,10 @@
       <button data-tab="products" class="nav-btn">
         <span class="nav-icon">📦</span>
         <span>Produtos</span>
+      </button>
+      <button data-tab="categories" class="nav-btn">
+        <span class="nav-icon">📂</span>
+        <span>Categorias</span>
       </button>
       <button data-tab="orders" class="nav-btn">
         <span class="nav-icon">📋</span>
@@ -56,7 +236,7 @@
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
-    
+
     <!-- ============ DASHBOARD PRINCIPAL ============ -->
     <section id="dashboard" class="tab">
       <header class="page-header">
@@ -67,189 +247,72 @@
         </div>
       </header>
 
-      <!-- ESTATÍSTICAS PRINCIPAIS -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-icon">📦</span>
-            <span class="stat-trend" id="productsTrend">—</span>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-value" id="totalProducts">0</h3>
-            <p class="stat-label">Total Produtos</p>
-          </div>
-          <div class="stat-footer">
-            <span id="activeProducts">0</span> ativos
-          </div>
+          <div class="stat-header"><span class="stat-icon">📦</span><span class="stat-trend" id="productsTrend">—</span></div>
+          <div class="stat-body"><h3 class="stat-value" id="totalProducts">0</h3><p class="stat-label">Total Produtos</p></div>
+          <div class="stat-footer"><span id="activeProducts">0</span> ativos</div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-icon">👥</span>
-            <span class="stat-trend" id="usersTrend">—</span>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-value" id="totalUsersStats">0</h3>
-            <p class="stat-label">Utilizadores</p>
-          </div>
-          <div class="stat-footer">
-            <span id="newUsersStats">0</span> novos (30d)
-          </div>
+          <div class="stat-header"><span class="stat-icon">👥</span><span class="stat-trend" id="usersTrend">—</span></div>
+          <div class="stat-body"><h3 class="stat-value" id="totalUsersStats">0</h3><p class="stat-label">Utilizadores</p></div>
+          <div class="stat-footer"><span id="newUsersStats">0</span> novos (30d)</div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-icon">📂</span>
-            <span class="stat-trend">—</span>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-value" id="totalCategories">0</h3>
-            <p class="stat-label">Categorias</p>
-          </div>
-          <div class="stat-footer">
-            Sistema de categorização
-          </div>
+          <div class="stat-header"><span class="stat-icon">📂</span><span class="stat-trend">—</span></div>
+          <div class="stat-body"><h3 class="stat-value" id="totalCategories">0</h3><p class="stat-label">Categorias</p></div>
+          <div class="stat-footer">Sistema de categorização</div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-header">
-            <span class="stat-icon">🔐</span>
-            <span class="stat-trend stat-positive">✓</span>
-          </div>
-          <div class="stat-body">
-            <h3 class="stat-value">ATIVO</h3>
-            <p class="stat-label">Segurança</p>
-          </div>
-          <div class="stat-footer">
-            Sessão segura
-          </div>
+          <div class="stat-header"><span class="stat-icon">🔐</span><span class="stat-trend stat-positive">✓</span></div>
+          <div class="stat-body"><h3 class="stat-value">ATIVO</h3><p class="stat-label">Segurança</p></div>
+          <div class="stat-footer">Sessão segura</div>
         </div>
       </div>
 
-      <!-- GRÁFICOS E ATIVIDADE -->
       <div class="dashboard-grid">
-        
-        <!-- ATIVIDADE RECENTE -->
         <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">ATIVIDADE RECENTE</h3>
-            <button class="btn-card-action">Ver tudo</button>
-          </div>
-          <div class="card-body">
-            <div id="recentActivity" class="activity-list">
-              <div class="activity-item">
-                <div class="activity-icon">⏳</div>
-                <div class="activity-details">
-                  <p class="activity-text">A carregar atividades...</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="card-header"><h3 class="card-title">ATIVIDADE RECENTE</h3><button class="btn-card-action">Ver tudo</button></div>
+          <div class="card-body"><div id="recentActivity" class="activity-list"><div class="activity-item"><div class="activity-icon">⏳</div><div class="activity-details"><p class="activity-text">A carregar atividades...</p></div></div></div></div>
         </div>
-
-        <!-- PRODUTOS RECENTES -->
         <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">PRODUTOS RECENTES</h3>
-            <button class="btn-card-action">Gerir</button>
-          </div>
-          <div class="card-body">
-            <div id="recentProducts" class="products-preview">
-              <div class="loading-state">A carregar produtos...</div>
-            </div>
-          </div>
+          <div class="card-header"><h3 class="card-title">PRODUTOS RECENTES</h3><button class="btn-card-action">Gerir</button></div>
+          <div class="card-body"><div id="recentProducts" class="products-preview"><div class="loading-state">A carregar produtos...</div></div></div>
         </div>
-
-        <!-- ESTATÍSTICAS DE STOCK -->
         <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">STOCK</h3>
-          </div>
+          <div class="card-header"><h3 class="card-title">STOCK</h3></div>
           <div class="card-body">
             <div class="stock-stats">
-              <div class="stock-item">
-                <span class="stock-label">Disponível</span>
-                <span class="stock-value stock-available" id="stockAvailable">0</span>
-              </div>
-              <div class="stock-item">
-                <span class="stock-label">Indisponível</span>
-                <span class="stock-value stock-unavailable" id="stockUnavailable">0</span>
-              </div>
-              <div class="stock-progress">
-                <div class="stock-bar" id="stockBar" style="width: 0%"></div>
-              </div>
+              <div class="stock-item"><span class="stock-label">Disponível</span><span class="stock-value stock-available" id="stockAvailable">0</span></div>
+              <div class="stock-item"><span class="stock-label">Indisponível</span><span class="stock-value stock-unavailable" id="stockUnavailable">0</span></div>
+              <div class="stock-progress"><div class="stock-bar" id="stockBar" style="width: 0%"></div></div>
             </div>
           </div>
         </div>
-
-        <!-- QUICK ACTIONS -->
         <div class="dashboard-card">
-          <div class="card-header">
-            <h3 class="card-title">AÇÕES RÁPIDAS</h3>
-          </div>
+          <div class="card-header"><h3 class="card-title">AÇÕES RÁPIDAS</h3></div>
           <div class="card-body">
             <div class="quick-actions">
-              <button class="quick-action-btn" data-action="add-product">
-                <span class="action-icon">➕</span>
-                <span class="action-label">Novo Produto</span>
-              </button>
-              <button class="quick-action-btn" data-action="add-user">
-                <span class="action-icon">👤</span>
-                <span class="action-label">Novo Utilizador</span>
-              </button>
-              <button class="quick-action-btn" data-action="view-products">
-                <span class="action-icon">📦</span>
-                <span class="action-label">Ver Produtos</span>
-              </button>
-              <button class="quick-action-btn" data-action="view-users">
-                <span class="action-icon">👥</span>
-                <span class="action-label">Ver Utilizadores</span>
-              </button>
+              <button class="quick-action-btn" data-action="add-product"><span class="action-icon">➕</span><span class="action-label">Novo Produto</span></button>
+              <button class="quick-action-btn" data-action="add-user"><span class="action-icon">👤</span><span class="action-label">Novo Utilizador</span></button>
+              <button class="quick-action-btn" data-action="view-products"><span class="action-icon">📦</span><span class="action-label">Ver Produtos</span></button>
+              <button class="quick-action-btn" data-action="view-users"><span class="action-icon">👥</span><span class="action-label">Ver Utilizadores</span></button>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- SISTEMA DE ALERTAS -->
-      <div class="alerts-section" id="dashboardAlerts">
-        <!-- Alertas dinâmicos aparecerão aqui -->
-      </div>
-
+      <div class="alerts-section" id="dashboardAlerts"></div>
     </section>
 
-    <!-- ============ SECÇÃO DE UTILIZADORES ============ -->
+    <!-- ============ UTILIZADORES ============ -->
     <section id="users" class="tab hidden">
-      <header class="page-header">
-        <h2 class="page-title">GESTÃO DE UTILIZADORES</h2>
-      </header>
-
-      <!-- ESTATÍSTICAS DE UTILIZADORES -->
+      <header class="page-header"><h2 class="page-title">GESTÃO DE UTILIZADORES</h2></header>
       <div class="stats-bar">
-        <div class="stat-item">
-          <span class="stat-icon">👥</span>
-          <div>
-            <span class="stat-label">Total</span>
-            <span class="stat-value" id="totalUsers">0</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">👑</span>
-          <div>
-            <span class="stat-label">Admins</span>
-            <span class="stat-value" id="totalAdmins">0</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">📅</span>
-          <div>
-            <span class="stat-label">Novos (30d)</span>
-            <span class="stat-value" id="newUsers">0</span>
-          </div>
-        </div>
+        <div class="stat-item"><span class="stat-icon">👥</span><div><span class="stat-label">Total</span><span class="stat-value" id="totalUsers">0</span></div></div>
+        <div class="stat-item"><span class="stat-icon">👑</span><div><span class="stat-label">Admins</span><span class="stat-value" id="totalAdmins">0</span></div></div>
+        <div class="stat-item"><span class="stat-icon">📅</span><div><span class="stat-label">Novos (30d)</span><span class="stat-value" id="newUsers">0</span></div></div>
       </div>
-
-      <!-- TOOLBAR -->
       <div class="toolbar">
         <input type="text" id="userSearch" placeholder="Pesquisar por nome ou email..." class="search-input">
         <select id="userFilterRole" class="filter-select">
@@ -257,34 +320,17 @@
           <option value="admin">Admin</option>
           <option value="user">User</option>
         </select>
-        <button id="addUserBtn" class="btn-primary">
-          <span>➕</span>
-          <span>NOVO UTILIZADOR</span>
-        </button>
+        <button id="addUserBtn" class="btn-primary"><span>➕</span><span>NOVO UTILIZADOR</span></button>
       </div>
-
-      <!-- TABELA -->
       <div class="data-table">
-        <div class="table-header">
-          <span>NOME</span>
-          <span>EMAIL</span>
-          <span>ROLE</span>
-          <span>DATA REGISTO</span>
-          <span>AÇÕES</span>
-        </div>
-        <div id="usersList" class="table-body">
-          <!-- Carregado via JS -->
-        </div>
+        <div class="table-header"><span>NOME</span><span>EMAIL</span><span>ROLE</span><span>DATA REGISTO</span><span>AÇÕES</span></div>
+        <div id="usersList" class="table-body"></div>
       </div>
     </section>
 
-    <!-- ============ SECÇÃO DE PRODUTOS ============ -->
+    <!-- ============ PRODUTOS ============ -->
     <section id="products" class="tab hidden">
-      <header class="page-header">
-        <h2 class="page-title">GESTÃO DE PRODUTOS</h2>
-      </header>
-
-      <!-- TOOLBAR -->
+      <header class="page-header"><h2 class="page-title">GESTÃO DE PRODUTOS</h2></header>
       <div class="toolbar">
         <input type="text" id="productSearch" placeholder="Pesquisar produto..." class="search-input">
         <select id="productFilterActive" class="filter-select">
@@ -299,71 +345,66 @@
           <option value="true">Disponível</option>
           <option value="false">Indisponível</option>
         </select>
-        <input type="text" id="productFilterCategory" placeholder="Categoria..." class="filter-input">
-        <input type="text" id="productFilterPrimaryCategory" placeholder="Categoria principal..." class="filter-input">
-        <button id="addProductBtn" class="btn-primary">
-          <span>➕</span>
-          <span>NOVO PRODUTO</span>
-        </button>
+        <input type="text" id="productFilterCategory" placeholder="Categoria principal..." class="filter-input">
+        <button id="addProductBtn" class="btn-primary"><span>➕</span><span>NOVO PRODUTO</span></button>
       </div>
-
-      <!-- TABELA -->
       <div class="data-table">
-        <div class="table-header">
-          <span>NOME</span>
-          <span>PREÇO</span>
-          <span>STOCK</span>
-          <span>CATEGORIAS</span>
-          <span>ESTADO</span>
-          <span>AÇÕES</span>
-        </div>
-        <div id="productsList" class="table-body">
-          <!-- Carregado via JS -->
-        </div>
+        <div class="table-header"><span>NOME</span><span>PREÇO</span><span>STOCK</span><span>CAT. PRINCIPAL</span><span>ESTADO</span><span>AÇÕES</span></div>
+        <div id="productsList" class="table-body"></div>
       </div>
     </section>
-    <!-- ============ SECÇÃO DE ENCOMENDAS ============ -->
+
+    <!-- ============ CATEGORIAS ============ -->
+    <section id="categories" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">GESTÃO DE CATEGORIAS</h2>
+      </header>
+
+      <div class="categories-layout">
+
+        <!-- CATEGORIAS PRIMÁRIAS -->
+        <div class="cat-section-card">
+          <div class="cat-section-header">
+            <span>🎯 CATEGORIAS PRINCIPAIS</span>
+            <button id="addPrimaryCategoryBtn" class="btn-primary" style="font-size:12px;padding:6px 12px;">➕ Nova</button>
+          </div>
+          <div style="padding: 8px 0; font-family: 'Courier New', monospace; font-size: 12px; color: #666; padding: 8px 16px; border-bottom: 1px solid #eee;">
+            Cada produto <strong>deve ter exatamente uma</strong> categoria principal.
+          </div>
+          <div id="primaryCategoriesList" style="min-height:80px;">
+            <div class="loading-state" style="padding:16px">⏳ A carregar...</div>
+          </div>
+        </div>
+
+        <!-- CATEGORIAS SECUNDÁRIAS -->
+        <div class="cat-section-card">
+          <div class="cat-section-header">
+            <span>🏷️ CATEGORIAS SECUNDÁRIAS / TAGS</span>
+            <button id="addSecondaryCategoryBtn" class="btn-primary" style="font-size:12px;padding:6px 12px;">➕ Nova</button>
+          </div>
+          <div style="padding: 8px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #666; border-bottom: 1px solid #eee;">
+            Podem ser <strong>materiais, tags</strong> ou qualquer atributo adicional.
+          </div>
+          <div id="secondaryCategoriesList" style="min-height:80px;">
+            <div class="loading-state" style="padding:16px">⏳ A carregar...</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ ENCOMENDAS ============ -->
     <section id="orders" class="tab hidden">
       <header class="page-header">
         <h2 class="page-title">GESTÃO DE ENCOMENDAS</h2>
-        <div class="page-actions">
-          <button id="ordersRefreshBtn" class="btn-icon" title="Atualizar">🔄</button>
-        </div>
+        <div class="page-actions"><button id="ordersRefreshBtn" class="btn-icon" title="Atualizar">🔄</button></div>
       </header>
-
-      <!-- STATS BAR -->
       <div class="stats-bar" style="margin-bottom:24px">
-        <div class="stat-item">
-          <span class="stat-icon">📋</span>
-          <div>
-            <span class="stat-label">Total</span>
-            <span class="stat-value" id="ordersStatTotal">—</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">⏳</span>
-          <div>
-            <span class="stat-label">Pendentes</span>
-            <span class="stat-value" id="ordersStatPending">—</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">💶</span>
-          <div>
-            <span class="stat-label">Receita Total</span>
-            <span class="stat-value" id="ordersStatRevenue">—</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">📅</span>
-          <div>
-            <span class="stat-label">Este Mês</span>
-            <span class="stat-value" id="ordersStatMonth">—</span>
-          </div>
-        </div>
+        <div class="stat-item"><span class="stat-icon">📋</span><div><span class="stat-label">Total</span><span class="stat-value" id="ordersStatTotal">—</span></div></div>
+        <div class="stat-item"><span class="stat-icon">⏳</span><div><span class="stat-label">Pendentes</span><span class="stat-value" id="ordersStatPending">—</span></div></div>
+        <div class="stat-item"><span class="stat-icon">💶</span><div><span class="stat-label">Receita Total</span><span class="stat-value" id="ordersStatRevenue">—</span></div></div>
+        <div class="stat-item"><span class="stat-icon">📅</span><div><span class="stat-label">Este Mês</span><span class="stat-value" id="ordersStatMonth">—</span></div></div>
       </div>
-
-      <!-- TOOLBAR -->
       <div class="toolbar">
         <input type="text" id="orderSearch" placeholder="Pesquisar por nome, email ou #id..." class="search-input">
         <select id="orderStatusFilter" class="filter-select" style="min-width:160px;flex:0">
@@ -378,162 +419,17 @@
         <input type="date" id="orderDateFrom" class="filter-input" style="flex:0;min-width:140px" title="De">
         <input type="date" id="orderDateTo" class="filter-input" style="flex:0;min-width:140px" title="Até">
       </div>
-
-      <!-- TABELA DE ENCOMENDAS -->
       <div class="data-table">
         <div class="table-header orders-table-header">
-          <span>#ID</span>
-          <span>CLIENTE</span>
-          <span>DATA</span>
-          <span>ESTADO</span>
-          <span>TOTAL</span>
-          <span>TRACKING</span>
-          <span>AÇÕES</span>
+          <span>#ID</span><span>CLIENTE</span><span>DATA</span><span>ESTADO</span><span>TOTAL</span><span>TRACKING</span><span>AÇÕES</span>
         </div>
-        <div id="ordersList" class="table-body">
-          <div class="orders-loading">A carregar encomendas...</div>
-        </div>
+        <div id="ordersList" class="table-body"><div class="orders-loading">A carregar encomendas...</div></div>
       </div>
-
-      <!-- PAGINAÇÃO -->
       <div id="ordersPagination" class="orders-pagination"></div>
     </section>
 
-    <!-- ============ MODAL: GERIR ENCOMENDA ============ -->
-    <div id="orderModal" class="modal hidden">
-      <div class="modal-content modal-order">
-
-        <!-- HEADER DINÂMICO (muda de cor com o status) -->
-        <div class="modal-header order-modal-header" id="mModalHeader">
-          <div class="order-modal-header-left">
-            <span class="order-modal-id" id="mOrderId">#—</span>
-            <span class="order-modal-date" id="mOrderDate">—</span>
-            <span class="order-modal-status-label" id="mStatusLabel">—</span>
-          </div>
-          <button class="modal-close" id="orderModalClose">×</button>
-        </div>
-
-        <div class="order-modal-body">
-
-          <!-- COLUNA ESQUERDA: info + itens -->
-          <div class="order-modal-left">
-
-            <!-- CLIENTE -->
-            <div class="order-section">
-              <div class="order-section-title">👤 CLIENTE</div>
-              <div class="order-info-grid">
-                <div class="order-info-row">
-                  <span class="order-info-key">Nome</span>
-                  <span class="order-info-val" id="mCustomerName">—</span>
-                </div>
-                <div class="order-info-row">
-                  <span class="order-info-key">Email</span>
-                  <span class="order-info-val" id="mCustomerEmail">—</span>
-                </div>
-                <div class="order-info-row">
-                  <span class="order-info-key">Telefone</span>
-                  <span class="order-info-val" id="mCustomerPhone">—</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- MORADA -->
-            <div class="order-section">
-              <div class="order-section-title">📍 MORADA DE ENTREGA</div>
-              <div class="order-info-row">
-                <span class="order-info-val" id="mAddress">—</span>
-              </div>
-            </div>
-
-            <!-- NOTAS -->
-            <div class="order-section">
-              <div class="order-section-title">📝 NOTAS</div>
-              <div class="order-notes-box" id="mNotes">—</div>
-            </div>
-
-            <!-- ITENS DA ENCOMENDA -->
-            <div class="order-section">
-              <div class="order-section-title">📦 ITENS</div>
-              <div id="mItemsList" class="modal-items-list"></div>
-              <div class="modal-order-total">
-                <span>TOTAL</span>
-                <span id="mTotal">—</span>
-              </div>
-            </div>
-
-            <!-- HISTÓRICO DE STATUS -->
-            <div class="order-section">
-              <div class="order-section-title">🕒 HISTÓRICO</div>
-              <div id="mStatusHistory" class="status-history"></div>
-            </div>
-
-          </div>
-
-          <!-- COLUNA DIREITA: ações de gestão -->
-          <div class="order-modal-right">
-
-            <!-- ALTERAR ESTADO -->
-            <div class="order-section order-action-box">
-              <div class="order-section-title">⚙️ ALTERAR ESTADO</div>
-              <select id="mStatusSelect" class="order-status-select">
-                <option value="pending">⏳ Pendente</option>
-                <option value="confirmed">✅ Confirmado</option>
-                <option value="printing">🖨️ Em Impressão</option>
-                <option value="shipped">🚚 Enviado</option>
-                <option value="delivered">📬 Entregue</option>
-                <option value="cancelled">❌ Cancelado</option>
-              </select>
-              <div class="order-status-hint" id="mStatusHint"></div>
-            </div>
-
-            <!-- CÓDIGO DE ENVIO -->
-            <div class="order-section order-action-box" id="mTrackingSection">
-              <div class="order-section-title">🚚 ENVIO / TRACKING</div>
-              <div class="form-group" style="margin-bottom:12px">
-                <label>Transportadora</label>
-                <select id="mTrackingCarrier" class="order-carrier-select">
-                  <option value="">— Selecionar —</option>
-                  <option value="CTT">CTT</option>
-                  <option value="CTT Expresso">CTT Expresso</option>
-                  <option value="DHL">DHL</option>
-                  <option value="DPD">DPD</option>
-                  <option value="FedEx">FedEx</option>
-                  <option value="GLS">GLS</option>
-                  <option value="TNT">TNT</option>
-                  <option value="UPS">UPS</option>
-                  <option value="MRW">MRW</option>
-                  <option value="Nacex">Nacex</option>
-                  <option value="Outro">Outro</option>
-                </select>
-              </div>
-              <div class="form-group" style="margin-bottom:0">
-                <label>Código de Rastreamento</label>
-                <input type="text" id="mTrackingCode" placeholder="Ex: CT123456789PT" class="order-tracking-input">
-              </div>
-              <div id="mTrackingLink" class="tracking-link-preview" style="display:none">
-                <a id="mTrackingLinkAnchor" href="#" target="_blank" rel="noopener">
-                  🔗 Rastrear envio →
-                </a>
-              </div>
-            </div>
-
-            <!-- GUARDAR -->
-            <button class="btn-primary order-save-btn" id="mSaveBtn">
-              💾 GUARDAR ALTERAÇÕES
-            </button>
-
-            <!-- AVISO ENVIO -->
-            <div class="order-ship-warning hidden" id="mShipWarning">
-              ⚠️ Para marcar como "Enviado" é necessário inserir o código de rastreamento.
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-      <section id="priceCalculator" class="tab hidden">
+    <!-- ============ CALCULADORA ============ -->
+  <section id="priceCalculator" class="tab hidden">
   <header class="page-header">
     <h2 class="page-title">🧮 CALCULADORA DE PREÇOS — IMPRESSÃO 3D</h2>
     <div class="page-actions">
@@ -904,77 +800,103 @@
   </div><!-- /calc-layout -->
 </section>
 
+
   </main>
 
-  <!-- ============================================
+  <!-- =========================================================
+       MODAIS DE ENCOMENDAS
+       ========================================================= -->
+  <div id="orderModal" class="modal hidden">
+    <div class="modal-content modal-order">
+      <div class="modal-header order-modal-header" id="mModalHeader">
+        <div class="order-modal-header-left">
+          <span class="order-modal-id" id="mOrderId">#—</span>
+          <span class="order-modal-date" id="mOrderDate">—</span>
+          <span class="order-modal-status-label" id="mStatusLabel">—</span>
+        </div>
+        <button class="modal-close" id="orderModalClose">×</button>
+      </div>
+      <div class="order-modal-body">
+        <div class="order-modal-left">
+          <div class="order-section"><h4 class="order-section-title">👤 CLIENTE</h4><div id="mClientInfo"></div></div>
+          <div class="order-section"><h4 class="order-section-title">📦 ITENS</h4><div id="mItemsList"></div></div>
+        </div>
+        <div class="order-modal-right">
+          <div class="order-section">
+            <h4 class="order-section-title">⚙️ GERIR ENCOMENDA</h4>
+            <div class="form-group">
+              <label>Estado</label>
+              <select id="mStatus" class="order-status-select">
+                <option value="pending">⏳ Pendente</option>
+                <option value="confirmed">✅ Confirmado</option>
+                <option value="printing">🖨️ Em Impressão</option>
+                <option value="shipped">📦 Enviado</option>
+                <option value="delivered">🏠 Entregue</option>
+                <option value="cancelled">❌ Cancelado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Transportadora</label>
+              <select id="mCarrier">
+                <option value="">-- Selecionar --</option>
+                <option value="CTT">CTT</option><option value="DHL">DHL</option>
+                <option value="DPD">DPD</option><option value="FedEx">FedEx</option>
+                <option value="GLS">GLS</option><option value="UPS">UPS</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Código de Rastreamento</label>
+              <input type="text" id="mTrackingCode" placeholder="Ex: CT123456789PT" class="order-tracking-input">
+            </div>
+            <div id="mTrackingLink" class="tracking-link-preview" style="display:none">
+              <a id="mTrackingLinkAnchor" href="#" target="_blank" rel="noopener">🔗 Rastrear envio →</a>
+            </div>
+          </div>
+          <button class="btn-primary order-save-btn" id="mSaveBtn">💾 GUARDAR ALTERAÇÕES</button>
+          <div class="order-ship-warning hidden" id="mShipWarning">
+            ⚠️ Para marcar como "Enviado" é necessário inserir o código de rastreamento.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
        MODAIS DE UTILIZADORES
-       ============================================ -->
-  
-  <!-- Modal: Criar Utilizador -->
+       ========================================================= -->
   <div id="createUserModal" class="modal hidden">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3>CRIAR NOVO UTILIZADOR</h3>
-        <button class="modal-close" data-close="createUser">×</button>
-      </div>
+      <div class="modal-header"><h3>CRIAR UTILIZADOR</h3><button class="modal-close" data-close="createUser">×</button></div>
       <form id="createUserForm" class="modal-form">
+        <div class="form-group"><label>Nome *</label><input type="text" id="createUserName" required></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="createUserEmail" required></div>
         <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="createUserName" required>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="createUserEmail" required>
+          <label>Role *</label>
+          <select id="createUserRole" required><option value="user">User</option><option value="admin">Admin</option></select>
         </div>
         <div class="form-group">
           <label>Password *</label>
           <input type="password" id="createUserPassword" required>
           <ul class="password-reqs">
-            <li id="createLengthReq">≥ 12 caracteres</li>
-            <li id="createUppercaseReq">Uma letra maiúscula</li>
-            <li id="createLowercaseReq">Uma letra minúscula</li>
-            <li id="createNumberReq">Um número</li>
+            <li id="createLengthReq">≥ 12 caracteres</li><li id="createUppercaseReq">Uma letra maiúscula</li>
+            <li id="createLowercaseReq">Uma letra minúscula</li><li id="createNumberReq">Um número</li>
             <li id="createSpecialReq">Um carácter especial</li>
           </ul>
-        </div>
-        <div class="form-group">
-          <label>Role *</label>
-          <select id="createUserRole" required>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
         </div>
         <button type="submit" class="btn-primary">CRIAR UTILIZADOR</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Ver Utilizador -->
   <div id="viewUserModal" class="modal hidden">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3>DETALHES DO UTILIZADOR</h3>
-        <button class="modal-close" data-close="viewUser">×</button>
-      </div>
+      <div class="modal-header"><h3>DETALHES DO UTILIZADOR</h3><button class="modal-close" data-close="viewUser">×</button></div>
       <div class="user-details">
-        <div class="detail-row">
-          <span class="detail-label">Nome:</span>
-          <span class="detail-value" id="viewUserName"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Email:</span>
-          <span class="detail-value" id="viewUserEmail"></span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Role:</span>
-          <span class="detail-value">
-            <span id="viewUserRole" class="role-badge"></span>
-          </span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Registado em:</span>
-          <span class="detail-value" id="viewUserCreated"></span>
-        </div>
+        <div class="detail-row"><span class="detail-label">Nome:</span><span class="detail-value" id="viewUserName"></span></div>
+        <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value" id="viewUserEmail"></span></div>
+        <div class="detail-row"><span class="detail-label">Role:</span><span class="detail-value"><span id="viewUserRole" class="role-badge"></span></span></div>
+        <div class="detail-row"><span class="detail-label">Registado em:</span><span class="detail-value" id="viewUserCreated"></span></div>
       </div>
       <div class="modal-actions">
         <button id="editUserFromViewBtn" class="btn-primary">✏️ EDITAR</button>
@@ -983,38 +905,23 @@
     </div>
   </div>
 
-  <!-- Modal: Editar Utilizador -->
   <div id="editUserModal" class="modal hidden">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3>EDITAR UTILIZADOR</h3>
-        <button class="modal-close" data-close="editUser">×</button>
-      </div>
+      <div class="modal-header"><h3>EDITAR UTILIZADOR</h3><button class="modal-close" data-close="editUser">×</button></div>
       <form id="editUserForm" class="modal-form">
         <input type="hidden" id="editUserId">
-        <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="editUserName" required>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="editUserEmail" required>
-        </div>
+        <div class="form-group"><label>Nome *</label><input type="text" id="editUserName" required></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="editUserEmail" required></div>
         <div class="form-group">
           <label>Role *</label>
-          <select id="editUserRole" required>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
+          <select id="editUserRole" required><option value="user">User</option><option value="admin">Admin</option></select>
         </div>
         <div class="form-group">
           <label>Nova Password (deixar vazio para não alterar)</label>
           <input type="password" id="editUserPassword" placeholder="********">
           <ul class="password-reqs">
-            <li id="editLengthReq">≥ 12 caracteres</li>
-            <li id="editUppercaseReq">Uma letra maiúscula</li>
-            <li id="editLowercaseReq">Uma letra minúscula</li>
-            <li id="editNumberReq">Um número</li>
+            <li id="editLengthReq">≥ 12 caracteres</li><li id="editUppercaseReq">Uma letra maiúscula</li>
+            <li id="editLowercaseReq">Uma letra minúscula</li><li id="editNumberReq">Um número</li>
             <li id="editSpecialReq">Um carácter especial</li>
           </ul>
         </div>
@@ -1023,9 +930,80 @@
     </div>
   </div>
 
-  <!-- ============================================
+  <!-- =========================================================
+       MODAIS DE CATEGORIAS
+       ========================================================= -->
+
+  <!-- Modal: Categoria Principal -->
+  <div id="primaryCategoryModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="primaryCatModalTitle">NOVA CATEGORIA PRINCIPAL</h3>
+        <button class="modal-close" data-close="primaryCat">×</button>
+      </div>
+      <form id="primaryCategoryForm" class="modal-form">
+        <input type="hidden" id="primaryCatId">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="primaryCatName" required placeholder="Ex: Decoração">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="primaryCatDesc" rows="2" placeholder="Descrição breve desta categoria"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ícone (emoji)</label>
+            <input type="text" id="primaryCatIcon" placeholder="Ex: 🏺" style="font-size:20px">
+          </div>
+          <div class="form-group">
+            <label>Ordem de exibição</label>
+            <input type="number" id="primaryCatOrder" value="0" min="0">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">💾 GUARDAR</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Categoria Secundária -->
+  <div id="secondaryCategoryModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="secondaryCatModalTitle">NOVA CATEGORIA SECUNDÁRIA</h3>
+        <button class="modal-close" data-close="secondaryCat">×</button>
+      </div>
+      <form id="secondaryCategoryForm" class="modal-form">
+        <input type="hidden" id="secondaryCatId">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="secondaryCatName" required placeholder="Ex: PLA, Best Seller">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="secondaryCatDesc" rows="2" placeholder="Descrição opcional"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="secondaryCatRole">
+              <option value="secondary">📌 Secundária (material, estilo...)</option>
+              <option value="tag">🏷️ Tag (best seller, novo...)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ordem</label>
+            <input type="number" id="secondaryCatOrder" value="0" min="0">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">💾 GUARDAR</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
        MODAIS DE PRODUTOS
-       ============================================ -->
+       ========================================================= -->
 
   <!-- Modal: Criar Produto -->
   <div id="createProductModal" class="modal hidden">
@@ -1034,58 +1012,68 @@
         <h3>CRIAR NOVO PRODUTO</h3>
         <button class="modal-close" data-close="create">×</button>
       </div>
-
       <form id="createProductForm" class="modal-form">
-        <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="createName" required>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="createName" required>
+          </div>
+          <div class="form-group">
+            <label>Preço (€) *</label>
+            <input type="number" id="createPrice" step="0.01" required>
+          </div>
         </div>
 
+        <!-- CATEGORIA PRINCIPAL -->
         <div class="form-group">
-          <label>Preço (€) *</label>
-          <input type="number" id="createPrice" step="0.01" required>
+          <label>Categoria Principal * <small style="color:#666;font-weight:normal">(obrigatória — 1 por produto)</small></label>
+          <select id="createPrimaryCategory" class="primary-cat-select" required>
+            <option value="">-- Seleciona categoria principal --</option>
+          </select>
         </div>
 
+        <!-- CATEGORIAS SECUNDÁRIAS -->
+        <div class="form-group">
+          <label>Categorias Secundárias / Tags <small style="color:#666;font-weight:normal">(opcional — múltiplas)</small></label>
+          <div id="createSecondaryCategories" class="secondary-cats-grid"></div>
+        </div>
+
+        <!-- DESCRIÇÃO RICH TEXT -->
         <div class="form-group">
           <label>Descrição *</label>
-          <textarea id="createDescription" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Categorias *</label>
-          <div id="categoriesCheckboxes" class="categories-checkbox-container">
-            <!-- Categorias carregadas via JS -->
+          <div class="rich-editor-toolbar">
+            <button type="button" onclick="document.execCommand('bold')" title="Negrito"><b>B</b></button>
+            <button type="button" onclick="document.execCommand('italic')" title="Itálico"><i>I</i></button>
+            <button type="button" onclick="document.execCommand('underline')" title="Sublinhado"><u>U</u></button>
+            <div class="separator"></div>
+            <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')" title="Título 2">H2</button>
+            <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')" title="Título 3">H3</button>
+            <button type="button" onclick="document.execCommand('formatBlock', false, 'p')" title="Parágrafo">¶</button>
+            <div class="separator"></div>
+            <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Lista">• Lista</button>
+            <button type="button" onclick="document.execCommand('insertOrderedList')" title="Lista numerada">1. Lista</button>
+            <div class="separator"></div>
+            <button type="button" onclick="document.execCommand('formatBlock', false, 'blockquote')" title="Citação">❝</button>
+            <button type="button" onclick="document.execCommand('removeFormat')" title="Limpar formatação">✕ Fmt</button>
           </div>
-          <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-            Seleciona todas as categorias a que este produto pertence
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label>Categoria Principal *</label>
-          <select id="primaryCategory" disabled>
-            <option value="">-- Categoria Principal --</option>
-          </select>
-          <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-            Escolhe qual a categoria principal para breadcrumbs e navegação
-          </small>
+          <div id="createDescEditor" class="rich-editor-content" contenteditable="true" data-placeholder="Descreve o produto..."></div>
         </div>
 
         <div class="form-group checkbox-group">
-          <label>
-            <input type="checkbox" id="createStock">
-            Produto disponível
-          </label>
+          <label><input type="checkbox" id="createStock"> Produto disponível em stock</label>
         </div>
 
         <div class="form-group">
-          <label>Ficheiros 3D e Imagens</label>
+          <label>Modelo 3D (.glb)</label>
           <input type="file" id="createModelFile" name="modelFile" accept=".glb">
+        </div>
+        <div class="form-group">
+          <label>Imagens (até 4)</label>
           <input type="file" id="createImages" name="images" accept="image/*" multiple>
-          <small>Podes adicionar até 4 imagens.</small>
         </div>
 
-        <button type="submit" class="btn-primary">CRIAR PRODUTO</button>
+        <button type="submit" class="btn-primary">➕ CRIAR PRODUTO</button>
       </form>
     </div>
   </div>
@@ -1098,23 +1086,15 @@
         <button class="modal-close" data-close="edit">×</button>
       </div>
 
-      <!-- SISTEMA DE ABAS -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" data-tab="edit-details">
-          📋 Detalhes
-        </button>
-        <button class="modal-tab-btn" data-tab="edit-model">
-          🎨 Modelo 3D
-        </button>
-        <button class="modal-tab-btn" data-tab="edit-images">
-          🖼️ Imagens
-        </button>
+        <button class="modal-tab-btn active" data-tab="edit-details">📋 Detalhes</button>
+        <button class="modal-tab-btn" data-tab="edit-model">🎨 Modelo 3D</button>
+        <button class="modal-tab-btn" data-tab="edit-images">🖼️ Imagens</button>
       </div>
 
-      <!-- CONTEÚDO DAS ABAS -->
       <div class="modal-tabs-container">
-        
-        <!-- ABA: EDITAR DETALHES -->
+
+        <!-- ABA: DETALHES -->
         <div id="tab-edit-details" class="modal-tab-content active">
           <form id="editProductForm">
             <input type="hidden" id="editId">
@@ -1124,133 +1104,103 @@
                 <label>Nome *</label>
                 <input type="text" id="editName" required>
               </div>
-
               <div class="form-group">
                 <label>Preço (€) *</label>
                 <input type="number" id="editPrice" step="0.01" required>
               </div>
             </div>
 
+            <!-- CATEGORIA PRINCIPAL -->
+            <div class="form-group">
+              <label>Categoria Principal * <small style="color:#666;font-weight:normal">(obrigatória — 1 por produto)</small></label>
+              <select id="editPrimaryCategory" class="primary-cat-select" required>
+                <option value="">-- Seleciona categoria principal --</option>
+              </select>
+            </div>
+
+            <!-- CATEGORIAS SECUNDÁRIAS -->
+            <div class="form-group">
+              <label>Categorias Secundárias / Tags <small style="color:#666;font-weight:normal">(opcional — múltiplas)</small></label>
+              <div id="editSecondaryCategories" class="secondary-cats-grid"></div>
+            </div>
+
+            <!-- DESCRIÇÃO RICH TEXT -->
             <div class="form-group">
               <label>Descrição *</label>
-              <textarea id="editDescription" rows="4" required></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>Categorias *</label>
-              <div id="categoriesCheckboxes" class="categories-checkbox-container">
-                <!-- Categorias carregadas via JS -->
+              <div class="rich-editor-toolbar">
+                <button type="button" onclick="document.execCommand('bold')" title="Negrito"><b>B</b></button>
+                <button type="button" onclick="document.execCommand('italic')" title="Itálico"><i>I</i></button>
+                <button type="button" onclick="document.execCommand('underline')" title="Sublinhado"><u>U</u></button>
+                <div class="separator"></div>
+                <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')" title="Título 2">H2</button>
+                <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')" title="Título 3">H3</button>
+                <button type="button" onclick="document.execCommand('formatBlock', false, 'p')" title="Parágrafo">¶</button>
+                <div class="separator"></div>
+                <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Lista">• Lista</button>
+                <button type="button" onclick="document.execCommand('insertOrderedList')" title="Lista numerada">1. Lista</button>
+                <div class="separator"></div>
+                <button type="button" onclick="document.execCommand('formatBlock', false, 'blockquote')" title="Citação">❝</button>
+                <button type="button" onclick="document.execCommand('removeFormat')" title="Limpar formatação">✕ Fmt</button>
               </div>
-              <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-                Seleciona todas as categorias a que este produto pertence
-              </small>
+              <div id="editDescEditor" class="rich-editor-content" contenteditable="true"></div>
             </div>
 
             <div class="form-group">
-              <label>Categoria Principal *</label>
-              <select id="primaryCategory" disabled>
-                <option value="">-- Categoria Principal --</option>
-              </select>
-              <small style="color:#666;font-size:12px;margin-top:5px;display:block;">
-                Escolhe qual a categoria principal para breadcrumbs e navegação
-              </small>
-            </div>
-
-            <div class="form-group">
-              <label>Stock Disponível</label>
-              <input type="checkbox" id="editStock">
+              <label><input type="checkbox" id="editStock"> Stock Disponível</label>
             </div>
 
             <div class="modal-actions">
-              <button type="submit" class="btn-primary">
-                💾 GUARDAR ALTERAÇÕES
-              </button>
-              <button type="button" id="deleteProductBtn" class="btn-danger">
-                🗑️ ELIMINAR PRODUTO
-              </button>
+              <button type="submit" class="btn-primary">💾 GUARDAR ALTERAÇÕES</button>
+              <button type="button" id="deleteProductBtn" class="btn-danger">🗑️ ELIMINAR PRODUTO</button>
             </div>
           </form>
         </div>
 
-        <!-- ABA: EDITAR MODELO 3D -->
+        <!-- ABA: MODELO 3D -->
         <div id="tab-edit-model" class="modal-tab-content">
           <div class="model-edit-container">
-            
-            <!-- Modelo Atual -->
             <div class="current-model">
               <h4>Modelo Atual</h4>
-              <model-viewer
-                id="editCurrentModel"
-                src="..."
-                alt="Modelo 3D Atual"
-                auto-rotate
-                camera-controls
-                shadow-intensity="1"
-                style="width:100%; height:400px; background-color:#2c2c2c; border-radius:8px;"
-              ></model-viewer>
+              <model-viewer id="editCurrentModel" src="..." alt="Modelo 3D Atual" auto-rotate camera-controls shadow-intensity="1" style="width:100%;height:400px;background-color:#2c2c2c;border-radius:8px;"></model-viewer>
               <p class="model-filename" id="currentModelFilename"></p>
             </div>
-
-            <!-- Upload Novo Modelo -->
             <div class="upload-model">
               <h4>Substituir Modelo</h4>
               <div class="upload-area">
                 <input type="file" id="editModelFile" accept=".glb" style="display:none;">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('editModelFile').click()">
-                  📁 Escolher Ficheiro .GLB
-                </button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('editModelFile').click()">📁 Escolher Ficheiro .GLB</button>
                 <p id="newModelFilename" class="file-selected"></p>
               </div>
-              <button type="button" id="uploadNewModelBtn" class="btn-primary" disabled>
-                ⬆️ Enviar Novo Modelo
-              </button>
+              <button type="button" id="uploadNewModelBtn" class="btn-primary" disabled>⬆️ Enviar Novo Modelo</button>
             </div>
-
           </div>
         </div>
 
-        <!-- ABA: EDITAR IMAGENS -->
+        <!-- ABA: IMAGENS -->
         <div id="tab-edit-images" class="modal-tab-content">
-          
-          <!-- Imagens Atuais -->
           <div class="current-images-section">
             <h4>Imagens Atuais (<span id="imageCount">0</span>/4)</h4>
-            <div id="editImagesGrid" class="images-grid-edit">
-              <!-- Imagens inseridas via JS -->
-            </div>
+            <div id="editImagesGrid" class="images-grid-edit"></div>
           </div>
-
-          <!-- Upload Novas Imagens -->
           <div class="upload-images-section">
             <h4>Adicionar Novas Imagens</h4>
             <div class="upload-area">
               <input type="file" id="editNewImages" accept="image/*" multiple style="display:none;">
-              <button type="button" class="btn-secondary" onclick="document.getElementById('editNewImages').click()">
-                📁 Escolher Imagens
-              </button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('editNewImages').click()">📁 Escolher Imagens</button>
               <p id="newImagesInfo" class="file-selected"></p>
             </div>
-            <button type="button" id="uploadNewImagesBtn" class="btn-primary" disabled>
-              ⬆️ Adicionar Imagens
-            </button>
+            <button type="button" id="uploadNewImagesBtn" class="btn-primary" disabled>⬆️ Adicionar Imagens</button>
           </div>
-
-          <!-- Substituir Todas -->
           <div class="replace-images-section">
             <h4>Substituir Todas as Imagens</h4>
             <div class="upload-area">
               <input type="file" id="editReplaceImages" accept="image/*" multiple style="display:none;">
-              <button type="button" class="btn-secondary" onclick="document.getElementById('editReplaceImages').click()">
-                📁 Escolher Novas Imagens (até 4)
-              </button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('editReplaceImages').click()">📁 Escolher Novas Imagens (até 4)</button>
               <p id="replaceImagesInfo" class="file-selected"></p>
             </div>
-            <button type="button" id="replaceAllImagesBtn" class="btn-danger" disabled>
-              🔄 Substituir Todas
-            </button>
+            <button type="button" id="replaceAllImagesBtn" class="btn-danger" disabled>🔄 Substituir Todas</button>
             <small class="warning-text">⚠️ Isto irá eliminar todas as imagens atuais permanentemente!</small>
           </div>
-
         </div>
 
       </div>
@@ -1265,87 +1215,52 @@
         <button class="modal-close" data-close="view">×</button>
       </div>
 
-      <!-- SISTEMA DE ABAS -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" data-tab="details">
-          📋 Detalhes
-        </button>
-        <button class="modal-tab-btn" data-tab="model">
-          🎨 Modelo 3D
-        </button>
-        <button class="modal-tab-btn" data-tab="images">
-          🖼️ Imagens
-        </button>
+        <button class="modal-tab-btn active" data-tab="details">📋 Detalhes</button>
+        <button class="modal-tab-btn" data-tab="model">🎨 Modelo 3D</button>
+        <button class="modal-tab-btn" data-tab="images">🖼️ Imagens</button>
       </div>
 
-      <!-- CONTEÚDO DAS ABAS -->
       <div class="modal-tabs-container">
-        
-        <!-- ABA: DETALHES -->
+
         <div id="tab-details" class="modal-tab-content active">
           <div class="product-details-grid">
+            <div class="detail-row"><span class="detail-label">Preço:</span><span class="detail-value">€<span id="viewPrice"></span></span></div>
+            <div class="detail-row"><span class="detail-label">Stock:</span><span class="detail-value"><span id="viewStock"></span></span></div>
+            <div class="detail-row"><span class="detail-label">Estado:</span><span class="detail-value"><span id="viewStatus"></span></span></div>
             <div class="detail-row">
-              <span class="detail-label">Preço:</span>
-              <span class="detail-value">€<span id="viewPrice"></span></span>
+              <span class="detail-label">Categoria Principal:</span>
+              <span class="detail-value" id="viewPrimaryCategory"></span>
             </div>
-            
             <div class="detail-row">
-              <span class="detail-label">Stock:</span>
-              <span class="detail-value"><span id="viewStock"></span></span>
+              <span class="detail-label">Categorias Secundárias:</span>
+              <span class="detail-value sec-cats-view" id="viewSecondaryCategories"></span>
             </div>
-            
-            <div class="detail-row">
-              <span class="detail-label">Estado:</span>
-              <span class="detail-value"><span id="viewStatus"></span></span>
-            </div>
-            
-            <div class="detail-row">
-              <span class="detail-label">Categoria:</span>
-              <span class="detail-value"><span id="viewCategory"></span></span>
-            </div>
-            
-            <div class="detail-row">
-              <span class="detail-label">Subcategoria:</span>
-              <span class="detail-value"><span id="viewSubcategory"></span></span>
-            </div>
-            
             <div class="detail-row full-width">
               <span class="detail-label">Descrição:</span>
-              <p class="detail-description" id="viewDescription"></p>
+              <div class="detail-description desc-rendered" id="viewDescription"></div>
             </div>
           </div>
         </div>
 
-        <!-- ABA: MODELO 3D -->
         <div id="tab-model" class="modal-tab-content">
           <div class="model-viewer-container">
-            <model-viewer
-              id="viewModel"
-              src="..."
-              alt="Modelo 3D"
-              auto-rotate
-              camera-controls
-              shadow-intensity="1"
-              style="width:100%; height:500px; background-color:#2c2c2c; border-radius:8px;"
-            ></model-viewer>
-            <div class="model-controls">
-              <p>🖱️ Arrasta para rodar | 🔍 Scroll para zoom</p>
-            </div>
+            <model-viewer id="viewModel" src="..." alt="Modelo 3D" auto-rotate camera-controls shadow-intensity="1" style="width:100%;height:500px;background-color:#2c2c2c;border-radius:8px;"></model-viewer>
+            <div class="model-controls"><p>🖱️ Arrasta para rodar | 🔍 Scroll para zoom</p></div>
           </div>
         </div>
 
-        <!-- ABA: IMAGENS -->
         <div id="tab-images" class="modal-tab-content">
-          <div id="imagesGrid" class="images-grid">
-            <!-- Imagens serão inseridas via JavaScript -->
-          </div>
+          <div id="imagesGrid" class="images-grid"></div>
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- =========================================================
+       SCRIPTS
+       ========================================================= -->
   <script src="/Dashboard/scripts/security.js"></script>
   <script src="/Dashboard/scripts/dashboard-stats.js"></script>
   <script src="/Dashboard/scripts/dashboard.js"></script>
