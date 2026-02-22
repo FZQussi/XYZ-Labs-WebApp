@@ -104,7 +104,7 @@ class ProductDetailsApp {
 
     const otherProducts = allProducts.filter(p => p.id != currentProductId);
 
-    const currentCategoryIds = (current.categories || []).map(c => c.id);
+    const currentCategoryIds = current.primary_category ? [current.primary_category.id] : [];
     const currentMaterial = current.material || '';
     const currentNameWords = (current.name || '')
       .toLowerCase()
@@ -114,12 +114,9 @@ class ProductDetailsApp {
     const scoredProducts = otherProducts.map(product => {
       let score = 0;
 
-      // ===== categorias em comum =====
-      if (product.categories) {
-        const hasCommonCategory = product.categories.some(cat =>
-          currentCategoryIds.includes(cat.id)
-        );
-        if (hasCommonCategory) score += 3;
+      // ===== categoria principal em comum =====
+      if (product.primary_category && currentCategoryIds.includes(product.primary_category.id)) {
+        score += 3;
       }
 
       // ===== material igual =====
@@ -208,7 +205,7 @@ class ProductRenderer {
 
     if (nameEl) nameEl.textContent = State.currentProduct.name;
     if (priceEl) priceEl.textContent = Number(State.currentProduct.price).toFixed(2);
-    if (descEl) descEl.textContent = State.currentProduct.description || 'Sem descrição disponível';
+    if (descEl) descEl.innerHTML = State.currentProduct.description || 'Sem descrição disponível';
   }
 
   static renderTags() {
@@ -216,12 +213,20 @@ class ProductRenderer {
     if (!tagsContainer) return;
 
     tagsContainer.innerHTML = '';
-    const categories = State.currentProduct.categories || [];
+    const product = State.currentProduct;
 
-    categories.forEach(cat => {
+    // Categoria principal primeiro
+    if (product.primary_category) {
+      const tag = document.createElement('span');
+      tag.className = 'product-tag primary';
+      tag.textContent = product.primary_category.name;
+      tagsContainer.appendChild(tag);
+    }
+
+    // Categorias secundárias a seguir
+    (product.secondary_categories || []).forEach(cat => {
       const tag = document.createElement('span');
       tag.className = 'product-tag';
-      if (cat.is_primary) tag.classList.add('primary');
       tag.textContent = cat.name;
       tagsContainer.appendChild(tag);
     });
@@ -253,7 +258,7 @@ class ProductRenderer {
     }
 
     if (specCategory) {
-      const primary = (State.currentProduct.categories || []).find(c => c.is_primary);
+      const primary = State.currentProduct.primary_category;
       specCategory.textContent = primary ? primary.name : 'Geral';
     }
 

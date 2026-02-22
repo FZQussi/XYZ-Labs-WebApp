@@ -3,8 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!slider) return;
 
   try {
-    // 🔹 Pegar categorias do backend
-    const res = await fetch(`${API_BASE}/categories`);
+    const res = await fetch('/api/categories/primary');
     if (!res.ok) throw new Error('Erro ao buscar categorias');
     const categories = await res.json();
 
@@ -13,21 +12,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 🔹 Criar boxes dinamicamente
     slider.innerHTML = categories.map(cat => `
       <div class="category-box" data-id="${cat.id}">
         <span>${cat.name}</span>
       </div>
     `).join('');
 
-    // 🔹 Adicionar clique nas boxes
     document.querySelectorAll('.category-box').forEach(box => {
       box.addEventListener('click', () => {
         const categoryId = box.getAttribute('data-id');
         if (!categoryId) return;
-
-        // Redireciona para products.html com query string category=<id>
-        window.location.href = `/PaginaFrontal/html/products.html?category=${encodeURIComponent(categoryId)}`;
+        window.location.href = `/PaginaFrontal/html/products.html?primary=${encodeURIComponent(categoryId)}`;
       });
     });
 

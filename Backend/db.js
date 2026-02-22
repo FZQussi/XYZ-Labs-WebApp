@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const client = new Pool({
   connectionString: process.env.DATABASE_URL,
+  options: '-c client_encoding=UTF8'
 });
 
 client.connect()

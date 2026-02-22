@@ -18,15 +18,9 @@
         <img src="/lib/images/Logo.svg" alt="XYZ Labs Logo" class="logo">
       </a>
     </div>
-
-    <!-- Menu Hamburger (Mobile) -->
     <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </button>
-
-    <!-- Navegação -->
     <nav class="header-nav" id="headerNav">
       <ul>
         <li><a href="HomePage.html" class="active">Home</a></li>
@@ -38,56 +32,38 @@
       </ul>
     </nav>
   </div>
-
   <div class="header-right">
-    <!-- Search Bar -->
-  <div class="header-search">
-  <span class="search-icon" id="searchBtn">
-    <img src="/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
-  </span>
-  <input
-    type="text"
-    placeholder="Pesquisar produtos..."
-    id="searchInput"
-  >
-</div>
-
-
-    <!-- Botões quando não logado -->
+    <div class="header-search">
+      <span class="search-icon" id="searchBtn">
+        <img src="/lib/icons/search-svgrepo-com.svg" alt="pesquisar">
+      </span>
+      <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+    </div>
     <div id="authButtons">
       <button id="signInBtn" class="btn-secondary">Sign In</button>
-      
       <button id="signUpBtn" class="btn-primary">Sign Up</button>
     </div>
-
-    <!-- Ícones quando logado -->
     <div id="userIcons" style="display:none; position: relative;">
-  <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
-    <img src="/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
-  </button>
-
-  <!-- 🔽 DROPDOWN USER -->
-  <div id="userDropdown" class="user-dropdown hidden">
-    <p class="dropdown-title" id="dropdownUserName"></p>
-    <ul id="dropdownLinks"></ul>
-  </div>
-
-  <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
-    <img src="/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
-    <span class="cart-badge" id="cartBadge">0</span>
-  </button>
-</div>
-
+      <button id="userMenuBtn" class="icon-btn" aria-label="Menu utilizador">
+        <img src="/lib/icons/user-alt-1-svgrepo-com.svg" alt="Utilizador">
+      </button>
+      <div id="userDropdown" class="user-dropdown hidden">
+        <p class="dropdown-title" id="dropdownUserName"></p>
+        <ul id="dropdownLinks"></ul>
+      </div>
+      <button id="cartBtn" class="icon-btn cart-btn" aria-label="Carrinho">
+        <img src="/lib/icons/cart-shopping-fast-svgrepo-com.svg" alt="Carrinho">
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
   </div>
 </header>
 
-<!-- Side menu fora do header -->
 <div id="sideMenu" class="side-menu">
-  <button class="closeBtn" id="closeMenu">×</button>
+  <button class="closeBtn" id="closeMenu">x</button>
   <div id="sideContent"></div>
 </div>
 
-<!-- Overlay partilhado: header nav + side menu + filtros -->
 <div class="overlay" id="overlay"></div>
 
 <!-- BREADCRUMB -->
@@ -97,75 +73,77 @@
   </div>
 </div>
 
-<!-- CONTEÚDO PRINCIPAL -->
+<!-- CONTEUDO PRINCIPAL -->
 <main class="products-page">
   <div class="container">
 
-    <!-- SIDEBAR DE FILTROS -->
+    <!-- SIDEBAR -->
     <aside class="filters-sidebar" id="filtersSidebar">
+      <button class="btn-close-filters" id="closeFilters">x Fechar Filtros</button>
 
-      <!-- Botão fechar filtros (mobile) -->
-      <button class="btn-close-filters" id="closeFilters">× Fechar Filtros</button>
-
-      <!-- CATEGORIAS -->
-      <div class="filter-section">
-        <div class="filter-section-header">
-          <h3>Categorias</h3>
-        </div>
-                <div class="filter-section-header">
-          
-          <button class="btn-clear" id="clearCategories">Limpar</button>
-        </div>
-        <div class="category-search-box">
-          <input
-            type="text"
-            id="categorySearch"
-            placeholder="Pesquisar categorias..."
-            class="input-category-search"
-          >
-        </div>
-
-        <div id="categoryFilters" class="filter-list">
-          <!-- Categorias carregadas via JS -->
+      <!-- CATEGORIA PRINCIPAL -->
+      <div class="filter-section" data-collapsible>
+        <button class="filter-section-toggle" type="button">
+          <h3>Categoria Principal</h3>
+          <div class="filter-toggle-icons">
+            <span class="btn-clear-inline" onclick="event.stopPropagation(); clearPrimaryFilter()">Limpar</span>
+            <span class="filter-arrow">&#9660;</span>
+          </div>
+        </button>
+        <div class="filter-section-body">
+          <div class="filter-list-scroll">
+            <div id="primaryCategoryFilters"></div>
+          </div>
         </div>
       </div>
 
-      <!-- FILTROS DINÂMICOS DE ATRIBUTOS -->
-      <div id="dynamicAttributeFilters">
-        <!-- Atributos carregados via JS -->
+      <!-- TAGS / SECUNDARIAS -->
+      <div class="filter-section" data-collapsible>
+        <button class="filter-section-toggle" type="button">
+          <h3>Tags / Secundarias</h3>
+          <div class="filter-toggle-icons">
+            <span class="btn-clear-inline" onclick="event.stopPropagation(); clearSecondaryFilters()">Limpar</span>
+            <span class="filter-arrow">&#9660;</span>
+          </div>
+        </button>
+        <div class="filter-section-body">
+          <div class="filter-search-box">
+            <input type="text" id="secondaryCategorySearch" placeholder="Pesquisar tags...">
+          </div>
+          <div class="filter-list-scroll">
+            <div id="secondaryCategoryFilters"></div>
+          </div>
+        </div>
       </div>
 
     </aside>
 
-    <!-- CONTEÚDO DE PRODUTOS -->
+    <!-- CONTEUDO DE PRODUTOS -->
     <div class="products-content">
 
-      <!-- TOOLBAR -->
       <div class="products-toolbar">
 
-        <!-- LINHA 1: Contador e Toggle Filtros -->
+        <!-- Linha 1 -->
         <div class="toolbar-row toolbar-top">
           <div class="toolbar-left">
             <button class="btn-toggle-filters" id="toggleFilters">
-              <span>☰</span> Filtros
+              <span>&#9776;</span> Filtros
             </button>
             <span class="products-count" id="productsCount">0 produtos</span>
           </div>
           <button class="btn-clear-all" id="clearFilters">Limpar Todos</button>
         </div>
 
-        <!-- LINHA 2: Filtros e Ordenação -->
+        <!-- Linha 2 -->
         <div class="toolbar-row toolbar-filters">
-
           <div class="filter-group-inline">
-            <label>Preço</label>
+            <label>Preco</label>
             <div class="price-inputs">
-              <input type="number" id="minPrice" placeholder="Min €" class="input-price">
+              <input type="number" id="minPrice" placeholder="Min EUR" class="input-price">
               <span class="separator">-</span>
-              <input type="number" id="maxPrice" placeholder="Max €" class="input-price">
+              <input type="number" id="maxPrice" placeholder="Max EUR" class="input-price">
             </div>
           </div>
-
           <div class="filter-group-inline">
             <label>Stock</label>
             <select id="filterStock" class="select-filter">
@@ -174,26 +152,26 @@
               <option value="false">Sem stock</option>
             </select>
           </div>
-
           <div class="filter-group-inline">
             <label>Ordenar</label>
             <select id="sortBy" class="select-filter">
               <option value="newest">Mais Recentes</option>
-              <option value="price-asc">Preço: Menor - Maior</option>
-              <option value="price-desc">Preço: Maior - Menor</option>
+              <option value="price-asc">Preco: Menor - Maior</option>
+              <option value="price-desc">Preco: Maior - Menor</option>
               <option value="name">Nome (A-Z)</option>
             </select>
           </div>
-
         </div>
+
+        <!-- Linha 3: Active filter tags -->
+        <div class="active-filters-row empty" id="activeFilterTags"></div>
+
       </div>
 
-      <!-- GRID DE PRODUTOS -->
       <div class="products-grid" id="productsGrid">
         <div class="loading">A carregar produtos...</div>
       </div>
 
-      <!-- PAGINAÇÃO -->
       <div class="pagination" id="pagination"></div>
     </div>
 
@@ -206,10 +184,10 @@
     <div class="footer-content">
       <div class="footer-section">
         <h3>XYZ Labs</h3>
-        <p>Impressão 3D de qualidade premium para os seus projetos únicos.</p>
+        <p>Impressao 3D de qualidade premium para os seus projetos unicos.</p>
       </div>
       <div class="footer-section">
-        <h4>Links Rápidos</h4>
+        <h4>Links Rapidos</h4>
         <ul>
           <li><a href="HomePage.html">Home</a></li>
           <li><a href="products.html">Produtos</a></li>
@@ -221,14 +199,14 @@
         <h4>Suporte</h4>
         <ul>
           <li><a href="FAQ.html">FAQ</a></li>
-          <li><a href="TC.html">Termos e Condições</a></li>
-          <li><a href="Privacy.html">Política de Privacidade</a></li>
+          <li><a href="TC.html">Termos e Condicoes</a></li>
+          <li><a href="Privacy.html">Politica de Privacidade</a></li>
         </ul>
       </div>
       <div class="footer-section">
         <h4>Contacto</h4>
-        <p>📧 info@xyzlabs.pt</p>
-        <p>📞 +351 935310984</p>
+        <p>info@xyzlabs.pt</p>
+        <p>+351 935310984</p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -239,6 +217,7 @@
 
 <script src="../scripts/cart.js"></script>
 <script src="../scripts/header.js"></script>
+<script src="../scripts/products-filters.js"></script>
 <script src="../scripts/products-page.js"></script>
 </body>
 </html>
