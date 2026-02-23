@@ -19,15 +19,12 @@ function generateInvoicePDFBuffer(order) {
       doc.on('data', chunk => chunks.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
 
-      // Cabeçalho
       doc.fontSize(20).fillColor('#111').text('XYZ Labs', { align: 'center' });
       doc.moveDown(0.3);
       doc.fontSize(14).fillColor('#555')
         .text(`Fatura - Pedido nº ${order_id}`, { align: 'center' })
         .text(`Data: ${new Date().toLocaleDateString('pt-PT')}`, { align: 'center' });
       doc.moveDown(1);
-
-      // ... resto do PDF omitido para brevidade ...
 
       doc.end();
     } catch (err) {
@@ -49,7 +46,6 @@ async function createOrder(req, res) {
       return res.status(400).json({ error: 'Dados do pedido incompletos' });
     }
 
-    // Validar …
     for (const item of items) {
       if (!item.material_name || !item.color_name) {
         return res.status(400).json({ error: 'Todos os produtos devem ter material e cor selecionados' });
@@ -77,7 +73,6 @@ async function createOrder(req, res) {
 
     const order_id = orderResult.rows[0].id;
 
-    // Inserir items
     for (const item of items) {
       await client.query(
         `INSERT INTO order_items (
@@ -103,15 +98,11 @@ async function createOrder(req, res) {
 
     res.status(200).json({ message: 'Pedido enviado com sucesso', order_id });
 
-    // Email + PDF em background (não bloqueia a resposta)
     (async () => {
       try {
         const transporter = nodemailer.createTransport({
           service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
         });
 
         const pdfBuffer = await generateInvoicePDFBuffer({
@@ -248,9 +239,7 @@ async function updateOrderTracking(req, res) {
 
     const result = await client.query(`
       UPDATE orders
-      SET tracking_code = $1,
-          tracking_carrier = $2,
-          updated_at = NOW()
+      SET tracking_code = $1, tracking_carrier = $2, updated_at = NOW()
       WHERE id = $3 RETURNING *
     `, [tracking_code || null, tracking_carrier || null, orderId]);
 
@@ -270,15 +259,15 @@ async function getOrderStats(req, res) {
   try {
     const result = await client.query(`
       SELECT
-        COUNT(*) FILTER (WHERE TRUE)                                  AS total_orders,
-        COUNT(*) FILTER (WHERE status = 'pending')                    AS pending,
-        COUNT(*) FILTER (WHERE status = 'confirmed')                  AS confirmed,
-        COUNT(*) FILTER (WHERE status = 'printing')                   AS printing,
-        COUNT(*) FILTER (WHERE status = 'shipped')                    AS shipped,
-        COUNT(*) FILTER (WHERE status = 'delivered')                  AS delivered,
-        COUNT(*) FILTER (WHERE status = 'cancelled')                  AS cancelled,
-        COALESCE(SUM(total_amount), 0)                                 AS total_revenue,
-        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days') AS orders_30days
+        COUNT(*) FILTER (WHERE TRUE)                                      AS total_orders,
+        COUNT(*) FILTER (WHERE status = 'pending')                        AS pending,
+        COUNT(*) FILTER (WHERE status = 'confirmed')                      AS confirmed,
+        COUNT(*) FILTER (WHERE status = 'printing')                       AS printing,
+        COUNT(*) FILTER (WHERE status = 'shipped')                        AS shipped,
+        COUNT(*) FILTER (WHERE status = 'delivered')                      AS delivered,
+        COUNT(*) FILTER (WHERE status = 'cancelled')                      AS cancelled,
+        COALESCE(SUM(total_amount), 0)                                     AS total_revenue,
+        COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '30 days')  AS orders_30days
       FROM orders
     `);
     res.json(result.rows[0]);
@@ -288,13 +277,56 @@ async function getOrderStats(req, res) {
   }
 }
 
-// Exportar todas as funções ao mesmo tempo
+// ===== GET ORDERS BY USER ID (Admin) =====
+// Chamado por GET /users/:id/orders — dashboard admin.
+// A filtragem é feita na BD. O frontend nunca recebe encomendas de outros utilizadores.
+// Cobre também encomendas feitas antes do registo (sem user_id mas com o mesmo email).
+async function getOrdersByUserId(req, res) {
+  try {
+    const { id: userId } = req.params;
+
+    const userCheck = await client.query(
+      'SELECT id, email FROM users WHERE id = $1',
+      [userId]
+    );
+    if (!userCheck.rows.length) {
+      return res.status(404).json({ error: 'Utilizador não encontrado' });
+    }
+    const userEmail = userCheck.rows[0].email;
+
+    const result = await client.query(`
+      SELECT
+        o.id, o.status, o.total_amount, o.created_at, o.updated_at,
+        o.customer_name, o.customer_email, o.customer_phone,
+        o.tracking_code, o.tracking_carrier, o.user_id
+      FROM orders o
+      WHERE o.user_id = $1
+         OR (o.user_id IS NULL AND LOWER(o.customer_email) = LOWER($2))
+      ORDER BY o.created_at DESC
+    `, [userId, userEmail]);
+
+    const orders = result.rows;
+
+    res.json({
+      orders,
+      summary: {
+        total_orders:   orders.length,
+        total_spent:    orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0),
+        pending_orders: orders.filter(o => o.status === 'pending').length
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao obter encomendas do utilizador:', err);
+    res.status(500).json({ error: 'Erro ao obter encomendas do utilizador' });
+  }
+}
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
   updateOrderTracking,
-  getOrderStats
+  getOrderStats,
+  getOrdersByUserId  // <- adicionado
 };
-

@@ -60,6 +60,15 @@
     });
   }
 
+  function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('pt-PT', { dateStyle: 'short', timeStyle: 'short' });
+  }
+
+  function fmtEuro(v) {
+    return `€${Number(v || 0).toFixed(2)}`;
+  }
+
   function validatePassword(password) {
     return (
       password.length >= 12 &&
@@ -228,6 +237,7 @@
       const user = await res.json();
 
       currentViewUser = user;
+      window._currentViewUserId = userId;
 
       viewUserName.textContent = user.name;
       viewUserEmail.textContent = user.email;
@@ -235,15 +245,135 @@
       viewUserRole.className = `role-badge ${user.role}`;
       viewUserCreated.textContent = formatDate(user.created_at);
 
+      // Mostrar modal
       viewUserModal.classList.remove('hidden');
+
+      // Carregar histórico de encomendas
+      loadUserOrders(userId);
+
     } catch (err) {
       console.error('Erro ao carregar utilizador:', err);
       alert('Erro ao carregar utilizador');
     }
   }
 
+  // ===== CARREGAR ENCOMENDAS DO UTILIZADOR =====
+  // Usa o endpoint dedicado GET /users/:id/orders (admin-only no backend).
+  // O backend faz a filtragem na BD — o frontend nunca recebe encomendas de outros users.
+  async function loadUserOrders(userId) {
+    const container = document.getElementById('userOrdersContainer');
+    const summaryEl = document.getElementById('userOrdersSummary');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="user-orders-loading">
+        <span>⏳</span> A carregar encomendas...
+      </div>`;
+    if (summaryEl) summaryEl.innerHTML = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/users/${userId}/orders`, {
+        headers: authHeaders()
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Erro ${res.status}`);
+      }
+
+      const data = await res.json();
+      // Backend devolve { orders: [...], summary: { total_orders, total_spent, pending_orders } }
+      const orders  = data.orders  || [];
+      const summary = data.summary || null;
+
+      renderUserOrders(orders, container, summaryEl, summary);
+
+    } catch (err) {
+      container.innerHTML = `
+        <div class="user-orders-empty">
+          <span>⚠️</span> Não foi possível carregar encomendas: ${err.message}
+        </div>`;
+    }
+  }
+
+  function renderUserOrders(orders, container, summaryEl, backendSummary) {
+    // Summary stats — preferencialmente do backend, fallback calculado localmente
+    if (summaryEl) {
+      const total   = backendSummary?.total_orders   ?? orders.length;
+      const revenue = backendSummary?.total_spent     ?? orders.reduce((s, o) => s + parseFloat(o.total_amount || 0), 0);
+      const pending = backendSummary?.pending_orders  ?? orders.filter(o => o.status === 'pending').length;
+
+      summaryEl.innerHTML = `
+        <div class="user-orders-stat">
+          <span class="user-orders-stat-val">${total}</span>
+          <span class="user-orders-stat-lbl">Total</span>
+        </div>
+        <div class="user-orders-stat">
+          <span class="user-orders-stat-val">€${Number(revenue).toFixed(2)}</span>
+          <span class="user-orders-stat-lbl">Gasto Total</span>
+        </div>
+        <div class="user-orders-stat">
+          <span class="user-orders-stat-val">${pending}</span>
+          <span class="user-orders-stat-lbl">Pendentes</span>
+        </div>`;
+    }
+
+    if (!orders.length) {
+      container.innerHTML = `
+        <div class="user-orders-empty">
+          <span>📭</span> Nenhuma encomenda encontrada.
+        </div>`;
+      return;
+    }
+
+    const STATUS_BG     = window.orderStatusBG     || {};
+    const STATUS_TEXT   = window.orderStatusText   || {};
+    const STATUS_LABELS = window.orderStatusLabels || {};
+
+    container.innerHTML = orders.map(o => {
+      const bg  = STATUS_BG[o.status]    || '#eee';
+      const col = STATUS_TEXT[o.status]  || '#000';
+      const lbl = STATUS_LABELS[o.status] || o.status;
+
+      const tracking = o.tracking_code
+        ? `<span class="uoh-tracking">${o.tracking_code}${o.tracking_carrier ? ` <em>${o.tracking_carrier}</em>` : ''}</span>`
+        : '';
+
+      return `
+        <div class="user-order-row">
+          <div class="user-order-main">
+            <span class="user-order-id">#${o.id}</span>
+            <span class="user-order-date">${formatDate(o.created_at)}</span>
+            <span class="user-order-status" style="background:${bg};color:${col}">${lbl}</span>
+            ${tracking}
+          </div>
+          <div class="user-order-right">
+            <span class="user-order-amount">${fmtEuro(o.total_amount)}</span>
+            <button class="btn-gerir-order" data-id="${o.id}" title="Gerir encomenda">GERIR</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Listeners para o botão GERIR — abre o modal de encomendas
+    container.querySelectorAll('.btn-gerir-order').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const orderId = parseInt(btn.dataset.id);
+        if (typeof window.openOrderModal === 'function') {
+          window.openOrderModal(orderId);
+        } else {
+          alert('Modal de encomendas não disponível. Certifica-te que orders.js está carregado.');
+        }
+      });
+    });
+  }
+
+  // Expor para reload após guardar encomenda
+  window.reloadUserOrders = (userId) => loadUserOrders(userId);
+
+  // ===== FECHAR VIEW MODAL =====
   document.querySelector('[data-close="viewUser"]').addEventListener('click', () => {
     viewUserModal.classList.add('hidden');
+    window._currentViewUserId = null;
   });
 
   editUserFromViewBtn.addEventListener('click', () => {

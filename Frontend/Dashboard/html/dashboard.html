@@ -182,6 +182,188 @@
       font-size: 12px;
       background: #f5f5f5;
     }
+
+    /* ===== HISTÓRICO DE ENCOMENDAS NO MODAL DE UTILIZADOR ===== */
+    .modal-view-user {
+      max-width: 720px !important;
+    }
+
+    .user-orders-section {
+      margin: 0;
+      border-top: 3px solid #000;
+    }
+
+    .user-orders-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #000;
+      color: #fff;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .user-orders-title {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .user-orders-summary {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .user-orders-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .user-orders-stat-val {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 16px;
+      color: #00FFFF;
+      line-height: 1;
+    }
+
+    .user-orders-stat-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.65;
+    }
+
+    .user-orders-list {
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .user-orders-loading,
+    .user-orders-empty {
+      padding: 28px 20px;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: bold;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .user-order-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 2px solid #eee;
+      gap: 12px;
+      transition: background 0.15s, border-left 0.15s, padding-left 0.15s;
+    }
+
+    .user-order-row:last-child { border-bottom: none; }
+
+    .user-order-row:hover {
+      background: #f5f5f5;
+      border-left: 4px solid #000;
+      padding-left: 16px;
+    }
+
+    .user-order-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .user-order-id {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      min-width: 52px;
+    }
+
+    .user-order-date {
+      font-size: 12px;
+      color: #555;
+      font-weight: bold;
+    }
+
+    .user-order-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 2px solid #000;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      font-family: 'Courier New', monospace;
+    }
+
+    .uoh-tracking {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: bold;
+      background: #f0f0f0;
+      border: 2px solid #000;
+      padding: 2px 6px;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .uoh-tracking em {
+      opacity: 0.6;
+      font-style: normal;
+      margin-left: 4px;
+    }
+
+    .user-order-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .user-order-amount {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .btn-gerir-order {
+      padding: 5px 12px;
+      border: 2px solid #000;
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-gerir-order:hover {
+      background: #fff;
+      color: #000;
+      transform: translate(-2px, -2px);
+      box-shadow: 2px 2px 0 #000;
+    }
   </style>
 </head>
 <body>
@@ -361,14 +543,12 @@
       </header>
 
       <div class="categories-layout">
-
-        <!-- CATEGORIAS PRIMÁRIAS -->
         <div class="cat-section-card">
           <div class="cat-section-header">
             <span>🎯 CATEGORIAS PRINCIPAIS</span>
             <button id="addPrimaryCategoryBtn" class="btn-primary" style="font-size:12px;padding:6px 12px;">➕ Nova</button>
           </div>
-          <div style="padding: 8px 0; font-family: 'Courier New', monospace; font-size: 12px; color: #666; padding: 8px 16px; border-bottom: 1px solid #eee;">
+          <div style="padding: 8px 16px; font-family: 'Courier New', monospace; font-size: 12px; color: #666; border-bottom: 1px solid #eee;">
             Cada produto <strong>deve ter exatamente uma</strong> categoria principal.
           </div>
           <div id="primaryCategoriesList" style="min-height:80px;">
@@ -376,7 +556,6 @@
           </div>
         </div>
 
-        <!-- CATEGORIAS SECUNDÁRIAS -->
         <div class="cat-section-card">
           <div class="cat-section-header">
             <span>🏷️ CATEGORIAS SECUNDÁRIAS / TAGS</span>
@@ -389,7 +568,6 @@
             <div class="loading-state" style="padding:16px">⏳ A carregar...</div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -429,377 +607,146 @@
     </section>
 
     <!-- ============ CALCULADORA ============ -->
-  <section id="priceCalculator" class="tab hidden">
-  <header class="page-header">
-    <h2 class="page-title">🧮 CALCULADORA DE PREÇOS — IMPRESSÃO 3D</h2>
-    <div class="page-actions">
-      <button id="resetCalcBtn" class="btn-icon" title="Reset">🔄</button>
-    </div>
-  </header>
-
-  <div class="calc-layout">
-
-    <!-- ===== COLUNA ESQUERDA: INPUTS ===== -->
-    <div class="calc-inputs-col">
-
-      <!-- PROJECT DETAILS -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">📋</span>
-          <h3>DETALHES DO PROJETO</h3>
+    <section id="priceCalculator" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">🧮 CALCULADORA DE PREÇOS — IMPRESSÃO 3D</h2>
+        <div class="page-actions">
+          <button id="resetCalcBtn" class="btn-icon" title="Reset">🔄</button>
         </div>
-        <div class="calc-card-body">
-          <div class="form-group">
-            <label>Nome da Peça</label>
-            <input type="text" id="calcPartName" placeholder="Ex: Suporte para câmara">
-          </div>
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Perfil de Impressora</label>
-              <select id="calcPrinterProfile">
-                <option value="generic">Generic Printer</option>
-                <option value="prusa_mk4">Prusa MK4</option>
-                <option value="bambu_x1">Bambu Lab X1</option>
-                <option value="ender3">Ender 3</option>
-                <option value="custom">Personalizado</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Peso Total (g)</label>
-              <input type="number" id="calcTotalWeight" placeholder="1.00" step="0.01" min="0" value="1">
-            </div>
-          </div>
-        </div>
-      </div>
+      </header>
 
-      <!-- FILAMENTS -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">🎨</span>
-          <h3>FILAMENTOS</h3>
-          <div class="calc-card-header-note">Peso Total: <strong id="calcTotalWeightDisplay">1.00g</strong></div>
-        </div>
-        <div class="calc-card-body">
-          <div id="filamentsContainer">
-            <!-- Filament rows inserted by JS -->
-          </div>
-          <button id="addFilamentBtn" class="calc-add-btn">➕ Adicionar Material</button>
-          <div class="calc-upgrade-note">
-            ⬆ Adiciona múltiplos materiais para suporte multi-material
-          </div>
-        </div>
-      </div>
-
-      <!-- PRINTING & LABOR TIME -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">⏱️</span>
-          <h3>TEMPOS</h3>
-        </div>
-        <div class="calc-card-body">
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Tempo Impressão (h)</label>
-              <input type="number" id="calcPrintHours" value="1" min="0" step="1" class="calc-time-input">
-            </div>
-            <div class="form-group">
-              <label>Minutos</label>
-              <input type="number" id="calcPrintMins" value="1" min="0" max="59" step="1" class="calc-time-input">
-            </div>
-          </div>
-          <div class="form-group" style="margin-top:8px">
-            <label>Tempo Mão de Obra (min)</label>
-            <input type="number" id="calcLaborMins" value="1" min="0" step="1" class="calc-time-input">
-          </div>
-        </div>
-      </div>
-
-      <!-- COSTS -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">💰</span>
-          <h3>CUSTOS FIXOS</h3>
-        </div>
-        <div class="calc-card-body">
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Hardware (€)</label>
-              <input type="number" id="calcHardwareCost" value="1" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <label>Embalagem (€)</label>
-              <input type="number" id="calcPackagingCost" value="1" min="0" step="0.01">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>IVA (%)</label>
-            <input type="number" id="calcVatRate" value="20" min="0" max="100" step="0.5">
-          </div>
-        </div>
-      </div>
-
-      <!-- ADVANCED SETTINGS -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">⚙️</span>
-          <h3>CONFIGURAÇÕES AVANÇADAS</h3>
-          <label class="calc-toggle-label">
-            <input type="checkbox" id="advancedToggle">
-            <span class="calc-toggle"></span>
-          </label>
-        </div>
-        <div id="advancedSettingsBody" class="calc-card-body calc-advanced-body" style="display:none;">
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Taxa Mão de Obra (€/h)</label>
-              <input type="number" id="calcLaborRate" value="20" min="0" step="0.5">
-            </div>
-            <div class="form-group">
-              <label>Fator Eficiência Material</label>
-              <input type="number" id="calcEfficiency" value="1.1" min="0.1" step="0.05">
-            </div>
-          </div>
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Custo Impressora (€)</label>
-              <input type="number" id="calcPrinterCost" value="749" min="0" step="1">
-            </div>
-            <div class="form-group">
-              <label>Custo Inicial Adicional (€)</label>
-              <input type="number" id="calcUpfrontCost" value="0" min="0" step="1">
-            </div>
-          </div>
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Manutenção Anual (€)</label>
-              <input type="number" id="calcMaintenance" value="75" min="0" step="1">
-            </div>
-            <div class="form-group">
-              <label>Vida Útil (anos)</label>
-              <input type="number" id="calcPrinterLife" value="3" min="1" step="1">
-            </div>
-          </div>
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Uptime (%)</label>
-              <input type="number" id="calcUptime" value="50" min="1" max="100" step="1">
-            </div>
-            <div class="form-group">
-              <label>Consumo Energia (W)</label>
-              <input type="number" id="calcPowerW" value="150" min="0" step="10">
-            </div>
-          </div>
-          <div class="calc-two-col">
-            <div class="form-group">
-              <label>Custo Energia (€/kWh)</label>
-              <input type="number" id="calcEnergyRate" value="0.20" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-              <label>Fator Buffer</label>
-              <input type="number" id="calcBufferFactor" value="1.3" min="1" step="0.05">
-            </div>
-          </div>
-
-          <!-- CALCULATED METRICS -->
-          <div class="calc-metrics-grid" id="calcMetrics">
-            <div class="calc-metric">
-              <div class="calc-metric-label">Investimento Total</div>
-              <div class="calc-metric-value" id="metricTotalInvestment">749,00 €</div>
-            </div>
-            <div class="calc-metric">
-              <div class="calc-metric-label">Custo de Vida</div>
-              <div class="calc-metric-value" id="metricLifetimeCost">974,00 €</div>
-            </div>
-            <div class="calc-metric">
-              <div class="calc-metric-label">Uptime Estimado</div>
-              <div class="calc-metric-value highlight" id="metricUptime">4380 hrs/ano</div>
-            </div>
-            <div class="calc-metric">
-              <div class="calc-metric-label">Depreciação</div>
-              <div class="calc-metric-value" id="metricDepreciation">0.06 €/hr</div>
-            </div>
-            <div class="calc-metric">
-              <div class="calc-metric-label">Manutenção</div>
-              <div class="calc-metric-value" id="metricMaintenanceCost">0.02 €/hr</div>
-            </div>
-            <div class="calc-metric calc-metric-accent">
-              <div class="calc-metric-label">Custo Total Impressora</div>
-              <div class="calc-metric-value" id="metricPrinterCost">0.14 €/hr</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /calc-inputs-col -->
-
-    <!-- ===== COLUNA DIREITA: RESULTADOS ===== -->
-    <div class="calc-results-col">
-
-      <!-- SUGGESTED PRICING -->
-      <div class="calc-card calc-pricing-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">💎</span>
-          <h3>PREÇOS SUGERIDOS</h3>
-        </div>
-        <div class="calc-card-body">
-          <div class="calc-pricing-grid">
-            <div class="pricing-tier competitive">
-              <div class="tier-header">
-                <span class="tier-icon">🌿</span>
-                <span class="tier-name">COMPETITIVO</span>
-                <span class="tier-price" id="priceCompetitive">3,32 €</span>
-              </div>
-              <div class="tier-margin">25% margem de lucro</div>
-              <div class="tier-vat" id="vatCompetitive">3,99 € c/ IVA</div>
-            </div>
-            <div class="pricing-tier standard">
-              <div class="tier-header">
-                <span class="tier-icon">⭐</span>
-                <span class="tier-name">STANDARD</span>
-                <span class="tier-price" id="priceStandard">4,15 €</span>
-              </div>
-              <div class="tier-margin">40% margem de lucro</div>
-              <div class="tier-vat" id="vatStandard">4,99 € c/ IVA</div>
-            </div>
-            <div class="pricing-tier premium">
-              <div class="tier-header">
-                <span class="tier-icon">🏆</span>
-                <span class="tier-name">PREMIUM</span>
-                <span class="tier-price" id="pricePremium">6,23 €</span>
-              </div>
-              <div class="tier-margin">60% margem de lucro</div>
-              <div class="tier-vat" id="vatPremium">7,48 € c/ IVA</div>
-            </div>
-            <div class="pricing-tier luxury">
-              <div class="tier-header">
-                <span class="tier-icon">💜</span>
-                <span class="tier-name">LUXURY</span>
-                <span class="tier-price" id="priceLuxury">12,46 €</span>
-              </div>
-              <div class="tier-margin">80% margem de lucro</div>
-              <div class="tier-vat" id="vatLuxury">14,96 € c/ IVA</div>
-            </div>
-          </div>
-
-          <!-- CUSTOM PRICING -->
-          <div class="calc-custom-pricing">
-            <div class="custom-pricing-header">
-              <span class="tier-icon">🎛️</span>
-              <span class="tier-name">PERSONALIZADO</span>
-              <span class="tier-price" id="priceCustom">4,99 €</span>
-            </div>
-            <div class="custom-pricing-desc">Define a tua própria margem de lucro manualmente.</div>
-            <div class="custom-slider-row">
-              <input type="range" id="customMarginSlider" min="0" max="200" value="50" class="calc-slider">
-              <input type="number" id="customMarginInput" value="50" min="0" max="200" class="calc-slider-num">
-              <span class="calc-slider-pct">%</span>
-            </div>
-            <div class="custom-pricing-footer">
-              <span id="customMarginLabel">50% margem de lucro</span>
-              <span id="vatCustom">5,98 € c/ IVA</span>
-            </div>
-          </div>
-
-          <!-- SELECTED / SAVE -->
-          <div class="calc-selected-row">
-            <div class="calc-selected-info">
-              Selecionado: <strong id="selectedPriceDisplay">4,99 € c/ IVA</strong>
-              <span id="selectedMarginDisplay" class="calc-margin-badge">40% margem</span>
-            </div>
-            <div class="calc-save-actions">
-              <button id="saveQuoteBtn" class="btn-primary calc-save-btn">💾 GUARDAR ORÇAMENTO</button>
-              <button id="copyCalcBtn" class="btn-icon" title="Copiar">📋</button>
-              <button id="shareCalcBtn" class="btn-icon" title="Partilhar">↗</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- COST BREAKDOWN -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">📊</span>
-          <h3>DECOMPOSIÇÃO DE CUSTOS</h3>
-        </div>
-        <div class="calc-card-body">
-          <div class="breakdown-grid">
-            <div class="breakdown-item">
-              <div class="breakdown-label">Custo Material</div>
-              <div class="breakdown-value" id="breakdownMaterial">0,02 €</div>
-            </div>
-            <div class="breakdown-item">
-              <div class="breakdown-label">Custo Hardware</div>
-              <div class="breakdown-value" id="breakdownHardware">1,00 €</div>
-            </div>
-            <div class="breakdown-item">
-              <div class="breakdown-label">Custo Embalagem</div>
-              <div class="breakdown-value" id="breakdownPackaging">1,00 €</div>
-            </div>
-            <div class="breakdown-item">
-              <div class="breakdown-label">Custo Mão de Obra</div>
-              <div class="breakdown-value" id="breakdownLabor">0,33 €</div>
-            </div>
-            <div class="breakdown-item">
-              <div class="breakdown-label">Custo Máquina</div>
-              <div class="breakdown-value" id="breakdownMachine">0,14 €</div>
-            </div>
-            <div class="breakdown-item breakdown-total">
-              <div class="breakdown-label">🔴 Custo Total Landed</div>
-              <div class="breakdown-value breakdown-total-value" id="breakdownTotal">2,49 €</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- COST ALLOCATION CHART -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">🥧</span>
-          <h3>ALOCAÇÃO DE CUSTOS</h3>
-        </div>
-        <div class="calc-card-body">
-          <div class="calc-allocation-layout">
-            <!-- Donut Chart -->
-            <div class="calc-donut-wrapper">
-              <svg id="costDonut" viewBox="0 0 200 200" width="200" height="200">
-                <circle id="donut-bg" cx="100" cy="100" r="70" fill="none" stroke="#E0E0E0" stroke-width="30"/>
-                <!-- Segments rendered by JS -->
-              </svg>
-              <div class="donut-center">
-                <div class="donut-total-label">Total</div>
-                <div class="donut-total-value" id="donutTotalValue">2,49 €</div>
+      <div class="calc-layout">
+        <div class="calc-inputs-col">
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">📋</span><h3>DETALHES DO PROJETO</h3></div>
+            <div class="calc-card-body">
+              <div class="form-group"><label>Nome da Peça</label><input type="text" id="calcPartName" placeholder="Ex: Suporte para câmara"></div>
+              <div class="calc-two-col">
+                <div class="form-group"><label>Perfil de Impressora</label><select id="calcPrinterProfile"><option value="generic">Generic Printer</option><option value="prusa_mk4">Prusa MK4</option><option value="bambu_x1">Bambu Lab X1</option><option value="ender3">Ender 3</option><option value="custom">Personalizado</option></select></div>
+                <div class="form-group"><label>Peso Total (g)</label><input type="number" id="calcTotalWeight" placeholder="1.00" step="0.01" min="0" value="1"></div>
               </div>
             </div>
-            <!-- Legend -->
-            <div class="calc-legend" id="calcLegend">
-              <!-- Rendered by JS -->
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">🎨</span><h3>FILAMENTOS</h3><div class="calc-card-header-note">Peso Total: <strong id="calcTotalWeightDisplay">1.00g</strong></div></div>
+            <div class="calc-card-body">
+              <div id="filamentsContainer"></div>
+              <button id="addFilamentBtn" class="calc-add-btn">➕ Adicionar Material</button>
+              <div class="calc-upgrade-note">⬆ Adiciona múltiplos materiais para suporte multi-material</div>
             </div>
           </div>
-          <div class="calc-allocation-footer">
-            <span>Custo Total Landed</span>
-            <span id="allocationTotal">2,49 €</span>
-            <span id="allocationLargest" style="font-size:11px;opacity:0.7">Maior: Embalagem (40.1%)</span>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">⏱️</span><h3>TEMPOS</h3></div>
+            <div class="calc-card-body">
+              <div class="calc-two-col">
+                <div class="form-group"><label>Tempo Impressão (h)</label><input type="number" id="calcPrintHours" value="1" min="0" step="1" class="calc-time-input"></div>
+                <div class="form-group"><label>Minutos</label><input type="number" id="calcPrintMins" value="1" min="0" max="59" step="1" class="calc-time-input"></div>
+              </div>
+              <div class="form-group" style="margin-top:8px"><label>Tempo Mão de Obra (min)</label><input type="number" id="calcLaborMins" value="1" min="0" step="1" class="calc-time-input"></div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">💰</span><h3>CUSTOS FIXOS</h3></div>
+            <div class="calc-card-body">
+              <div class="calc-two-col">
+                <div class="form-group"><label>Hardware (€)</label><input type="number" id="calcHardwareCost" value="1" min="0" step="0.01"></div>
+                <div class="form-group"><label>Embalagem (€)</label><input type="number" id="calcPackagingCost" value="1" min="0" step="0.01"></div>
+              </div>
+              <div class="form-group"><label>IVA (%)</label><input type="number" id="calcVatRate" value="20" min="0" max="100" step="0.5"></div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">⚙️</span><h3>CONFIGURAÇÕES AVANÇADAS</h3><label class="calc-toggle-label"><input type="checkbox" id="advancedToggle"><span class="calc-toggle"></span></label></div>
+            <div id="advancedSettingsBody" class="calc-card-body calc-advanced-body" style="display:none;">
+              <div class="calc-two-col">
+                <div class="form-group"><label>Taxa Mão de Obra (€/h)</label><input type="number" id="calcLaborRate" value="20" min="0" step="0.5"></div>
+                <div class="form-group"><label>Fator Eficiência Material</label><input type="number" id="calcEfficiency" value="1.1" min="0.1" step="0.05"></div>
+              </div>
+              <div class="calc-two-col">
+                <div class="form-group"><label>Custo Impressora (€)</label><input type="number" id="calcPrinterCost" value="749" min="0" step="1"></div>
+                <div class="form-group"><label>Custo Inicial Adicional (€)</label><input type="number" id="calcUpfrontCost" value="0" min="0" step="1"></div>
+              </div>
+              <div class="calc-two-col">
+                <div class="form-group"><label>Manutenção Anual (€)</label><input type="number" id="calcMaintenance" value="75" min="0" step="1"></div>
+                <div class="form-group"><label>Vida Útil (anos)</label><input type="number" id="calcPrinterLife" value="3" min="1" step="1"></div>
+              </div>
+              <div class="calc-two-col">
+                <div class="form-group"><label>Uptime (%)</label><input type="number" id="calcUptime" value="50" min="1" max="100" step="1"></div>
+                <div class="form-group"><label>Consumo Energia (W)</label><input type="number" id="calcPowerW" value="150" min="0" step="10"></div>
+              </div>
+              <div class="calc-two-col">
+                <div class="form-group"><label>Custo Energia (€/kWh)</label><input type="number" id="calcEnergyRate" value="0.20" min="0" step="0.01"></div>
+                <div class="form-group"><label>Fator Buffer</label><input type="number" id="calcBufferFactor" value="1.3" min="1" step="0.05"></div>
+              </div>
+              <div class="calc-metrics-grid" id="calcMetrics">
+                <div class="calc-metric"><div class="calc-metric-label">Investimento Total</div><div class="calc-metric-value" id="metricTotalInvestment">749,00 €</div></div>
+                <div class="calc-metric"><div class="calc-metric-label">Custo de Vida</div><div class="calc-metric-value" id="metricLifetimeCost">974,00 €</div></div>
+                <div class="calc-metric"><div class="calc-metric-label">Uptime Estimado</div><div class="calc-metric-value highlight" id="metricUptime">4380 hrs/ano</div></div>
+                <div class="calc-metric"><div class="calc-metric-label">Depreciação</div><div class="calc-metric-value" id="metricDepreciation">0.06 €/hr</div></div>
+                <div class="calc-metric"><div class="calc-metric-label">Manutenção</div><div class="calc-metric-value" id="metricMaintenanceCost">0.02 €/hr</div></div>
+                <div class="calc-metric calc-metric-accent"><div class="calc-metric-label">Custo Total Impressora</div><div class="calc-metric-value" id="metricPrinterCost">0.14 €/hr</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-results-col">
+          <div class="calc-card calc-pricing-card">
+            <div class="calc-card-header"><span class="calc-card-icon">💎</span><h3>PREÇOS SUGERIDOS</h3></div>
+            <div class="calc-card-body">
+              <div class="calc-pricing-grid">
+                <div class="pricing-tier competitive"><div class="tier-header"><span class="tier-icon">🌿</span><span class="tier-name">COMPETITIVO</span><span class="tier-price" id="priceCompetitive">3,32 €</span></div><div class="tier-margin">25% margem de lucro</div><div class="tier-vat" id="vatCompetitive">3,99 € c/ IVA</div></div>
+                <div class="pricing-tier standard"><div class="tier-header"><span class="tier-icon">⭐</span><span class="tier-name">STANDARD</span><span class="tier-price" id="priceStandard">4,15 €</span></div><div class="tier-margin">40% margem de lucro</div><div class="tier-vat" id="vatStandard">4,99 € c/ IVA</div></div>
+                <div class="pricing-tier premium"><div class="tier-header"><span class="tier-icon">🏆</span><span class="tier-name">PREMIUM</span><span class="tier-price" id="pricePremium">6,23 €</span></div><div class="tier-margin">60% margem de lucro</div><div class="tier-vat" id="vatPremium">7,48 € c/ IVA</div></div>
+                <div class="pricing-tier luxury"><div class="tier-header"><span class="tier-icon">💜</span><span class="tier-name">LUXURY</span><span class="tier-price" id="priceLuxury">12,46 €</span></div><div class="tier-margin">80% margem de lucro</div><div class="tier-vat" id="vatLuxury">14,96 € c/ IVA</div></div>
+              </div>
+              <div class="calc-custom-pricing">
+                <div class="custom-pricing-header"><span class="tier-icon">🎛️</span><span class="tier-name">PERSONALIZADO</span><span class="tier-price" id="priceCustom">4,99 €</span></div>
+                <div class="custom-pricing-desc">Define a tua própria margem de lucro manualmente.</div>
+                <div class="custom-slider-row"><input type="range" id="customMarginSlider" min="0" max="200" value="50" class="calc-slider"><input type="number" id="customMarginInput" value="50" min="0" max="200" class="calc-slider-num"><span class="calc-slider-pct">%</span></div>
+                <div class="custom-pricing-footer"><span id="customMarginLabel">50% margem de lucro</span><span id="vatCustom">5,98 € c/ IVA</span></div>
+              </div>
+              <div class="calc-selected-row">
+                <div class="calc-selected-info">Selecionado: <strong id="selectedPriceDisplay">4,99 € c/ IVA</strong><span id="selectedMarginDisplay" class="calc-margin-badge">40% margem</span></div>
+                <div class="calc-save-actions"><button id="saveQuoteBtn" class="btn-primary calc-save-btn">💾 GUARDAR ORÇAMENTO</button><button id="copyCalcBtn" class="btn-icon" title="Copiar">📋</button><button id="shareCalcBtn" class="btn-icon" title="Partilhar">↗</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">📊</span><h3>DECOMPOSIÇÃO DE CUSTOS</h3></div>
+            <div class="calc-card-body">
+              <div class="breakdown-grid">
+                <div class="breakdown-item"><div class="breakdown-label">Custo Material</div><div class="breakdown-value" id="breakdownMaterial">0,02 €</div></div>
+                <div class="breakdown-item"><div class="breakdown-label">Custo Hardware</div><div class="breakdown-value" id="breakdownHardware">1,00 €</div></div>
+                <div class="breakdown-item"><div class="breakdown-label">Custo Embalagem</div><div class="breakdown-value" id="breakdownPackaging">1,00 €</div></div>
+                <div class="breakdown-item"><div class="breakdown-label">Custo Mão de Obra</div><div class="breakdown-value" id="breakdownLabor">0,33 €</div></div>
+                <div class="breakdown-item"><div class="breakdown-label">Custo Máquina</div><div class="breakdown-value" id="breakdownMachine">0,14 €</div></div>
+                <div class="breakdown-item breakdown-total"><div class="breakdown-label">🔴 Custo Total Landed</div><div class="breakdown-value breakdown-total-value" id="breakdownTotal">2,49 €</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">🥧</span><h3>ALOCAÇÃO DE CUSTOS</h3></div>
+            <div class="calc-card-body">
+              <div class="calc-allocation-layout">
+                <div class="calc-donut-wrapper">
+                  <svg id="costDonut" viewBox="0 0 200 200" width="200" height="200">
+                    <circle id="donut-bg" cx="100" cy="100" r="70" fill="none" stroke="#E0E0E0" stroke-width="30"/>
+                  </svg>
+                  <div class="donut-center"><div class="donut-total-label">Total</div><div class="donut-total-value" id="donutTotalValue">2,49 €</div></div>
+                </div>
+                <div class="calc-legend" id="calcLegend"></div>
+              </div>
+              <div class="calc-allocation-footer"><span>Custo Total Landed</span><span id="allocationTotal">2,49 €</span><span id="allocationLargest" style="font-size:11px;opacity:0.7">Maior: Embalagem (40.1%)</span></div>
+            </div>
+          </div>
+          <div class="calc-card">
+            <div class="calc-card-header"><span class="calc-card-icon">📁</span><h3>ORÇAMENTOS GUARDADOS</h3><button id="clearQuotesBtn" class="calc-clear-btn">Limpar</button></div>
+            <div class="calc-card-body" id="savedQuotesList"><div class="calc-empty-state">Nenhum orçamento guardado ainda.</div></div>
           </div>
         </div>
       </div>
-
-      <!-- SAVED QUOTES -->
-      <div class="calc-card">
-        <div class="calc-card-header">
-          <span class="calc-card-icon">📁</span>
-          <h3>ORÇAMENTOS GUARDADOS</h3>
-          <button id="clearQuotesBtn" class="calc-clear-btn">Limpar</button>
-        </div>
-        <div class="calc-card-body" id="savedQuotesList">
-          <div class="calc-empty-state">Nenhum orçamento guardado ainda.</div>
-        </div>
-      </div>
-
-    </div><!-- /calc-results-col -->
-
-  </div><!-- /calc-layout -->
-</section>
-
+    </section>
 
   </main>
 
@@ -889,15 +836,33 @@
     </div>
   </div>
 
+  <!-- *** MODAL VER UTILIZADOR — COM HISTÓRICO DE ENCOMENDAS *** -->
   <div id="viewUserModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header"><h3>DETALHES DO UTILIZADOR</h3><button class="modal-close" data-close="viewUser">×</button></div>
+    <div class="modal-content modal-view-user">
+      <div class="modal-header">
+        <h3>DETALHES DO UTILIZADOR</h3>
+        <button class="modal-close" data-close="viewUser">×</button>
+      </div>
+
+      <!-- INFO DO UTILIZADOR -->
       <div class="user-details">
         <div class="detail-row"><span class="detail-label">Nome:</span><span class="detail-value" id="viewUserName"></span></div>
         <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value" id="viewUserEmail"></span></div>
         <div class="detail-row"><span class="detail-label">Role:</span><span class="detail-value"><span id="viewUserRole" class="role-badge"></span></span></div>
         <div class="detail-row"><span class="detail-label">Registado em:</span><span class="detail-value" id="viewUserCreated"></span></div>
       </div>
+
+      <!-- HISTÓRICO DE ENCOMENDAS -->
+      <div class="user-orders-section">
+        <div class="user-orders-header">
+          <span class="user-orders-title">📋 HISTÓRICO DE ENCOMENDAS</span>
+          <div id="userOrdersSummary" class="user-orders-summary"></div>
+        </div>
+        <div id="userOrdersContainer" class="user-orders-list">
+          <div class="user-orders-loading"><span>⏳</span> A carregar...</div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button id="editUserFromViewBtn" class="btn-primary">✏️ EDITAR</button>
         <button id="deleteUserFromViewBtn" class="btn-danger">🗑️ ELIMINAR</button>
@@ -933,68 +898,32 @@
   <!-- =========================================================
        MODAIS DE CATEGORIAS
        ========================================================= -->
-
-  <!-- Modal: Categoria Principal -->
   <div id="primaryCategoryModal" class="modal hidden">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="primaryCatModalTitle">NOVA CATEGORIA PRINCIPAL</h3>
-        <button class="modal-close" data-close="primaryCat">×</button>
-      </div>
+      <div class="modal-header"><h3 id="primaryCatModalTitle">NOVA CATEGORIA PRINCIPAL</h3><button class="modal-close" data-close="primaryCat">×</button></div>
       <form id="primaryCategoryForm" class="modal-form">
         <input type="hidden" id="primaryCatId">
-        <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="primaryCatName" required placeholder="Ex: Decoração">
-        </div>
-        <div class="form-group">
-          <label>Descrição</label>
-          <textarea id="primaryCatDesc" rows="2" placeholder="Descrição breve desta categoria"></textarea>
-        </div>
+        <div class="form-group"><label>Nome *</label><input type="text" id="primaryCatName" required placeholder="Ex: Decoração"></div>
+        <div class="form-group"><label>Descrição</label><textarea id="primaryCatDesc" rows="2" placeholder="Descrição breve desta categoria"></textarea></div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Ícone (emoji)</label>
-            <input type="text" id="primaryCatIcon" placeholder="Ex: 🏺" style="font-size:20px">
-          </div>
-          <div class="form-group">
-            <label>Ordem de exibição</label>
-            <input type="number" id="primaryCatOrder" value="0" min="0">
-          </div>
+          <div class="form-group"><label>Ícone (emoji)</label><input type="text" id="primaryCatIcon" placeholder="Ex: 🏺" style="font-size:20px"></div>
+          <div class="form-group"><label>Ordem de exibição</label><input type="number" id="primaryCatOrder" value="0" min="0"></div>
         </div>
         <button type="submit" class="btn-primary">💾 GUARDAR</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Categoria Secundária -->
   <div id="secondaryCategoryModal" class="modal hidden">
     <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="secondaryCatModalTitle">NOVA CATEGORIA SECUNDÁRIA</h3>
-        <button class="modal-close" data-close="secondaryCat">×</button>
-      </div>
+      <div class="modal-header"><h3 id="secondaryCatModalTitle">NOVA CATEGORIA SECUNDÁRIA</h3><button class="modal-close" data-close="secondaryCat">×</button></div>
       <form id="secondaryCategoryForm" class="modal-form">
         <input type="hidden" id="secondaryCatId">
-        <div class="form-group">
-          <label>Nome *</label>
-          <input type="text" id="secondaryCatName" required placeholder="Ex: PLA, Best Seller">
-        </div>
-        <div class="form-group">
-          <label>Descrição</label>
-          <textarea id="secondaryCatDesc" rows="2" placeholder="Descrição opcional"></textarea>
-        </div>
+        <div class="form-group"><label>Nome *</label><input type="text" id="secondaryCatName" required placeholder="Ex: PLA, Best Seller"></div>
+        <div class="form-group"><label>Descrição</label><textarea id="secondaryCatDesc" rows="2" placeholder="Descrição opcional"></textarea></div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Tipo</label>
-            <select id="secondaryCatRole">
-              <option value="secondary">📌 Secundária (material, estilo...)</option>
-              <option value="tag">🏷️ Tag (best seller, novo...)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ordem</label>
-            <input type="number" id="secondaryCatOrder" value="0" min="0">
-          </div>
+          <div class="form-group"><label>Tipo</label><select id="secondaryCatRole"><option value="secondary">📌 Secundária (material, estilo...)</option><option value="tag">🏷️ Tag (best seller, novo...)</option></select></div>
+          <div class="form-group"><label>Ordem</label><input type="number" id="secondaryCatOrder" value="0" min="0"></div>
         </div>
         <button type="submit" class="btn-primary">💾 GUARDAR</button>
       </form>
@@ -1004,159 +933,84 @@
   <!-- =========================================================
        MODAIS DE PRODUTOS
        ========================================================= -->
-
-  <!-- Modal: Criar Produto -->
   <div id="createProductModal" class="modal hidden">
     <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h3>CRIAR NOVO PRODUTO</h3>
-        <button class="modal-close" data-close="create">×</button>
-      </div>
+      <div class="modal-header"><h3>CRIAR NOVO PRODUTO</h3><button class="modal-close" data-close="create">×</button></div>
       <form id="createProductForm" class="modal-form">
-
         <div class="form-row">
-          <div class="form-group">
-            <label>Nome *</label>
-            <input type="text" id="createName" required>
-          </div>
-          <div class="form-group">
-            <label>Preço (€) *</label>
-            <input type="number" id="createPrice" step="0.01" required>
-          </div>
+          <div class="form-group"><label>Nome *</label><input type="text" id="createName" required></div>
+          <div class="form-group"><label>Preço (€) *</label><input type="number" id="createPrice" step="0.01" required></div>
         </div>
-
-        <!-- CATEGORIA PRINCIPAL -->
-        <div class="form-group">
-          <label>Categoria Principal * <small style="color:#666;font-weight:normal">(obrigatória — 1 por produto)</small></label>
-          <select id="createPrimaryCategory" class="primary-cat-select" required>
-            <option value="">-- Seleciona categoria principal --</option>
-          </select>
-        </div>
-
-        <!-- CATEGORIAS SECUNDÁRIAS -->
-        <div class="form-group">
-          <label>Categorias Secundárias / Tags <small style="color:#666;font-weight:normal">(opcional — múltiplas)</small></label>
-          <div id="createSecondaryCategories" class="secondary-cats-grid"></div>
-        </div>
-
-        <!-- DESCRIÇÃO RICH TEXT -->
+        <div class="form-group"><label>Categoria Principal * <small style="color:#666;font-weight:normal">(obrigatória — 1 por produto)</small></label><select id="createPrimaryCategory" class="primary-cat-select" required><option value="">-- Seleciona categoria principal --</option></select></div>
+        <div class="form-group"><label>Categorias Secundárias / Tags <small style="color:#666;font-weight:normal">(opcional — múltiplas)</small></label><div id="createSecondaryCategories" class="secondary-cats-grid"></div></div>
         <div class="form-group">
           <label>Descrição *</label>
           <div class="rich-editor-toolbar">
-            <button type="button" onclick="document.execCommand('bold')" title="Negrito"><b>B</b></button>
-            <button type="button" onclick="document.execCommand('italic')" title="Itálico"><i>I</i></button>
-            <button type="button" onclick="document.execCommand('underline')" title="Sublinhado"><u>U</u></button>
+            <button type="button" onclick="document.execCommand('bold')"><b>B</b></button>
+            <button type="button" onclick="document.execCommand('italic')"><i>I</i></button>
+            <button type="button" onclick="document.execCommand('underline')"><u>U</u></button>
             <div class="separator"></div>
-            <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')" title="Título 2">H2</button>
-            <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')" title="Título 3">H3</button>
-            <button type="button" onclick="document.execCommand('formatBlock', false, 'p')" title="Parágrafo">¶</button>
+            <button type="button" onclick="document.execCommand('formatBlock',false,'h2')">H2</button>
+            <button type="button" onclick="document.execCommand('formatBlock',false,'h3')">H3</button>
+            <button type="button" onclick="document.execCommand('formatBlock',false,'p')">¶</button>
             <div class="separator"></div>
-            <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Lista">• Lista</button>
-            <button type="button" onclick="document.execCommand('insertOrderedList')" title="Lista numerada">1. Lista</button>
+            <button type="button" onclick="document.execCommand('insertUnorderedList')">• Lista</button>
+            <button type="button" onclick="document.execCommand('insertOrderedList')">1. Lista</button>
             <div class="separator"></div>
-            <button type="button" onclick="document.execCommand('formatBlock', false, 'blockquote')" title="Citação">❝</button>
-            <button type="button" onclick="document.execCommand('removeFormat')" title="Limpar formatação">✕ Fmt</button>
+            <button type="button" onclick="document.execCommand('formatBlock',false,'blockquote')">❝</button>
+            <button type="button" onclick="document.execCommand('removeFormat')">✕ Fmt</button>
           </div>
           <div id="createDescEditor" class="rich-editor-content" contenteditable="true" data-placeholder="Descreve o produto..."></div>
         </div>
-
-        <div class="form-group checkbox-group">
-          <label><input type="checkbox" id="createStock"> Produto disponível em stock</label>
-        </div>
-
-        <div class="form-group">
-          <label>Modelo 3D (.glb)</label>
-          <input type="file" id="createModelFile" name="modelFile" accept=".glb">
-        </div>
-        <div class="form-group">
-          <label>Imagens (até 4)</label>
-          <input type="file" id="createImages" name="images" accept="image/*" multiple>
-        </div>
-
+        <div class="form-group checkbox-group"><label><input type="checkbox" id="createStock"> Produto disponível em stock</label></div>
+        <div class="form-group"><label>Modelo 3D (.glb)</label><input type="file" id="createModelFile" name="modelFile" accept=".glb"></div>
+        <div class="form-group"><label>Imagens (até 4)</label><input type="file" id="createImages" name="images" accept="image/*" multiple></div>
         <button type="submit" class="btn-primary">➕ CRIAR PRODUTO</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal: Editar Produto -->
   <div id="editProductModal" class="modal hidden">
     <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h3>EDITAR PRODUTO: <span id="editProductName"></span></h3>
-        <button class="modal-close" data-close="edit">×</button>
-      </div>
-
+      <div class="modal-header"><h3>EDITAR PRODUTO: <span id="editProductName"></span></h3><button class="modal-close" data-close="edit">×</button></div>
       <div class="modal-tabs">
         <button class="modal-tab-btn active" data-tab="edit-details">📋 Detalhes</button>
         <button class="modal-tab-btn" data-tab="edit-model">🎨 Modelo 3D</button>
         <button class="modal-tab-btn" data-tab="edit-images">🖼️ Imagens</button>
       </div>
-
       <div class="modal-tabs-container">
-
-        <!-- ABA: DETALHES -->
         <div id="tab-edit-details" class="modal-tab-content active">
           <form id="editProductForm">
             <input type="hidden" id="editId">
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Nome *</label>
-                <input type="text" id="editName" required>
-              </div>
-              <div class="form-group">
-                <label>Preço (€) *</label>
-                <input type="number" id="editPrice" step="0.01" required>
-              </div>
-            </div>
-
-            <!-- CATEGORIA PRINCIPAL -->
-            <div class="form-group">
-              <label>Categoria Principal * <small style="color:#666;font-weight:normal">(obrigatória — 1 por produto)</small></label>
-              <select id="editPrimaryCategory" class="primary-cat-select" required>
-                <option value="">-- Seleciona categoria principal --</option>
-              </select>
-            </div>
-
-            <!-- CATEGORIAS SECUNDÁRIAS -->
-            <div class="form-group">
-              <label>Categorias Secundárias / Tags <small style="color:#666;font-weight:normal">(opcional — múltiplas)</small></label>
-              <div id="editSecondaryCategories" class="secondary-cats-grid"></div>
-            </div>
-
-            <!-- DESCRIÇÃO RICH TEXT -->
+            <div class="form-row"><div class="form-group"><label>Nome *</label><input type="text" id="editName" required></div><div class="form-group"><label>Preço (€) *</label><input type="number" id="editPrice" step="0.01" required></div></div>
+            <div class="form-group"><label>Categoria Principal *</label><select id="editPrimaryCategory" class="primary-cat-select" required><option value="">-- Seleciona categoria principal --</option></select></div>
+            <div class="form-group"><label>Categorias Secundárias / Tags</label><div id="editSecondaryCategories" class="secondary-cats-grid"></div></div>
             <div class="form-group">
               <label>Descrição *</label>
               <div class="rich-editor-toolbar">
-                <button type="button" onclick="document.execCommand('bold')" title="Negrito"><b>B</b></button>
-                <button type="button" onclick="document.execCommand('italic')" title="Itálico"><i>I</i></button>
-                <button type="button" onclick="document.execCommand('underline')" title="Sublinhado"><u>U</u></button>
+                <button type="button" onclick="document.execCommand('bold')"><b>B</b></button>
+                <button type="button" onclick="document.execCommand('italic')"><i>I</i></button>
+                <button type="button" onclick="document.execCommand('underline')"><u>U</u></button>
                 <div class="separator"></div>
-                <button type="button" onclick="document.execCommand('formatBlock', false, 'h2')" title="Título 2">H2</button>
-                <button type="button" onclick="document.execCommand('formatBlock', false, 'h3')" title="Título 3">H3</button>
-                <button type="button" onclick="document.execCommand('formatBlock', false, 'p')" title="Parágrafo">¶</button>
+                <button type="button" onclick="document.execCommand('formatBlock',false,'h2')">H2</button>
+                <button type="button" onclick="document.execCommand('formatBlock',false,'h3')">H3</button>
+                <button type="button" onclick="document.execCommand('formatBlock',false,'p')">¶</button>
                 <div class="separator"></div>
-                <button type="button" onclick="document.execCommand('insertUnorderedList')" title="Lista">• Lista</button>
-                <button type="button" onclick="document.execCommand('insertOrderedList')" title="Lista numerada">1. Lista</button>
+                <button type="button" onclick="document.execCommand('insertUnorderedList')">• Lista</button>
+                <button type="button" onclick="document.execCommand('insertOrderedList')">1. Lista</button>
                 <div class="separator"></div>
-                <button type="button" onclick="document.execCommand('formatBlock', false, 'blockquote')" title="Citação">❝</button>
-                <button type="button" onclick="document.execCommand('removeFormat')" title="Limpar formatação">✕ Fmt</button>
+                <button type="button" onclick="document.execCommand('formatBlock',false,'blockquote')">❝</button>
+                <button type="button" onclick="document.execCommand('removeFormat')">✕ Fmt</button>
               </div>
               <div id="editDescEditor" class="rich-editor-content" contenteditable="true"></div>
             </div>
-
-            <div class="form-group">
-              <label><input type="checkbox" id="editStock"> Stock Disponível</label>
-            </div>
-
+            <div class="form-group"><label><input type="checkbox" id="editStock"> Stock Disponível</label></div>
             <div class="modal-actions">
               <button type="submit" class="btn-primary">💾 GUARDAR ALTERAÇÕES</button>
               <button type="button" id="deleteProductBtn" class="btn-danger">🗑️ ELIMINAR PRODUTO</button>
             </div>
           </form>
         </div>
-
-        <!-- ABA: MODELO 3D -->
         <div id="tab-edit-model" class="modal-tab-content">
           <div class="model-edit-container">
             <div class="current-model">
@@ -1175,8 +1029,6 @@
             </div>
           </div>
         </div>
-
-        <!-- ABA: IMAGENS -->
         <div id="tab-edit-images" class="modal-tab-content">
           <div class="current-images-section">
             <h4>Imagens Atuais (<span id="imageCount">0</span>/4)</h4>
@@ -1184,76 +1036,48 @@
           </div>
           <div class="upload-images-section">
             <h4>Adicionar Novas Imagens</h4>
-            <div class="upload-area">
-              <input type="file" id="editNewImages" accept="image/*" multiple style="display:none;">
-              <button type="button" class="btn-secondary" onclick="document.getElementById('editNewImages').click()">📁 Escolher Imagens</button>
-              <p id="newImagesInfo" class="file-selected"></p>
-            </div>
+            <div class="upload-area"><input type="file" id="editNewImages" accept="image/*" multiple style="display:none;"><button type="button" class="btn-secondary" onclick="document.getElementById('editNewImages').click()">📁 Escolher Imagens</button><p id="newImagesInfo" class="file-selected"></p></div>
             <button type="button" id="uploadNewImagesBtn" class="btn-primary" disabled>⬆️ Adicionar Imagens</button>
           </div>
           <div class="replace-images-section">
             <h4>Substituir Todas as Imagens</h4>
-            <div class="upload-area">
-              <input type="file" id="editReplaceImages" accept="image/*" multiple style="display:none;">
-              <button type="button" class="btn-secondary" onclick="document.getElementById('editReplaceImages').click()">📁 Escolher Novas Imagens (até 4)</button>
-              <p id="replaceImagesInfo" class="file-selected"></p>
-            </div>
+            <div class="upload-area"><input type="file" id="editReplaceImages" accept="image/*" multiple style="display:none;"><button type="button" class="btn-secondary" onclick="document.getElementById('editReplaceImages').click()">📁 Escolher Novas Imagens (até 4)</button><p id="replaceImagesInfo" class="file-selected"></p></div>
             <button type="button" id="replaceAllImagesBtn" class="btn-danger" disabled>🔄 Substituir Todas</button>
             <small class="warning-text">⚠️ Isto irá eliminar todas as imagens atuais permanentemente!</small>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Modal: Ver Produto -->
   <div id="viewProductModal" class="modal hidden">
     <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h3 id="viewName"></h3>
-        <button class="modal-close" data-close="view">×</button>
-      </div>
-
+      <div class="modal-header"><h3 id="viewName"></h3><button class="modal-close" data-close="view">×</button></div>
       <div class="modal-tabs">
         <button class="modal-tab-btn active" data-tab="details">📋 Detalhes</button>
         <button class="modal-tab-btn" data-tab="model">🎨 Modelo 3D</button>
         <button class="modal-tab-btn" data-tab="images">🖼️ Imagens</button>
       </div>
-
       <div class="modal-tabs-container">
-
         <div id="tab-details" class="modal-tab-content active">
           <div class="product-details-grid">
             <div class="detail-row"><span class="detail-label">Preço:</span><span class="detail-value">€<span id="viewPrice"></span></span></div>
             <div class="detail-row"><span class="detail-label">Stock:</span><span class="detail-value"><span id="viewStock"></span></span></div>
             <div class="detail-row"><span class="detail-label">Estado:</span><span class="detail-value"><span id="viewStatus"></span></span></div>
-            <div class="detail-row">
-              <span class="detail-label">Categoria Principal:</span>
-              <span class="detail-value" id="viewPrimaryCategory"></span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Categorias Secundárias:</span>
-              <span class="detail-value sec-cats-view" id="viewSecondaryCategories"></span>
-            </div>
-            <div class="detail-row full-width">
-              <span class="detail-label">Descrição:</span>
-              <div class="detail-description desc-rendered" id="viewDescription"></div>
-            </div>
+            <div class="detail-row"><span class="detail-label">Categoria Principal:</span><span class="detail-value" id="viewPrimaryCategory"></span></div>
+            <div class="detail-row"><span class="detail-label">Categorias Secundárias:</span><span class="detail-value sec-cats-view" id="viewSecondaryCategories"></span></div>
+            <div class="detail-row full-width"><span class="detail-label">Descrição:</span><div class="detail-description desc-rendered" id="viewDescription"></div></div>
           </div>
         </div>
-
         <div id="tab-model" class="modal-tab-content">
           <div class="model-viewer-container">
             <model-viewer id="viewModel" src="..." alt="Modelo 3D" auto-rotate camera-controls shadow-intensity="1" style="width:100%;height:500px;background-color:#2c2c2c;border-radius:8px;"></model-viewer>
             <div class="model-controls"><p>🖱️ Arrasta para rodar | 🔍 Scroll para zoom</p></div>
           </div>
         </div>
-
         <div id="tab-images" class="modal-tab-content">
           <div id="imagesGrid" class="images-grid"></div>
         </div>
-
       </div>
     </div>
   </div>

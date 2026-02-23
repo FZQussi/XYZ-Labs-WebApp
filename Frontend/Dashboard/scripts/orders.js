@@ -380,6 +380,10 @@
       setTimeout(() => {
         document.getElementById('orderModal')?.classList.add('hidden');
         loadOrders();
+        // Recarregar histórico se o modal de utilizador estiver aberto
+        if (window._currentViewUserId) {
+          window.reloadUserOrders && window.reloadUserOrders(window._currentViewUserId);
+        }
       }, 900);
 
     } catch (err) {
@@ -422,5 +426,15 @@
   });
 
   window.reloadOrders = loadOrders;
+
+  // ===== EXPOR openModal GLOBALMENTE =====
+  // Permite que o modal de utilizadores abra o modal de gerir encomenda
+  window.openOrderModal = openModal;
+
+  // Expor helpers de status para uso externo (modal de utilizadores)
+  window.orderStatusBG    = STATUS_BG;
+  window.orderStatusText  = STATUS_TEXT;
+  window.orderStatusLabels = STATUS_LABELS;
+
   console.log('Modulo de encomendas carregado');
 })();
