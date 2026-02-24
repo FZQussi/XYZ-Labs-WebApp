@@ -260,7 +260,7 @@
     setText('mTotal', fmtEuro(o.total_amount));
 
     // Status
-    const sel = document.getElementById('mStatusSelect');
+    const sel = document.getElementById('mStatus');
     if (sel) sel.value = o.status || 'pending';
     updateStatusHint(o.status);
 
@@ -342,9 +342,21 @@
   async function saveOrder() {
     if (!currentOrder) return;
 
-    const status  = document.getElementById('mStatusSelect')?.value;
-    const code    = document.getElementById('mTrackingCode')?.value.trim();
-    const carrier = document.getElementById('mTrackingCarrier')?.value.trim();
+    // Ler o select — com fallback para o status atual da encomenda
+    const selectEl  = document.getElementById('mStatus');
+    const status    = selectEl?.value || currentOrder.status;
+    const code      = document.getElementById('mTrackingCode')?.value?.trim()    || '';
+    const carrier   = document.getElementById('mTrackingCarrier')?.value?.trim() || '';
+
+    // Debug: detetar se o elemento select não foi encontrado
+    if (!selectEl) {
+      console.warn('⚠️ [orders] #mStatus não encontrado no DOM — a usar status atual:', status);
+    }
+    if (!status) {
+      console.error('❌ [orders] Nenhum status disponível — cancelar save');
+      if (window.showNotification) window.showNotification('Erro: não foi possível ler o estado da encomenda', 'error');
+      return;
+    }
 
     if (status === 'shipped' && !code) {
       document.getElementById('mShipWarning')?.classList.remove('hidden');
@@ -356,6 +368,8 @@
     const btn = document.getElementById('mSaveBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'A guardar...'; }
 
+    console.log(`📤 [orders] A guardar encomenda #${currentOrder.id} → status="${status}", tracking="${code}", carrier="${carrier}"`);
+
     try {
       // 1. Status
       const r1 = await fetch(`${API_BASE}/orders/${currentOrder.id}/status`, {
@@ -363,30 +377,40 @@
         headers: authHeaders(),
         body: JSON.stringify({ status })
       });
-      if (!r1.ok) throw new Error('Erro ao atualizar estado');
+      if (!r1.ok) {
+        const errBody = await r1.json().catch(() => ({}));
+        throw new Error(errBody.error || `Erro ${r1.status} ao atualizar estado`);
+      }
 
       // 2. Tracking
       const r2 = await fetch(`${API_BASE}/orders/${currentOrder.id}/tracking`, {
         method: 'PUT',
         headers: authHeaders(),
-        body: JSON.stringify({ tracking_code: code, tracking_carrier: carrier })
+        body: JSON.stringify({ tracking_code: code || null, tracking_carrier: carrier || null })
       });
-      if (!r2.ok) throw new Error('Erro ao guardar tracking');
+      if (!r2.ok) {
+        const errBody = await r2.json().catch(() => ({}));
+        throw new Error(errBody.error || `Erro ${r2.status} ao guardar tracking`);
+      }
 
       // Sucesso
-      if (btn) { btn.textContent = 'GUARDADO'; btn.style.background = '#00FF00'; btn.style.color = '#000'; }
+      currentOrder.status          = status;
+      currentOrder.tracking_code   = code   || null;
+      currentOrder.tracking_carrier = carrier || null;
+
+      if (btn) { btn.textContent = 'GUARDADO ✓'; btn.style.background = '#00FF00'; btn.style.color = '#000'; }
       if (window.showNotification) window.showNotification(`Encomenda #${currentOrder.id} atualizada`, 'success');
 
       setTimeout(() => {
         document.getElementById('orderModal')?.classList.add('hidden');
         loadOrders();
-        // Recarregar histórico se o modal de utilizador estiver aberto
         if (window._currentViewUserId) {
           window.reloadUserOrders && window.reloadUserOrders(window._currentViewUserId);
         }
       }, 900);
 
     } catch (err) {
+      console.error('❌ [orders] Erro ao guardar:', err.message);
       if (window.showNotification) window.showNotification(err.message, 'error');
       else alert(err.message);
       if (btn) { btn.disabled = false; btn.textContent = 'GUARDAR ALTERACOES'; btn.style.background = ''; btn.style.color = ''; }
@@ -402,7 +426,7 @@
 
     document.getElementById('mSaveBtn')?.addEventListener('click', saveOrder);
 
-    document.getElementById('mStatusSelect')?.addEventListener('change', e => {
+    document.getElementById('mStatus')?.addEventListener('change', e => {
       updateStatusHint(e.target.value);
       applyHeaderColor(e.target.value);
       setText('mStatusLabel', STATUS_LABELS[e.target.value] || e.target.value);

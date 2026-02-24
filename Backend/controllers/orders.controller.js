@@ -211,6 +211,9 @@ async function updateOrderStatus(req, res) {
     const { status } = req.body;
 
     const validStatuses = ['pending','confirmed','printing','shipped','delivered','cancelled'];
+    if (!status) {
+      return res.status(400).json({ error: `Campo "status" em falta no body do pedido.` });
+    }
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: `Status inválido: ${validStatuses.join(', ')}` });
     }
