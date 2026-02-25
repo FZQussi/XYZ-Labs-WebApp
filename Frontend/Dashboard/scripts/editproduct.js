@@ -1,4 +1,4 @@
-// Frontend/Dashboard/scripts/editproduct.js — ATUALIZADO
+// Frontend/Dashboard/scripts/editproduct.js — CORRIGIDO COM ESPERA
 (() => {
   const API_BASE = '';
   const token = localStorage.getItem('token');
@@ -32,9 +32,13 @@
   const imageCount         = editModal?.querySelector('#imageCount');
   const editNewImages      = editModal?.querySelector('#editNewImages');
   const newImagesInfo      = editModal?.querySelector('#newImagesInfo');
+  const newImagesValidationContainer = editModal?.querySelector('#newImagesValidationContainer');
+  const newImagesPreviewGrid = editModal?.querySelector('#newImagesPreviewGrid');
   const uploadNewImagesBtn = editModal?.querySelector('#uploadNewImagesBtn');
   const editReplaceImages  = editModal?.querySelector('#editReplaceImages');
   const replaceImagesInfo  = editModal?.querySelector('#replaceImagesInfo');
+  const replaceImagesValidationContainer = editModal?.querySelector('#replaceImagesValidationContainer');
+  const replaceImagesPreviewGrid = editModal?.querySelector('#replaceImagesPreviewGrid');
   const replaceAllImagesBtn = editModal?.querySelector('#replaceAllImagesBtn');
 
   const editCloseBtn = editModal?.querySelector('[data-close="edit"]');
@@ -44,6 +48,32 @@
   const authHeaders = () => ({ Authorization: `Bearer ${token}` });
   const showModal   = () => editModal?.classList.remove('hidden');
   const hideModal   = () => editModal?.classList.add('hidden');
+
+  // ===== ESPERAR PELO IMAGE VALIDATOR =====
+  function waitForImageValidator() {
+    return new Promise((resolve) => {
+      if (window.ImageValidator) {
+        console.log('✅ ImageValidator já está carregado');
+        resolve();
+        return;
+      }
+
+      const checkInterval = setInterval(() => {
+        if (window.ImageValidator) {
+          console.log('✅ ImageValidator carregado');
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 100);
+
+      // Timeout de 5 segundos
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        console.warn('⚠️ ImageValidator não carregou em tempo útil');
+        resolve(); // Continua mesmo sem o validador
+      }, 5000);
+    });
+  }
 
   // ===== ABAS =====
   tabButtons?.forEach(btn => {
@@ -238,18 +268,86 @@
   });
 
   // ===== IMAGENS UPLOAD =====
-  editNewImages?.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      if (newImagesInfo) newImagesInfo.textContent = `${e.target.files.length} imagem(ns) selecionada(s)`;
+  editNewImages?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (newImagesInfo) newImagesInfo.textContent = files.length > 0 ? `${files.length} imagem(ns) selecionada(s)` : '';
+    
+    // Esperar pelo ImageValidator se necessário
+    if (!window.ImageValidator && files.length > 0) {
+      await waitForImageValidator();
+    }
+
+    // Se temos o validador, usa-o
+    if (files.length > 0 && window.ImageValidator) {
+      const validation = window.ImageValidator.validateFiles(files);
+      
+      if (newImagesValidationContainer) {
+        window.ImageValidator.showNotifications('newImagesValidationContainer', validation);
+      }
+
+      // Mostrar previews
+      if (newImagesPreviewGrid) {
+        newImagesPreviewGrid.innerHTML = '';
+        
+        for (const file of files) {
+          const previewData = await window.ImageValidator.createPreviewWithValidation(file);
+          
+          if (previewData.preview) {
+            const item = document.createElement('div');
+            item.className = `image-preview-item ${previewData.validation.valid ? 'success' : 'error'}`;
+            
+            const img = document.createElement('img');
+            img.src = previewData.preview;
+            img.alt = file.name;
+            
+            const badge = document.createElement('div');
+            badge.className = 'size-badge';
+            badge.textContent = previewData.validation.formatted;
+            badge.title = file.name;
+            
+            item.appendChild(img);
+            item.appendChild(badge);
+            newImagesPreviewGrid.appendChild(item);
+          }
+        }
+      }
+      
       if (uploadNewImagesBtn) uploadNewImagesBtn.disabled = false;
+    } else {
+      if (newImagesValidationContainer) newImagesValidationContainer.innerHTML = '';
+      if (newImagesPreviewGrid) newImagesPreviewGrid.innerHTML = '';
+      if (uploadNewImagesBtn) uploadNewImagesBtn.disabled = true;
     }
   });
 
   uploadNewImagesBtn?.addEventListener('click', async () => {
     const files = editNewImages?.files;
     if (!files?.length) return;
+    
+    // Esperar pelo ImageValidator se necessário
+    if (!window.ImageValidator) {
+      await waitForImageValidator();
+    }
+
+    let validFiles = Array.from(files);
+    
+    // Se temos o validador, filtra os ficheiros válidos
+    if (window.ImageValidator) {
+      const validation = window.ImageValidator.validateFiles(validFiles);
+      if (!validation.valid) {
+        alert(`⚠️ Algumas imagens não são válidas:\n${validation.results.map(r => !r.valid ? `❌ ${r.file.name}` : `✅ ${r.file.name}`).join('\n')}`);
+      }
+      validFiles = validation.validFiles || [];
+    }
+
+    if (validFiles.length === 0) {
+      alert('❌ Nenhuma imagem válida para enviar');
+      return;
+    }
+
     const fd = new FormData();
-    for (let i = 0; i < Math.min(4, files.length); i++) fd.append('images', files[i]);
+    for (let i = 0; i < Math.min(4, validFiles.length); i++) fd.append('images', validFiles[i]);
     try {
       uploadNewImagesBtn.disabled = true;
       uploadNewImagesBtn.textContent = '⏳ A enviar...';
@@ -260,6 +358,8 @@
       await loadProductImages(currentProduct.id);
       if (editNewImages) editNewImages.value = '';
       if (newImagesInfo) newImagesInfo.textContent = '';
+      if (newImagesValidationContainer) newImagesValidationContainer.innerHTML = '';
+      if (newImagesPreviewGrid) newImagesPreviewGrid.innerHTML = '';
     } catch (err) {
       alert('Erro ao adicionar imagens');
     } finally {
@@ -270,10 +370,56 @@
     }
   });
 
-  editReplaceImages?.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-      if (replaceImagesInfo) replaceImagesInfo.textContent = `${e.target.files.length} imagem(ns) selecionada(s)`;
+  editReplaceImages?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (replaceImagesInfo) replaceImagesInfo.textContent = files.length > 0 ? `${files.length} imagem(ns) selecionada(s)` : '';
+    
+    // Esperar pelo ImageValidator se necessário
+    if (!window.ImageValidator && files.length > 0) {
+      await waitForImageValidator();
+    }
+
+    // Se temos o validador, usa-o
+    if (files.length > 0 && window.ImageValidator) {
+      const validation = window.ImageValidator.validateFiles(files);
+      
+      if (replaceImagesValidationContainer) {
+        window.ImageValidator.showNotifications('replaceImagesValidationContainer', validation);
+      }
+
+      // Mostrar previews
+      if (replaceImagesPreviewGrid) {
+        replaceImagesPreviewGrid.innerHTML = '';
+        
+        for (const file of files) {
+          const previewData = await window.ImageValidator.createPreviewWithValidation(file);
+          
+          if (previewData.preview) {
+            const item = document.createElement('div');
+            item.className = `image-preview-item ${previewData.validation.valid ? 'success' : 'error'}`;
+            
+            const img = document.createElement('img');
+            img.src = previewData.preview;
+            img.alt = file.name;
+            
+            const badge = document.createElement('div');
+            badge.className = 'size-badge';
+            badge.textContent = previewData.validation.formatted;
+            badge.title = file.name;
+            
+            item.appendChild(img);
+            item.appendChild(badge);
+            replaceImagesPreviewGrid.appendChild(item);
+          }
+        }
+      }
+      
       if (replaceAllImagesBtn) replaceAllImagesBtn.disabled = false;
+    } else {
+      if (replaceImagesValidationContainer) replaceImagesValidationContainer.innerHTML = '';
+      if (replaceImagesPreviewGrid) replaceImagesPreviewGrid.innerHTML = '';
+      if (replaceAllImagesBtn) replaceAllImagesBtn.disabled = true;
     }
   });
 
@@ -281,8 +427,30 @@
     const files = editReplaceImages?.files;
     if (!files?.length) return;
     if (!confirm('⚠️ Isto irá eliminar TODAS as imagens atuais. Continuar?')) return;
+    
+    // Esperar pelo ImageValidator se necessário
+    if (!window.ImageValidator) {
+      await waitForImageValidator();
+    }
+
+    let validFiles = Array.from(files);
+    
+    // Se temos o validador, filtra os ficheiros válidos
+    if (window.ImageValidator) {
+      const validation = window.ImageValidator.validateFiles(validFiles);
+      if (!validation.valid) {
+        alert(`⚠️ Algumas imagens não são válidas:\n${validation.results.map(r => !r.valid ? `❌ ${r.file.name}` : `✅ ${r.file.name}`).join('\n')}`);
+      }
+      validFiles = validation.validFiles || [];
+    }
+
+    if (validFiles.length === 0) {
+      alert('❌ Nenhuma imagem válida para enviar');
+      return;
+    }
+
     const fd = new FormData();
-    for (let i = 0; i < Math.min(4, files.length); i++) fd.append('images', files[i]);
+    for (let i = 0; i < Math.min(4, validFiles.length); i++) fd.append('images', validFiles[i]);
     try {
       replaceAllImagesBtn.disabled = true;
       replaceAllImagesBtn.textContent = '⏳ A substituir...';
@@ -293,6 +461,8 @@
       await loadProductImages(currentProduct.id);
       if (editReplaceImages) editReplaceImages.value = '';
       if (replaceImagesInfo) replaceImagesInfo.textContent = '';
+      if (replaceImagesValidationContainer) replaceImagesValidationContainer.innerHTML = '';
+      if (replaceImagesPreviewGrid) replaceImagesPreviewGrid.innerHTML = '';
     } catch (err) {
       alert('Erro ao substituir imagens');
     } finally {
@@ -344,6 +514,11 @@
     document.addEventListener('categoriesLoaded', () => {
       if (currentProduct) populateEditCategories(currentProduct);
     });
+  });
+
+  // Esperar pelo ImageValidator ao carregar
+  waitForImageValidator().then(() => {
+    console.log('✅ editproduct.js carregado com ImageValidator');
   });
 
   console.log('✅ editproduct.js carregado');

@@ -50,7 +50,10 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-app.use(express.json({ limit: '10kb' }));
+// ===== AUMENTAR LIMITE DE TAMANHO PARA UPLOADS =====
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
 app.use('/images', express.static(path.join(__dirname, 'Frontend/images')));
 app.use('/models', express.static(path.join(__dirname, 'Frontend/models')));
 app.use('/forgot-password', forgotRoutes);
@@ -86,4 +89,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`✅ Servidor a correr em http://localhost:${port}`);
   console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
+  console.log(`📤 Limite de upload: 100MB (Nginx: 100MB | Express: 100MB)`);
 });
