@@ -1,100 +1,45 @@
 // ============================================================
-// products-filters.js (ALTERADO - MÚLTIPLOS PAINÉIS ABERTOS)
-// Gestão da sidebar de filtros com FILTROS SECUNDÁRIOS DINÂMICOS:
-//   - Carregar categorias primárias da API
-//   - Carregar estrutura de filtros secundários do JSON
-//   - Mostrar/esconder filtros secundários conforme a categoria primária selecionada
-//   - Sections colapsáveis (MÚLTIPLAS ABERTAS SIMULTANEAMENTE)
+// products-filters.js
+// Gestão da sidebar de filtros:
+//   - Carregar categorias primárias e secundárias
+//   - Sections colapsáveis (só uma aberta de cada vez)
+//   - Scroll interno nas listas
 //   - Active filter tags na toolbar
 // ============================================================
 
 const API_BASE = '';
 
 let primaryCategories   = [];
-let categoriesStructure = {}; // Estrutura de filtros secundários por categoria
+let secondaryCategories = [];
 let selectedPrimaryId   = null;
-let selectedSecondaryFilters = {}; // { filterId: [tag ids] }
 
 // ============================================================
-// DETECTAR CAMINHO CORRETO DO JSON (PROCURA NA PASTA /scripts/)
+// CARREGAR CATEGORIAS
 // ============================================================
-async function loadCategoriesStructure() {
-  // Tentar múltiplos caminhos possíveis (a maioria procura em /scripts/ onde está este ficheiro)
-  const possiblePaths = [
-    './categories-structure.json',                    // Mesma pasta (recomendado)
-    '../scripts/categories-structure.json',           // Vindo de pages/
-    '../../PaginaFrontal/scripts/categories-structure.json',  // Caminho completo
-    '/scripts/categories-structure.json',             // Raiz
-  ];
-
-  for (const path of possiblePaths) {
-    try {
-      const response = await fetch(path);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ JSON carregado com sucesso de: ${path}`);
-        return data;
-      }
-    } catch (err) {
-      // Continuar a tentar o próximo caminho
-      continue;
-    }
-  }
-
-  // Se chegou aqui, nenhum caminho funcionou
-  console.error('❌ Não foi possível carregar categories-structure.json');
-  console.error('Caminhos tentados:', possiblePaths);
-  console.error('O ficheiro deve estar em: /PaginaFrontal/scripts/categories-structure.json');
-  return { categories: [] };
-}
-
-// ============================================================
-// CARREGAR DADOS
-// ============================================================
-async function loadFiltersData() {
+async function loadCategories() {
   try {
-    // Carregar categorias primárias
-    const primRes = await fetch(`${API_BASE}/api/categories/primary`);
-    if (!primRes.ok) {
-      throw new Error(`Erro ao carregar categorias primárias: ${primRes.status}`);
-    }
-    primaryCategories = await primRes.json();
-    console.log('✅ Categorias primárias carregadas:', primaryCategories);
-
-    // Carregar estrutura de filtros secundários do JSON
-    const structData = await loadCategoriesStructure();
-    
-    // Converter para map para fácil acesso por ID
-    if (structData.categories) {
-      structData.categories.forEach(cat => {
-        categoriesStructure[cat.id] = cat;
-      });
-      console.log('✅ Estrutura de filtros carregada:', categoriesStructure);
-    }
+    const [primRes, secRes] = await Promise.all([
+      fetch(`${API_BASE}/api/categories/primary`),
+      fetch(`${API_BASE}/api/categories/secondary`)
+    ]);
+    primaryCategories   = primRes.ok ? await primRes.json() : [];
+    secondaryCategories = secRes.ok  ? await secRes.json()  : [];
 
     renderPrimaryFilters();
+    renderSecondaryFilters();
+    initSecondarySearch();
     applyFiltersFromURL();
   } catch (err) {
-    console.error('Erro ao carregar dados de filtros:', err);
-    const container = document.getElementById('primaryCategoryFilters');
-    if (container) {
-      container.innerHTML = `<p style="color: red; padding: 10px;">⚠️ Erro ao carregar filtros. Verifique a consola (F12).</p>`;
-    }
+    console.error('Erro ao carregar categorias:', err);
   }
 }
 
 // ============================================================
-// RENDER CATEGORIAS PRIMÁRIAS (radio — só uma)
+// RENDER PRIMÁRIAS (radio — só uma)
 // ============================================================
 function renderPrimaryFilters() {
   const container = document.getElementById('primaryCategoryFilters');
   if (!container) return;
-
-  if (!primaryCategories.length) {
-    container.innerHTML = '<p style="color: #666;">Nenhuma categoria disponível</p>';
-    return;
-  }
 
   container.innerHTML = primaryCategories.map(cat => `
     <label class="filter-label">
@@ -106,8 +51,6 @@ function renderPrimaryFilters() {
   container.querySelectorAll('.primary-cat-radio').forEach(radio => {
     radio.addEventListener('change', () => {
       selectedPrimaryId = parseInt(radio.value);
-      selectedSecondaryFilters = {}; // Limpar filtros secundários ao trocar de categoria
-      renderSecondaryFilters();
       applyFilters();
       renderActiveFilterTags();
     });
@@ -115,74 +58,46 @@ function renderPrimaryFilters() {
 }
 
 // ============================================================
-// RENDER FILTROS SECUNDÁRIOS (dinâmicos conforme a categoria primária)
+// RENDER SECUNDÁRIAS (checkboxes — várias)
 // ============================================================
 function renderSecondaryFilters() {
   const container = document.getElementById('secondaryCategoryFilters');
   if (!container) return;
 
-  // Se nenhuma categoria primária selecionada, mostrar mensagem
-  if (!selectedPrimaryId) {
-    container.innerHTML = '<p class="no-secondary-filters">Selecione uma categoria principal para ver filtros adicionais.</p>';
-    return;
-  }
-
-  // Obter estrutura de filtros para a categoria selecionada
-  const catStructure = categoriesStructure[selectedPrimaryId];
-  if (!catStructure || !catStructure.secondaryFilters || !catStructure.secondaryFilters.length) {
-    container.innerHTML = '<p class="no-secondary-filters">Sem filtros disponíveis para esta categoria.</p>';
-    return;
-  }
-
-  // Renderizar cada grupo de filtros (Marca, Modelo, Ano, etc.)
-  container.innerHTML = catStructure.secondaryFilters.map(filterGroup => `
-    <div class="secondary-filter-group">
-      <h4>${filterGroup.name}</h4>
-      <div class="secondary-filter-options">
-        ${filterGroup.tags.map(tag => `
-          <label class="filter-label">
-            <input 
-              type="checkbox" 
-              value="${tag.id}" 
-              data-name="${tag.name}"
-              data-group-key="${filterGroup.key}"
-              class="secondary-filter-checkbox">
-            <span>${tag.name}</span>
-          </label>
-        `).join('')}
-      </div>
-    </div>
+  container.innerHTML = secondaryCategories.map(cat => `
+    <label class="filter-label">
+      <input type="checkbox" value="${cat.id}" data-name="${cat.name}" class="secondary-cat-checkbox">
+      <span>${cat.name}</span>
+    </label>
   `).join('');
 
-  // Adicionar event listeners aos checkboxes
-  container.querySelectorAll('.secondary-filter-checkbox').forEach(cb => {
+  container.querySelectorAll('.secondary-cat-checkbox').forEach(cb => {
     cb.addEventListener('change', () => {
-      const groupKey = cb.getAttribute('data-group-key');
-      if (!selectedSecondaryFilters[groupKey]) {
-        selectedSecondaryFilters[groupKey] = [];
-      }
-      if (cb.checked) {
-        selectedSecondaryFilters[groupKey].push(parseInt(cb.value));
-      } else {
-        selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey].filter(id => id !== parseInt(cb.value));
-      }
       applyFilters();
       renderActiveFilterTags();
     });
   });
+}
 
-  // Restaurar checkboxes se houver filtros já selecionados
-  Object.keys(selectedSecondaryFilters).forEach(groupKey => {
-    selectedSecondaryFilters[groupKey].forEach(tagId => {
-      const cb = container.querySelector(`.secondary-filter-checkbox[value="${tagId}"]`);
-      if (cb) cb.checked = true;
+// ============================================================
+// PESQUISA NAS SECUNDÁRIAS
+// ============================================================
+function initSecondarySearch() {
+  const input = document.getElementById('secondaryCategorySearch');
+  if (!input) return;
+
+  input.addEventListener('input', function () {
+    const search = this.value.toLowerCase();
+    document.querySelectorAll('#secondaryCategoryFilters .filter-label').forEach(label => {
+      const name = label.querySelector('span').textContent.toLowerCase();
+      label.style.display = name.includes(search) ? '' : 'none';
     });
   });
 }
 
 // ============================================================
 // SECTIONS COLAPSÁVEIS
-// ALTERADO: MÚLTIPLAS PODEM ESTAR ABERTAS AO MESMO TEMPO
+// Solo uma aberta de cada vez
 // ============================================================
 function initCollapsibleFilters() {
   const sections = document.querySelectorAll('.filter-section[data-collapsible]');
@@ -195,18 +110,24 @@ function initCollapsibleFilters() {
     toggle.addEventListener('click', () => {
       const isOpen = section.classList.contains('open');
 
-      // ALTERADO: Apenas toggle a secção atual (não fecha as outras)
-      section.classList.toggle('open');
-      body.classList.toggle('open');
+      // Fechar todas
+      sections.forEach(s => {
+        s.classList.remove('open');
+        s.querySelector('.filter-section-body')?.classList.remove('open');
+      });
+
+      // Abrir esta se estava fechada
+      if (!isOpen) {
+        section.classList.add('open');
+        body.classList.add('open');
+      }
     });
   });
 
-  // Abrir ambas as primeiras sections por defeito
-  if (sections.length >= 2) {
+  // Abrir a primeira por defeito
+  if (sections.length) {
     sections[0].classList.add('open');
     sections[0].querySelector('.filter-section-body')?.classList.add('open');
-    sections[1].classList.add('open');
-    sections[1].querySelector('.filter-section-body')?.classList.add('open');
   }
 }
 
@@ -222,7 +143,6 @@ function applyFiltersFromURL() {
     if (radio) {
       radio.checked = true;
       selectedPrimaryId = parseInt(primaryId);
-      renderSecondaryFilters();
     }
   }
 
@@ -257,22 +177,17 @@ function renderActiveFilterTags() {
     }
   }
 
-  // Filtros secundários
-  Object.keys(selectedSecondaryFilters).forEach(groupKey => {
-    selectedSecondaryFilters[groupKey].forEach(tagId => {
-      const cb = document.querySelector(`.secondary-filter-checkbox[value="${tagId}"]`);
-      if (cb) {
-        const name = cb.getAttribute('data-name');
-        tags.push({
-          label: name,
-          type: 'secondary',
-          remove: () => {
-            cb.checked = false;
-            selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey].filter(id => id !== tagId);
-            applyFilters();
-            renderActiveFilterTags();
-          }
-        });
+  // Categorias secundárias
+  document.querySelectorAll('.secondary-cat-checkbox:checked').forEach(cb => {
+    const id   = parseInt(cb.value);
+    const name = cb.getAttribute('data-name');
+    tags.push({
+      label: name,
+      type: 'secondary',
+      remove: () => {
+        cb.checked = false;
+        applyFilters();
+        renderActiveFilterTags();
       }
     });
   });
@@ -307,7 +222,7 @@ function renderActiveFilterTags() {
     </span>
   `).join('');
 
-  // Guardar callbacks
+  // Guardar callbacks (não podem ir inline por segurança)
   container.querySelectorAll('.tag-remove').forEach(btn => {
     const idx = parseInt(btn.getAttribute('data-index'));
     btn.addEventListener('click', (e) => {
@@ -323,32 +238,30 @@ function renderActiveFilterTags() {
 function clearPrimaryFilter() {
   document.querySelectorAll('.primary-cat-radio').forEach(r => r.checked = false);
   selectedPrimaryId = null;
-  selectedSecondaryFilters = {};
-  renderSecondaryFilters();
   applyFilters();
   renderActiveFilterTags();
 }
 
 function clearSecondaryFilters() {
-  document.querySelectorAll('.secondary-filter-checkbox').forEach(cb => cb.checked = false);
-  selectedSecondaryFilters = {};
+  document.querySelectorAll('.secondary-cat-checkbox').forEach(cb => cb.checked = false);
   applyFilters();
   renderActiveFilterTags();
 }
 
 function clearAllFilters() {
   document.querySelectorAll('.primary-cat-radio').forEach(r => r.checked = false);
-  document.querySelectorAll('.secondary-filter-checkbox').forEach(cb => cb.checked = false);
+  document.querySelectorAll('.secondary-cat-checkbox').forEach(cb => cb.checked = false);
   selectedPrimaryId = null;
-  selectedSecondaryFilters = {};
 
-  const fields = ['minPrice', 'maxPrice', 'filterStock', 'searchInput'];
+  const fields = ['minPrice', 'maxPrice', 'filterStock', 'searchInput', 'secondaryCategorySearch'];
   fields.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
 
-  renderSecondaryFilters();
+  // Reset secondary search visibility
+  document.querySelectorAll('#secondaryCategoryFilters .filter-label').forEach(l => l.style.display = '');
+
   applyFilters();
   renderActiveFilterTags();
 }
@@ -374,7 +287,7 @@ function closeFilters() {
 // INIT (chamado pelo products-page.js depois de carregar os dados)
 // ============================================================
 async function initFilters() {
-  await loadFiltersData();
+  await loadCategories();
   initCollapsibleFilters();
 
   document.getElementById('clearFilters')?.addEventListener('click', clearAllFilters);

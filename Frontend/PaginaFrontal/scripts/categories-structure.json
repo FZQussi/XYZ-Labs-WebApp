@@ -1,0 +1,451 @@
+{
+  "categories": [
+    {
+      "id": 13,
+      "name": "Automóvel",
+      "secondaryFilters": [
+        {
+          "name": "Marca",
+          "key": "brand",
+          "tags": [
+            { "id": 101, "name": "BMW" },
+            { "id": 102, "name": "Mercedes-Benz" },
+            { "id": 103, "name": "Audi" },
+            { "id": 104, "name": "Volkswagen" },
+            { "id": 105, "name": "Ford" },
+            { "id": 106, "name": "Toyota" },
+            { "id": 107, "name": "Honda" }
+          ]
+        },
+        {
+          "name": "Modelo",
+          "key": "model",
+          "tags": [
+            { "id": 201, "name": "Série 3" },
+            { "id": 202, "name": "Série 5" },
+            { "id": 203, "name": "Classe C" },
+            { "id": 204, "name": "Classe E" },
+            { "id": 205, "name": "A4" },
+            { "id": 206, "name": "A6" }
+          ]
+        },
+        {
+          "name": "Ano",
+          "key": "year",
+          "tags": [
+            { "id": 301, "name": "2024" },
+            { "id": 302, "name": "2023" },
+            { "id": 303, "name": "2022" },
+            { "id": 304, "name": "2021" },
+            { "id": 305, "name": "2020" },
+            { "id": 306, "name": "2019" }
+          ]
+        },
+        {
+          "name": "Local da Peça",
+          "key": "part_location",
+          "tags": [
+            { "id": 401, "name": "Motor" },
+            { "id": 402, "name": "Transmissão" },
+            { "id": 403, "name": "Suspensão" },
+            { "id": 404, "name": "Travões" },
+            { "id": 405, "name": "Interior" },
+            { "id": 406, "name": "Exterior" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Casa & Decoração",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 501, "name": "Sofás" },
+            { "id": 502, "name": "Mesas" },
+            { "id": 503, "name": "Cadeiras" },
+            { "id": 504, "name": "Camas" },
+            { "id": 505, "name": "Armários" },
+            { "id": 506, "name": "Estantes" }
+          ]
+        },
+        {
+          "name": "Material",
+          "key": "material",
+          "tags": [
+            { "id": 601, "name": "Madeira" },
+            { "id": 602, "name": "Metal" },
+            { "id": 603, "name": "Vidro" },
+            { "id": 604, "name": "Tecido" },
+            { "id": 605, "name": "Plástico" }
+          ]
+        },
+        {
+          "name": "Cor",
+          "key": "color",
+          "tags": [
+            { "id": 701, "name": "Preto" },
+            { "id": 702, "name": "Branco" },
+            { "id": 703, "name": "Cinzento" },
+            { "id": 704, "name": "Castanho" },
+            { "id": 705, "name": "Colorido" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Cozinha & Armazenamento",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 801, "name": "Utensílios" },
+            { "id": 802, "name": "Panelas" },
+            { "id": 803, "name": "Pratos" },
+            { "id": 804, "name": "Copos" },
+            { "id": 805, "name": "Caixas Armazenamento" }
+          ]
+        },
+        {
+          "name": "Material",
+          "key": "material",
+          "tags": [
+            { "id": 901, "name": "Aço Inoxidável" },
+            { "id": 902, "name": "Cerâmica" },
+            { "id": 903, "name": "Vidro" },
+            { "id": 904, "name": "Plástico" },
+            { "id": 905, "name": "Silicone" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Brinquedos & Jogos",
+      "secondaryFilters": [
+        {
+          "name": "Faixa Etária",
+          "key": "age_group",
+          "tags": [
+            { "id": 1001, "name": "0-3 anos" },
+            { "id": 1002, "name": "3-6 anos" },
+            { "id": 1003, "name": "6-12 anos" },
+            { "id": 1004, "name": "12+ anos" }
+          ]
+        },
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 1101, "name": "Brinquedos Educativos" },
+            { "id": 1102, "name": "Jogos de Tabuleiro" },
+            { "id": 1103, "name": "Puzzle" },
+            { "id": 1104, "name": "Figuras Ação" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Infantil & Educação",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 1201, "name": "Livros" },
+            { "id": 1202, "name": "Material Escolar" },
+            { "id": 1203, "name": "Roupas Infantis" },
+            { "id": 1204, "name": "Sapatos Infantis" }
+          ]
+        },
+        {
+          "name": "Tamanho",
+          "key": "size",
+          "tags": [
+            { "id": 1301, "name": "RN (0-3M)" },
+            { "id": 1302, "name": "3-6M" },
+            { "id": 1303, "name": "6-12M" },
+            { "id": 1304, "name": "1-2 anos" },
+            { "id": 1305, "name": "3-4 anos" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Animais de Estimação",
+      "secondaryFilters": [
+        {
+          "name": "Tipo de Animal",
+          "key": "animal_type",
+          "tags": [
+            { "id": 1401, "name": "Cão" },
+            { "id": 1402, "name": "Gato" },
+            { "id": 1403, "name": "Pássaro" },
+            { "id": 1404, "name": "Coelho" },
+            { "id": 1405, "name": "Peixe" }
+          ]
+        },
+        {
+          "name": "Tipo de Produto",
+          "key": "product_type",
+          "tags": [
+            { "id": 1501, "name": "Comida" },
+            { "id": 1502, "name": "Brinquedos" },
+            { "id": 1503, "name": "Cama & Acessórios" },
+            { "id": 1504, "name": "Higiene" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Ferramentas",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 1601, "name": "Manuais" },
+            { "id": 1602, "name": "Eléctricas" },
+            { "id": 1603, "name": "Pneumáticas" },
+            { "id": 1604, "name": "Segurança" }
+          ]
+        },
+        {
+          "name": "Marca",
+          "key": "brand",
+          "tags": [
+            { "id": 1701, "name": "Bosch" },
+            { "id": 1702, "name": "DeWalt" },
+            { "id": 1703, "name": "Makita" },
+            { "id": 1704, "name": "Stanley" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Escritório & Estudo",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 1801, "name": "Papelaria" },
+            { "id": 1802, "name": "Mobiliário Escritório" },
+            { "id": 1803, "name": "Equipamento Técnico" },
+            { "id": 1804, "name": "Organização" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Gaming & Tecnologia",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 1901, "name": "Consolas" },
+            { "id": 1902, "name": "Acessórios Gaming" },
+            { "id": 1903, "name": "Computadores" },
+            { "id": 1904, "name": "Periféricos" }
+          ]
+        },
+        {
+          "name": "Marca",
+          "key": "brand",
+          "tags": [
+            { "id": 2001, "name": "Sony PlayStation" },
+            { "id": 2002, "name": "Xbox" },
+            { "id": 2003, "name": "Nintendo" },
+            { "id": 2004, "name": "PC Gaming" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Electrónica & Cabos",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2101, "name": "Smartphones" },
+            { "id": 2102, "name": "Tablets" },
+            { "id": 2103, "name": "Computadores" },
+            { "id": 2104, "name": "Cabos & Adaptadores" }
+          ]
+        },
+        {
+          "name": "Marca",
+          "key": "brand",
+          "tags": [
+            { "id": 2201, "name": "Apple" },
+            { "id": 2202, "name": "Samsung" },
+            { "id": 2203, "name": "Sony" },
+            { "id": 2204, "name": "LG" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Hobby & Criatividade",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2301, "name": "Pintura & Desenho" },
+            { "id": 2302, "name": "Artesanato" },
+            { "id": 2303, "name": "DIY" },
+            { "id": 2304, "name": "Modelismo" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "Desporto & Fitness",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2401, "name": "Equipamento Ginásio" },
+            { "id": 2402, "name": "Roupas Desporto" },
+            { "id": 2403, "name": "Sapatos Desporto" },
+            { "id": 2404, "name": "Acessórios" }
+          ]
+        },
+        {
+          "name": "Desporto",
+          "key": "sport",
+          "tags": [
+            { "id": 2501, "name": "Corrida" },
+            { "id": 2502, "name": "Futebol" },
+            { "id": 2503, "name": "Ténis" },
+            { "id": 2504, "name": "Natação" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Saúde & Wellness",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2601, "name": "Suplementos" },
+            { "id": 2602, "name": "Cuidados Pele" },
+            { "id": 2603, "name": "Higiene Pessoal" },
+            { "id": 2604, "name": "Bem-estar" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Acessórios & Moda",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2701, "name": "Bolsas" },
+            { "id": 2702, "name": "Cintos" },
+            { "id": 2703, "name": "Chapéus" },
+            { "id": 2704, "name": "Joias" }
+          ]
+        },
+        {
+          "name": "Estação",
+          "key": "season",
+          "tags": [
+            { "id": 2801, "name": "Primavera/Verão" },
+            { "id": 2802, "name": "Outono/Inverno" },
+            { "id": 2803, "name": "Todas as Estações" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Organização & Armazenamento",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 2901, "name": "Caixas Armazenamento" },
+            { "id": 2902, "name": "Prateleiras" },
+            { "id": 2903, "name": "Gavetas" },
+            { "id": 2904, "name": "Sacos Vácuo" }
+          ]
+        },
+        {
+          "name": "Tamanho",
+          "key": "size",
+          "tags": [
+            { "id": 3001, "name": "Pequeno" },
+            { "id": 3002, "name": "Médio" },
+            { "id": 3003, "name": "Grande" },
+            { "id": 3004, "name": "Extra Grande" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Jardim & Exterior",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 3101, "name": "Ferramentas Jardim" },
+            { "id": 3102, "name": "Plantas & Sementes" },
+            { "id": 3103, "name": "Móveis Exterior" },
+            { "id": 3104, "name": "Decoração Jardim" }
+          ]
+        },
+        {
+          "name": "Estação",
+          "key": "season",
+          "tags": [
+            { "id": 3201, "name": "Primavera" },
+            { "id": 3202, "name": "Verão" },
+            { "id": 3203, "name": "Outono" },
+            { "id": 3204, "name": "Inverno" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "outros",
+      "secondaryFilters": [
+        {
+          "name": "Tipo",
+          "key": "type",
+          "tags": [
+            { "id": 3301, "name": "Diversos" },
+            { "id": 3302, "name": "Promoções" },
+            { "id": 3303, "name": "Liquidação" }
+          ]
+        }
+      ]
+    }
+  ]
+}

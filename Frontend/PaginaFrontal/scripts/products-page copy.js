@@ -1,8 +1,8 @@
 // ============================================================
-// products-page.js (ACTUALIZADO)
+// products-page.js
 // Gestão de produtos:
 //   - Carregar e renderizar produtos
-//   - Aplicar filtros dinâmicos (lê estado do products-filters.js)
+//   - Aplicar filtros (lê estado do products-filters.js)
 //   - Paginação e ordenação
 // ============================================================
 
@@ -30,7 +30,7 @@ async function loadProducts() {
 
 // ============================================================
 // APPLY FILTERS
-// Lê o estado do products-filters.js (selectedPrimaryId, selectedSecondaryFilters, etc.)
+// Lê o estado do products-filters.js (selectedPrimaryId, etc.)
 // ============================================================
 function applyFilters() {
   const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
@@ -38,37 +38,27 @@ function applyFilters() {
   const maxPrice   = parseFloat(document.getElementById('maxPrice')?.value) || Infinity;
   const stockValue = document.getElementById('filterStock')?.value || '';
 
+  const selectedSecondaryIds = Array.from(
+    document.querySelectorAll('.secondary-cat-checkbox:checked')
+  ).map(cb => parseInt(cb.value));
+
   filteredProducts = allProducts.filter(product => {
     const price = Number(product.price);
 
-    // Filtro de pesquisa
     if (searchTerm && !product.name.toLowerCase().includes(searchTerm)) return false;
-
-    // Filtro de preço
     if (price < minPrice || price > maxPrice) return false;
-
-    // Filtro de stock
     if (stockValue === 'true'  && !product.stock) return false;
     if (stockValue === 'false' &&  product.stock) return false;
 
-    // Filtro de categoria primária
+    // Categoria primária (só uma)
     if (selectedPrimaryId) {
       if (product.primary_category?.id !== selectedPrimaryId) return false;
     }
 
-    // Filtros secundários (AND — produto tem todos os filtros selecionados)
-    // Cada grupo de filtros (Marca, Modelo, Ano, etc.) é tratado com OR dentro do grupo
-    // Mas diferentes grupos são AND entre eles
-    for (const groupKey of Object.keys(selectedSecondaryFilters)) {
-      const selectedTagIds = selectedSecondaryFilters[groupKey];
-      if (selectedTagIds.length === 0) continue;
-
-      // O produto precisa ter pelo menos uma tag de cada grupo selecionado
-      const productHasTag = (product.secondary_categories || []).some(cat => 
-        selectedTagIds.includes(cat.id)
-      );
-
-      if (!productHasTag) return false;
+    // Categorias secundárias (AND — produto tem todas as selecionadas)
+    if (selectedSecondaryIds.length) {
+      const productSecIds = (product.secondary_categories || []).map(c => c.id);
+      if (!selectedSecondaryIds.every(id => productSecIds.includes(id))) return false;
     }
 
     return true;
@@ -115,7 +105,7 @@ function renderProducts() {
   }
 
   grid.innerHTML = paginated.map(product => {
-    const image = product.images?.[0] || '/lib/images/placeholder.jpg';
+const image = product.images?.[0] || '/lib/images/placeholder.jpg';
 
     const primaryTag = product.primary_category
       ? `<span class="tag tag-primary">${product.primary_category.name}</span>`

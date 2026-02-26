@@ -97,16 +97,19 @@
         </div>
       </div>
 
-      <!-- FILTROS SECUNDÁRIOS (DINÂMICOS) -->
+      <!-- TAGS / SECUNDARIAS -->
       <div class="filter-section" data-collapsible>
         <button class="filter-section-toggle" type="button">
-          <h3>Filtros Adicionais</h3>
+          <h3>Tags / Secundarias</h3>
           <div class="filter-toggle-icons">
             <span class="btn-clear-inline" onclick="event.stopPropagation(); clearSecondaryFilters()">Limpar</span>
             <span class="filter-arrow">&#9660;</span>
           </div>
         </button>
         <div class="filter-section-body">
+          <div class="filter-search-box">
+            <input type="text" id="secondaryCategorySearch" placeholder="Pesquisar tags...">
+          </div>
           <div class="filter-list-scroll">
             <div id="secondaryCategoryFilters"></div>
           </div>

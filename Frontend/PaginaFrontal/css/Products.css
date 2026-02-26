@@ -913,3 +913,100 @@
     font-size: 12px;
   }
 }
+/* ============================================================
+   ADICIONAL CSS PARA FILTROS DINÂMICOS
+   ============================================================ */
+
+/* Mensagem quando nenhuma categoria é selecionada */
+.no-secondary-filters {
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--brutalist-gray);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Grupo de filtros secundários */
+.secondary-filter-group {
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: var(--border-thin);
+}
+
+.secondary-filter-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.secondary-filter-group h4 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-md);
+  color: var(--brutalist-black);
+}
+
+/* Container das opções de filtro */
+.secondary-filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Labels dos filtros (com checkbox) */
+.secondary-filter-options .filter-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.secondary-filter-options .filter-label input[type="checkbox"] {
+  width: auto;
+  margin-right: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.secondary-filter-options .filter-label span {
+  flex: 1;
+  user-select: none;
+}
+
+.secondary-filter-options .filter-label:hover {
+  color: var(--brutalist-gray);
+}
+
+/* Animação suave quando filtros aparecem */
+#secondaryCategoryFilters {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsivo: em mobile, melhorar espaçamento */
+@media (max-width: 768px) {
+  .secondary-filter-group {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+  }
+
+  .secondary-filter-group h4 {
+    font-size: 12px;
+  }
+
+  .secondary-filter-options .filter-label {
+    font-size: 12px;
+  }
+}
