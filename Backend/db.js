@@ -11,3 +11,13 @@ client.connect()
   .catch(err => console.error('Erro PostgreSQL:', err));
 
 module.exports = client;
+
+
+
+
+
+
+
+
+
+

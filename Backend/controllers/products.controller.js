@@ -59,6 +59,8 @@ exports.getProducts = async (req, res) => {
       ORDER BY p.created_at DESC
     `);
 
+    
+
     res.json(result.rows);
   } catch (err) {
     console.error('Erro ao obter produtos:', err);
@@ -103,6 +105,8 @@ exports.getProductById = async (req, res) => {
     res.status(500).json({ error: 'Erro ao obter produto' });
   }
 };
+
+
 
 // ===== CREATE PRODUCT =====
 exports.createProduct = async (req, res) => {

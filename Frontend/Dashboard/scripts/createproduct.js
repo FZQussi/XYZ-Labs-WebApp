@@ -276,5 +276,6 @@
   // Esperar pelo ImageValidator ao carregar
   waitForImageValidator().then(() => {
     console.log('✅ createproduct.js carregado com ImageValidator');
+    console.log('✅ createproduct.js carregado com ImageValidator');
   });
 })();
