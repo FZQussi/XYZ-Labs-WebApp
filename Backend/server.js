@@ -89,5 +89,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`✅ Servidor a correr em http://localhost:${port}`);
   console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
-  console.log(`📤 Limite de upload: 100MB (Nginx: 100MB | Express: 100MB)`);
+  console.log(`📤 Limite de upload: 101MB (Nginx: 100MB | Express: 100MB)`);
 });
