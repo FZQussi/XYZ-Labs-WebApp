@@ -63,12 +63,9 @@ app.use('/reset-password', resetRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 
-// Categorias — router dedicado
-// /api/categories/primary      → getPrimaryCategories
-// /api/categories/secondary    → getSecondaryCategories
-// /api/categories              → getSecondaryCategories (legado)
+
 app.use('/api/categories', categoriesRoutes);
-app.use('/categories', categoriesRoutes);     // legado
+app.use('/categories', categoriesRoutes);  
 
 // Produtos
 app.use('/products',     productRoutes);
@@ -87,6 +84,9 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
+  console.log(`✅ Servidor a correr em http://localhost:${port}`);
+  console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
+  console.log(`📤 Limite de upload: 101MB (Nginx: 100MB | Express: 100MB)`);
   console.log(`✅ Servidor a correr em http://localhost:${port}`);
   console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
   console.log(`📤 Limite de upload: 101MB (Nginx: 100MB | Express: 100MB)`);
