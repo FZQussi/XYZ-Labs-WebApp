@@ -12,7 +12,38 @@
   z-index: 999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
+/* ==========================================
+   AUTH-VISIBILITY.CSS
+   Controla a visibilidade de elementos de autenticação
+   Com base na class do documento
+   ========================================== */
 
+/* Por padrão (estado inicial) */
+#authButtons {
+  display: flex !important;
+}
+
+#userIcons {
+  display: none !important;
+}
+
+/* Quando autenticado */
+.authenticated #authButtons {
+  display: none !important;
+}
+
+.authenticated #userIcons {
+  display: flex !important;
+}
+
+/* Quando NÃO autenticado */
+.not-authenticated #authButtons {
+  display: flex !important;
+}
+
+.not-authenticated #userIcons {
+  display: none !important;
+}
 .header-left {
   display: flex;
   align-items: center;

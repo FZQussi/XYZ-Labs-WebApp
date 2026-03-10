@@ -7,6 +7,22 @@
    <link rel="stylesheet" href="/PaginaFrontal/css/base.css">
    <link rel="stylesheet" href="/PaginaFrontal/css/Header.css">
    <link rel="stylesheet" href="/PaginaFrontal/css/about.css">
+        <script>
+    (function() {
+      'use strict';
+      
+      // Verificação rápida e síncrona
+      const token = localStorage.getItem('token');
+      
+      if (token) {
+        // Utilizador logado - adicionar class ao documento
+        document.documentElement.classList.add('authenticated');
+      } else {
+        // Utilizador não logado - adicionar class ao documento
+        document.documentElement.classList.add('not-authenticated');
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -299,4 +315,10 @@
     </div>
   </div>
 </footer>
-<script data-cfasync="false" src="/cdn-cgi/scri
+
+<!-- Scripts para gerir navbar e carrinho -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="/PaginaFrontal/scripts/cart.js"></script>
+<script src="/PaginaFrontal/scripts/header.js"></script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 // ==========================================
 // HEADER.JS - Reutilizável em todas as páginas
+// ✨ VERSÃO OTIMIZADA - Sem flicker de autenticação
 // Inclui: menu mobile, dropdown utilizador,
 //         pesquisa, side menu, overlay
 // ==========================================
@@ -13,44 +14,75 @@
   // INICIALIZAÇÃO
   // ==========================================
   document.addEventListener('DOMContentLoaded', async () => {
-    await initHeaderAuth();
+    // A visibilidade dos botões já foi definida pelo CSS
+    // Agora apenas validamos o token no servidor
+    await validateAuthToken();
+    
     initMobileMenu();
     initUserDropdown();
     initHeaderSearch();
+    initAuthButtons();
   });
 
   // ==========================================
-  // AUTENTICAÇÃO
+  // VALIDAÇÃO DE TOKEN
   // ==========================================
-  async function initHeaderAuth() {
-    const authButtons = document.getElementById('authButtons');
-    const userIcons   = document.getElementById('userIcons');
-    const token       = localStorage.getItem('token');
+  async function validateAuthToken() {
+    const token = localStorage.getItem('token');
 
+    // Sem token = não autenticado
     if (!token) {
-      if (authButtons) authButtons.style.display = 'flex';
-      if (userIcons)   userIcons.style.display   = 'none';
       return;
     }
 
+    // Com token = validar no servidor
     try {
-      const res  = await fetch(API_VALIDATE, {
+      const res = await fetch(API_VALIDATE, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
 
+      // Token inválido = fazer logout
       if (!res.ok || !data.valid) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        location.reload();
+        document.documentElement.classList.remove('authenticated');
+        document.documentElement.classList.add('not-authenticated');
+        
+        // Recarregar página para resetar a UI
+        setTimeout(() => {
+          location.reload();
+        }, 500);
         return;
       }
 
-      if (authButtons) authButtons.style.display = 'none';
-      if (userIcons)   userIcons.style.display   = 'flex';
+      // Token válido = manter autenticado
+      console.log('[Header] Token validado com sucesso');
 
     } catch (err) {
       console.error('[Header] Erro ao validar sessão:', err);
+      // Em caso de erro de rede, manter o utilizador logado
+      // (pressumir que o backend está temporariamente indisponível)
+    }
+  }
+
+  // ==========================================
+  // BOTÕES DE AUTENTICAÇÃO
+  // ==========================================
+  function initAuthButtons() {
+    const signInBtn = document.getElementById('signInBtn');
+    const signUpBtn = document.getElementById('signUpBtn');
+
+    if (signInBtn) {
+      signInBtn.addEventListener('click', () => {
+        window.location.href = '/userpages/html/login.html';
+      });
+    }
+
+    if (signUpBtn) {
+      signUpBtn.addEventListener('click', () => {
+        window.location.href = '/userpages/html/register.html';
+      });
     }
   }
 
@@ -130,40 +162,29 @@
   // DROPDOWN DO UTILIZADOR
   // ==========================================
   function initUserDropdown() {
-    const userMenuBtn     = document.getElementById('userMenuBtn');
-    const userDropdown    = document.getElementById('userDropdown');
-    const dropdownLinks   = document.getElementById('dropdownLinks');
+    const userMenuBtn      = document.getElementById('userMenuBtn');
+    const userDropdown     = document.getElementById('userDropdown');
+    const dropdownLinks    = document.getElementById('dropdownLinks');
     const dropdownUserName = document.getElementById('dropdownUserName');
-    const signInBtn       = document.getElementById('signInBtn');
-    const signUpBtn       = document.getElementById('signUpBtn');
 
     const user = JSON.parse(localStorage.getItem('user') || 'null');
-
-    // Botões Sign In / Sign Up
-    if (signInBtn) {
-      signInBtn.addEventListener('click', () => {
-        window.location.href = '/userpages/html/login.html';
-      });
-    }
-    if (signUpBtn) {
-      signUpBtn.addEventListener('click', () => {
-        window.location.href = '/userpages/html/register.html';
-      });
-    }
 
     // Dropdown só existe se estiver logado
     if (!userMenuBtn || !user || !userDropdown) return;
 
+    // Toggle dropdown
     userMenuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       userDropdown.classList.toggle('hidden');
       closeNav(); // fecha menu mobile se estiver aberto
     });
 
+    // Nome do utilizador
     if (dropdownUserName) {
       dropdownUserName.textContent = `Olá, ${user.name}`;
     }
 
+    // Links do dropdown
     if (dropdownLinks) {
       const adminLink = user.role === 'admin'
         ? `<li><a href="/Dashboard/html/dashboard.html">Dashboard</a></li>`
@@ -175,12 +196,15 @@
         <li><a href="#" id="dropdownLogout">Logout</a></li>
       `;
 
+      // Logout
       const logoutBtn = document.getElementById('dropdownLogout');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
           e.preventDefault();
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          document.documentElement.classList.remove('authenticated');
+          document.documentElement.classList.add('not-authenticated');
           location.reload();
         });
       }
