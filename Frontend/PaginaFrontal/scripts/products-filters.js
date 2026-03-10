@@ -1,11 +1,12 @@
 // ============================================================
-// products-filters.js (ALTERADO - MÚLTIPLOS PAINÉIS ABERTOS)
+// products-filters.js (CORRIGIDO - DROPDOWN PARA CATEGORIA PRINCIPAL)
 // Gestão da sidebar de filtros com FILTROS SECUNDÁRIOS DINÂMICOS:
 //   - Carregar categorias primárias da API
 //   - Carregar estrutura de filtros secundários do JSON
 //   - Mostrar/esconder filtros secundários conforme a categoria primária selecionada
 //   - Sections colapsáveis (MÚLTIPLAS ABERTAS SIMULTANEAMENTE)
 //   - Active filter tags na toolbar
+//   - ALTERADO: SELECT DROPDOWN para categoria principal (em vez de radio buttons)
 // ============================================================
 
 const API_BASE = '';
@@ -85,7 +86,8 @@ async function loadFiltersData() {
 }
 
 // ============================================================
-// RENDER CATEGORIAS PRIMÁRIAS (radio — só uma)
+// RENDER CATEGORIAS PRIMÁRIAS (SELECT DROPDOWN)
+// ALTERADO: Usar <select> em vez de radio buttons
 // ============================================================
 function renderPrimaryFilters() {
   const container = document.getElementById('primaryCategoryFilters');
@@ -96,22 +98,30 @@ function renderPrimaryFilters() {
     return;
   }
 
-  container.innerHTML = primaryCategories.map(cat => `
-    <label class="filter-label">
-      <input type="radio" name="primaryCategory" value="${cat.id}" class="primary-cat-radio">
-      <span>${cat.name}</span>
-    </label>
-  `).join('');
+  // Criar o select dropdown
+  const selectHTML = `
+    <select id="primaryCategorySelect" class="primary-category-select">
+      <option value="">🏠 Todas as Categorias</option>
+      ${primaryCategories.map(cat => `
+        <option value="${cat.id}">${cat.icon || '📁'} ${cat.name}</option>
+      `).join('')}
+    </select>
+  `;
 
-  container.querySelectorAll('.primary-cat-radio').forEach(radio => {
-    radio.addEventListener('change', () => {
-      selectedPrimaryId = parseInt(radio.value);
+  container.innerHTML = selectHTML;
+
+  // Adicionar event listener ao select
+  const selectEl = document.getElementById('primaryCategorySelect');
+  if (selectEl) {
+    selectEl.addEventListener('change', () => {
+      const value = selectEl.value;
+      selectedPrimaryId = value ? parseInt(value) : null;
       selectedSecondaryFilters = {}; // Limpar filtros secundários ao trocar de categoria
       renderSecondaryFilters();
       applyFilters();
       renderActiveFilterTags();
     });
-  });
+  }
 }
 
 // ============================================================
@@ -182,7 +192,7 @@ function renderSecondaryFilters() {
 
 // ============================================================
 // SECTIONS COLAPSÁVEIS
-// ALTERADO: MÚLTIPLAS PODEM ESTAR ABERTAS AO MESMO TEMPO
+// MÚLTIPLAS PODEM ESTAR ABERTAS AO MESMO TEMPO
 // ============================================================
 function initCollapsibleFilters() {
   const sections = document.querySelectorAll('.filter-section[data-collapsible]');
@@ -195,7 +205,7 @@ function initCollapsibleFilters() {
     toggle.addEventListener('click', () => {
       const isOpen = section.classList.contains('open');
 
-      // ALTERADO: Apenas toggle a secção atual (não fecha as outras)
+      // Apenas toggle a secção atual (não fecha as outras)
       section.classList.toggle('open');
       body.classList.toggle('open');
     });
@@ -218,9 +228,9 @@ function applyFiltersFromURL() {
 
   const primaryId = params.get('primary');
   if (primaryId) {
-    const radio = document.querySelector(`.primary-cat-radio[value="${primaryId}"]`);
-    if (radio) {
-      radio.checked = true;
+    const select = document.getElementById('primaryCategorySelect');
+    if (select) {
+      select.value = primaryId;
       selectedPrimaryId = parseInt(primaryId);
       renderSecondaryFilters();
     }
@@ -321,7 +331,8 @@ function renderActiveFilterTags() {
 // CLEAR HELPERS
 // ============================================================
 function clearPrimaryFilter() {
-  document.querySelectorAll('.primary-cat-radio').forEach(r => r.checked = false);
+  const select = document.getElementById('primaryCategorySelect');
+  if (select) select.value = '';
   selectedPrimaryId = null;
   selectedSecondaryFilters = {};
   renderSecondaryFilters();
@@ -337,7 +348,8 @@ function clearSecondaryFilters() {
 }
 
 function clearAllFilters() {
-  document.querySelectorAll('.primary-cat-radio').forEach(r => r.checked = false);
+  const select = document.getElementById('primaryCategorySelect');
+  if (select) select.value = '';
   document.querySelectorAll('.secondary-filter-checkbox').forEach(cb => cb.checked = false);
   selectedPrimaryId = null;
   selectedSecondaryFilters = {};

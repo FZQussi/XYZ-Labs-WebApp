@@ -1,5 +1,5 @@
 // ============================================
-// DASHBOARD.JS - Controlador Principal
+// DASHBOARD.JS - Controlador Principal (CORRIGIDO)
 // ============================================
 
 const API_BASE = '';
@@ -75,8 +75,12 @@ function initTabs() {
     switch(tabName) {
       case 'dashboard':
         // Recarregar estatísticas
+        console.log('📊 Tentando chamar reloadDashboardStats...');
         if (window.reloadDashboardStats) {
+          console.log('✅ reloadDashboardStats encontrada, executando...');
           window.reloadDashboardStats();
+        } else {
+          console.warn('⚠️ reloadDashboardStats não está definida ainda!');
         }
         break;
       
@@ -360,8 +364,9 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 // ===== INICIALIZAÇÃO PRINCIPAL =====
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎯 DOMContentLoaded - Inicializando aplicação');
+// CORRIGIDO: Verificar se documento está pronto
+function initializeApp() {
+  console.log('🎯 Inicializando aplicação (readyState: ' + document.readyState + ')');
 
   // Ordem de inicialização
   initDashboard();
@@ -370,7 +375,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initModals();
 
   console.log('✅ Dashboard completamente inicializado');
-});
+}
+
+// Verificar se o documento já está pronto
+if (document.readyState === 'loading') {
+  // Documento ainda está sendo carregado
+  console.log('📄 Documento ainda está a carregar, aguardando DOMContentLoaded...');
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  // Documento já foi completamente carregado
+  console.log('📄 Documento já estava carregado, inicializando imediatamente...');
+  initializeApp();
+}
 
 // Log de carregamento
 console.log('📄 dashboard.js carregado');

@@ -1,5 +1,5 @@
 // ============================================
-// SECURITY.JS - Sistema de Segurança do Dashboard
+// SECURITY.JS - Sistema de Segurança do Dashboard (CORRIGIDO)
 // ============================================
 
 (() => {
@@ -406,15 +406,20 @@
     return parts.length === 3;
   };
 
-  // ===== INICIALIZAÇÃO =====
+  // ===== INICIALIZAÇÃO CORRIGIDA =====
   
-  // Iniciar sistema de segurança quando DOM carregar
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.securityManager = new SecurityManager();
-    });
-  } else {
+  function initializeSecurity() {
+    console.log('🔐 Inicializando sistema de segurança (readyState: ' + document.readyState + ')');
     window.securityManager = new SecurityManager();
+  }
+
+  // Verificar se documento está pronto
+  if (document.readyState === 'loading') {
+    console.log('🔐 Documento ainda está a carregar...');
+    document.addEventListener('DOMContentLoaded', initializeSecurity);
+  } else {
+    console.log('🔐 Documento já estava carregado, inicializando imediatamente...');
+    initializeSecurity();
   }
 
   // Exportar para uso global

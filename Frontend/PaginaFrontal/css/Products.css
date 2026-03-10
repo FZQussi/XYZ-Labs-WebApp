@@ -1010,3 +1010,165 @@
     font-size: 12px;
   }
 }
+/* ============================================================
+   ESTILO PARA SELECT DROPDOWN - CATEGORIA PRINCIPAL
+   Adicione isto ao seu ficheiro products.css
+   ============================================================ */
+
+/* Contentor do select */
+#primaryCategoryFilters {
+  padding: 8px 0;
+}
+
+/* Select dropdown styling */
+.primary-category-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
+  padding-right: 36px;
+}
+
+/* Hover state */
+.primary-category-select:hover {
+  border-color: #666;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus state */
+.primary-category-select:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Options inside dropdown */
+.primary-category-select option {
+  padding: 8px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Option hover (dark option) */
+.primary-category-select option:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+/* Option selected */
+.primary-category-select option:checked {
+  background: linear-gradient(#333, #333);
+  background-color: #333;
+  color: white;
+}
+
+/* ============================================================
+   VERSÃO ALTERNATIVA - MAIS ELEGANTE (BRUTALIST)
+   ============================================================ */
+
+/*
+.primary-category-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 3px solid #000;
+  background-color: #fff;
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="black"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 40px;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.primary-category-select:hover {
+  background-color: #f0f0f0;
+  box-shadow: 6px 6px 0 #000;
+}
+
+.primary-category-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #000;
+  background-color: #fff;
+}
+
+.primary-category-select option {
+  padding: 12px;
+  background-color: #fff;
+  color: #000;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+.primary-category-select option:checked {
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+}
+*/
+
+/* ============================================================
+   DARK MODE (opcional)
+   ============================================================ */
+
+/*
+@media (prefers-color-scheme: dark) {
+  .primary-category-select {
+    background-color: #1a1a1a;
+    color: #fff;
+    border-color: #666;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>');
+  }
+
+  .primary-category-select:hover {
+    background-color: #2a2a2a;
+    border-color: #999;
+  }
+
+  .primary-category-select:focus {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+
+  .primary-category-select option {
+    background-color: #1a1a1a;
+    color: #fff;
+  }
+
+  .primary-category-select option:checked {
+    background: #444;
+    color: #fff;
+  }
+}
+*/
+
+/* ============================================================
+   Responsivo - Mobile
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .primary-category-select {
+    padding: 10px 12px;
+    font-size: 16px; /* Evita zoom no mobile */
+  }
+}

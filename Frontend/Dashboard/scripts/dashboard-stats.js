@@ -1,5 +1,5 @@
 // ============================================
-// DASHBOARD-STATS.JS - Sistema de Estatísticas
+// DASHBOARD-STATS.JS - Sistema de Estatísticas (CORRIGIDO)
 // ============================================
 
 (() => {
@@ -365,17 +365,21 @@
     }, 120000); // 2 minutos
   }
 
-  // ===== INICIALIZAÇÃO =====
-  document.addEventListener('DOMContentLoaded', () => {
+  // ===== INICIALIZAÇÃO CORRIGIDA =====
+  function initializeStats() {
+    console.log('📊 Inicializando módulo de estatísticas (readyState: ' + document.readyState + ')');
+    
     // Carregar stats apenas se estamos no dashboard
     const dashboardSection = document.getElementById('dashboard');
     if (dashboardSection && !dashboardSection.classList.contains('hidden')) {
+      console.log('📊 Dashboard visível, carregando estatísticas...');
       loadDashboardStats();
     }
 
     // Recarregar quando trocar para dashboard
     document.querySelectorAll('[data-tab="dashboard"]').forEach(btn => {
       btn.addEventListener('click', () => {
+        console.log('📊 Tab Dashboard clicada, recarregando estatísticas...');
         setTimeout(loadDashboardStats, 100);
       });
     });
@@ -388,9 +392,20 @@
     
     // Iniciar auto-refresh
     startAutoRefresh();
-  });
+    
+    console.log('✅ Módulo de estatísticas inicializado');
+  }
 
-  // Exportar para uso global
+  // Verificar se documento está pronto
+  if (document.readyState === 'loading') {
+    console.log('📊 Documento ainda está a carregar...');
+    document.addEventListener('DOMContentLoaded', initializeStats);
+  } else {
+    console.log('📊 Documento já estava carregado, inicializando imediatamente...');
+    initializeStats();
+  }
+
+  // Exportar para uso global - IMPORTANTE: isto deve estar FORA do DOMContentLoaded
   window.reloadDashboardStats = loadDashboardStats;
 
   console.log('📊 Módulo de estatísticas carregado');
