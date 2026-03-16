@@ -144,13 +144,28 @@ function renderSecondaryFilters() {
     return;
   }
 
+  // 🔴 BARRA DE PESQUISA ÚNICA NO TOPO (NOVA)
+  const searchBar = `
+    <div class="secondary-filters-search-wrapper">
+      <div class="secondary-filter-search">
+        <input 
+          type="text" 
+          class="secondary-filters-search-input"
+          placeholder="Procurar em todos os filtros..." 
+          id="secondaryFiltersSearch">
+        <button class="secondary-filter-search-clear" type="button">✕</button>
+      </div>
+    </div>
+  `;
+
   // Renderizar cada grupo de filtros (Marca, Modelo, Ano, etc.)
-  container.innerHTML = catStructure.secondaryFilters.map(filterGroup => `
-    <div class="secondary-filter-group">
+  const filterGroupsHTML = catStructure.secondaryFilters.map(filterGroup => `
+    <div class="secondary-filter-group" data-group-key="${filterGroup.key}">
       <h4>${filterGroup.name}</h4>
-      <div class="secondary-filter-options">
+      
+      <div class="secondary-filter-options" data-group-key="${filterGroup.key}">
         ${filterGroup.tags.map(tag => `
-          <label class="filter-label">
+          <label class="filter-label" data-filter-text="${tag.name.toLowerCase()}" data-group-key="${filterGroup.key}">
             <input 
               type="checkbox" 
               value="${tag.id}" 
@@ -163,6 +178,8 @@ function renderSecondaryFilters() {
       </div>
     </div>
   `).join('');
+
+  container.innerHTML = searchBar + filterGroupsHTML;
 
   // Adicionar event listeners aos checkboxes
   container.querySelectorAll('.secondary-filter-checkbox').forEach(cb => {
@@ -188,6 +205,40 @@ function renderSecondaryFilters() {
       if (cb) cb.checked = true;
     });
   });
+
+  // ============================================================
+  // 🔴 EVENT LISTENER PARA BARRA DE PESQUISA ÚNICA (NOVA)
+  // ============================================================
+  const searchInput = document.getElementById('secondaryFiltersSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchText = e.target.value.toLowerCase().trim();
+      const allLabels = container.querySelectorAll('.filter-label');
+      
+      // Filtrar todas as labels
+      allLabels.forEach(label => {
+        const filterText = label.getAttribute('data-filter-text');
+        const isMatch = filterText.includes(searchText);
+        
+        if (isMatch || searchText === '') {
+          label.classList.remove('hidden');
+        } else {
+          label.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  // Botão limpar pesquisa
+  const clearBtn = container.querySelector('.secondary-filter-search-clear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      const input = clearBtn.previousElementSibling;
+      input.value = '';
+      input.focus();
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
 }
 
 // ============================================================

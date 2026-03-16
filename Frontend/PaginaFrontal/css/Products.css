@@ -118,7 +118,7 @@
 /* Scroll interno da lista */
 .filter-list-scroll {
   overflow-y: auto;
-  max-height: 280px;
+  max-height: 400px;
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
   scrollbar-width: thin;
   scrollbar-color: var(--brutalist-black) var(--bg-light);
@@ -949,6 +949,66 @@
   color: var(--brutalist-black);
 }
 
+/* ============================================================
+   BARRA DE PESQUISA - FILTROS SECUNDÁRIOS (NOVO)
+   ============================================================ */
+
+.secondary-filter-search {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.secondary-filter-search input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 2px solid var(--brutalist-black);
+  background-color: var(--brutalist-white);
+  color: var(--brutalist-black);
+  transition: all var(--transition-fast);
+}
+
+.secondary-filter-search input::placeholder {
+  color: var(--brutalist-gray);
+}
+
+.secondary-filter-search input:hover {
+  background-color: var(--bg-light);
+}
+
+.secondary-filter-search input:focus {
+  outline: none;
+  border-color: var(--brutalist-black);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  background-color: var(--brutalist-white);
+}
+
+/* Botão limpar pesquisa */
+.secondary-filter-search-clear {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--brutalist-gray);
+  padding: 4px 8px;
+  transition: all var(--transition-fast);
+  display: none;
+}
+
+.secondary-filter-search-clear:hover {
+  color: var(--brutalist-black);
+}
+
+.secondary-filter-search input:not(:placeholder-shown) ~ .secondary-filter-search-clear {
+  display: block;
+}
+
 /* Container das opções de filtro */
 .secondary-filter-options {
   display: flex;
@@ -964,6 +1024,7 @@
   cursor: pointer;
   font-weight: 500;
   font-size: 13px;
+  transition: all var(--transition-fast);
 }
 
 .secondary-filter-options .filter-label input[type="checkbox"] {
@@ -979,6 +1040,20 @@
 
 .secondary-filter-options .filter-label:hover {
   color: var(--brutalist-gray);
+}
+
+/* Estado: Opção oculta (pesquisa não corresponde) */
+.secondary-filter-options .filter-label.hidden {
+  display: none;
+}
+
+/* Mensagem quando nenhuma opção corresponde à pesquisa */
+.secondary-filter-no-results {
+  padding: var(--spacing-md) 0;
+  text-align: center;
+  color: var(--brutalist-gray);
+  font-size: 12px;
+  font-style: italic;
 }
 
 /* Animação suave quando filtros aparecem */
