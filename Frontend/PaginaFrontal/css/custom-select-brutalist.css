@@ -1,0 +1,282 @@
+/* ============================================================
+   CUSTOM SELECT BRUTALIST - ESTILOS COMPLETOS
+   Substitui o select nativo por um dropdown totalmente customizado
+   ============================================================ */
+
+/* ===== CONTAINER DO SELECT ===== */
+.brute-select-container {
+  position: relative;
+  width: 100%;
+  min-width: 250px;
+}
+
+/* ===== TRIGGER (Botão que mostra a seleção) ===== */
+.brute-select-trigger {
+  width: 100%;
+  padding: 12px 16px;
+  border: 4px solid #000000;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: 'Arial', 'Helvetica Neue', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 4px 4px 0 #000000;
+  outline: none;
+  border-bottom: 4px solid #000000;
+}
+
+/* Hover no trigger */
+.brute-select-trigger:hover {
+  background-color: #f5f5f5;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000000;
+}
+
+/* Active/Pressed */
+.brute-select-trigger:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 #000000;
+}
+
+/* Focus */
+.brute-select-trigger:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #ffffff, 
+              0 0 0 6px #000000, 
+              6px 6px 0 #000000;
+  background-color: #ffffff;
+}
+
+/* ===== VALOR SELECIONADO (Texto) ===== */
+.brute-select-value {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  display: block;
+}
+
+/* ===== SETA DO TRIGGER ===== */
+.brute-select-arrow {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 900;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  color: #000000;
+}
+
+.brute-select-container.open .brute-select-arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== DROPDOWN (Lista de opções) ===== */
+.brute-select-dropdown {
+  display: none;
+  position: fixed;
+  background-color: #ffffff;
+  border: 4px solid #000000;
+  border-top: none;
+  border-radius: 0 0 0 0;
+  z-index: 10000;
+  box-shadow: 8px 8px 0 #000000;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #000000 #f5f5f5;
+  width: 0;
+  left: 0;
+  top: 0;
+}
+
+/* Scrollbar WebKit (Chrome, Safari) */
+.brute-select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.brute-select-dropdown::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+  border-left: 1px solid #e0e0e0;
+}
+
+.brute-select-dropdown::-webkit-scrollbar-thumb {
+  background-color: #000000;
+  border-radius: 4px;
+}
+
+.brute-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background-color: #333333;
+}
+
+/* ===== CONTAINER DE OPÇÕES ===== */
+.brute-select-options {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+
+/* ===== OPÇÃO INDIVIDUAL ===== */
+.brute-select-option {
+  padding: 12px 16px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brute-select-option:last-child {
+  border-bottom: none;
+}
+
+/* Hover na opção ===== */
+.brute-select-option:hover,
+.brute-select-option.hovered {
+  background-color: #f5f5f5;
+  padding-left: 20px;
+  border-left: 4px solid #000000;
+  font-weight: 700;
+  transform: translate(2px, 0);
+}
+
+/* ===== OPÇÃO SELECIONADA ===== */
+.brute-select-option.selected {
+  background-color: #000000;
+  color: #ffffff;
+  font-weight: 800;
+  padding-left: 20px;
+  border-left: 6px solid #000000;
+}
+
+/* Símbolo de seleção */
+.brute-select-option.selected::after {
+  content: "✓";
+  position: absolute;
+  right: 16px;
+  font-weight: 900;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Hover na opção selecionada ===== */
+.brute-select-option.selected:hover,
+.brute-select-option.selected.hovered {
+  background-color: #333333;
+  border-left-width: 8px;
+  padding-left: 16px;
+  color: #ffffff;
+}
+
+/* ===== SELECT NATIVO ESCONDIDO ===== */
+.hidden-native-select {
+  display: none !important;
+}
+
+/* ===== RESPONSIVO - TABLET ===== */
+@media (max-width: 768px) {
+  .brute-select-container {
+    min-width: 200px;
+  }
+
+  .brute-select-trigger {
+    padding: 10px 12px;
+    font-size: 12px;
+    gap: 12px;
+    box-shadow: 3px 3px 0 #000000;
+  }
+
+  .brute-select-trigger:hover {
+    box-shadow: 5px 5px 0 #000000;
+  }
+
+  .brute-select-option {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .brute-select-option.selected::after {
+    right: 12px;
+    font-size: 12px;
+  }
+
+  .brute-select-dropdown {
+    max-height: 280px;
+    box-shadow: 6px 6px 0 #000000;
+  }
+}
+
+/* ===== RESPONSIVO - MOBILE ===== */
+@media (max-width: 480px) {
+  .brute-select-container {
+    min-width: 160px;
+  }
+
+  .brute-select-trigger {
+    padding: 8px 10px;
+    font-size: 11px;
+    gap: 8px;
+    box-shadow: 2px 2px 0 #000000;
+    border: 3px solid #000000;
+  }
+
+  .brute-select-trigger:hover {
+    box-shadow: 4px 4px 0 #000000;
+  }
+
+  .brute-select-value {
+    font-size: 11px;
+  }
+
+  .brute-select-arrow {
+    font-size: 9px;
+  }
+
+  .brute-select-option {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .brute-select-option.selected::after {
+    right: 10px;
+    font-size: 11px;
+  }
+
+  .brute-select-dropdown {
+    max-height: 200px;
+    box-shadow: 4px 4px 0 #000000;
+    border-width: 3px;
+  }
+}
+
+/* ===== BROWSER COMPATIBILITY ===== */
+.brute-select-trigger {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.brute-select-option {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
