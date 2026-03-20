@@ -1,12 +1,12 @@
 // ============================================================
-// products-filters.js (CORRIGIDO - SEM ÍCONES)
+// products-filters.js (MELHORADO - FILTROS ADICIONAIS DINÂMICOS)
 // Gestão da sidebar de filtros com FILTROS SECUNDÁRIOS DINÂMICOS:
 //   - Carregar categorias primárias da API
 //   - Carregar estrutura de filtros secundários do JSON
 //   - Mostrar/esconder filtros secundários conforme a categoria primária selecionada
 //   - Sections colapsáveis (MÚLTIPLAS ABERTAS SIMULTANEAMENTE)
 //   - Active filter tags na toolbar
-//   - ALTERADO: SELECT DROPDOWN para categoria principal (em vez de radio buttons)
+//   - ✅ NOVA: Secção de Filtros Adicionais aparece apenas após selecionar categoria
 //   - REMOVIDO: Referências aos ícones (icon field)
 // ============================================================
 
@@ -76,6 +76,10 @@ async function loadFiltersData() {
     }
 
     renderPrimaryFilters();
+    
+    // Inicialmente, esconder a secção de filtros adicionais
+    hideSecondaryFiltersSection();
+    
     applyFiltersFromURL();
   } catch (err) {
     console.error('Erro ao carregar dados de filtros:', err);
@@ -88,7 +92,6 @@ async function loadFiltersData() {
 
 // ============================================================
 // RENDER CATEGORIAS PRIMÁRIAS (SELECT DROPDOWN)
-// ALTERADO: Remover referências aos ícones
 // ============================================================
 function renderPrimaryFilters() {
   const container = document.getElementById('primaryCategoryFilters');
@@ -102,7 +105,7 @@ function renderPrimaryFilters() {
   // Criar o select dropdown (SEM ÍCONES)
   const selectHTML = `
     <select id="primaryCategorySelect" class="primary-category-select">
-      <option value="">Todas as Categorias</option>
+      <option value="" selected>Todas as Categorias</option>
       ${primaryCategories.map(cat => `
         <option value="${cat.id}">${cat.name}</option>
       `).join('')}
@@ -118,10 +121,41 @@ function renderPrimaryFilters() {
       const value = selectEl.value;
       selectedPrimaryId = value ? parseInt(value) : null;
       selectedSecondaryFilters = {}; // Limpar filtros secundários ao trocar de categoria
+      
+      if (selectedPrimaryId) {
+        showSecondaryFiltersSection();
+      } else {
+        hideSecondaryFiltersSection();
+      }
+      
       renderSecondaryFilters();
       applyFilters();
       renderActiveFilterTags();
     });
+  }
+}
+
+// ============================================================
+// ESCONDER/MOSTRAR SECÇÃO DE FILTROS ADICIONAIS
+// ============================================================
+function hideSecondaryFiltersSection() {
+  const container = document.getElementById('secondaryCategoryFilters');
+  if (!container) return;
+  
+  const filterSection = container.closest('[data-collapsible]');
+  if (filterSection) {
+    filterSection.style.display = 'none';
+  }
+  container.innerHTML = '';
+}
+
+function showSecondaryFiltersSection() {
+  const container = document.getElementById('secondaryCategoryFilters');
+  if (!container) return;
+  
+  const filterSection = container.closest('[data-collapsible]');
+  if (filterSection) {
+    filterSection.style.display = 'block';
   }
 }
 
@@ -132,9 +166,9 @@ function renderSecondaryFilters() {
   const container = document.getElementById('secondaryCategoryFilters');
   if (!container) return;
 
-  // Se nenhuma categoria primária selecionada, mostrar mensagem
+  // Se nenhuma categoria primária selecionada, secção já está escondida
   if (!selectedPrimaryId) {
-    container.innerHTML = '<p class="no-secondary-filters">Selecione uma categoria principal para ver filtros adicionais.</p>';
+    container.innerHTML = '';
     return;
   }
 
@@ -145,7 +179,7 @@ function renderSecondaryFilters() {
     return;
   }
 
-  // 🔴 BARRA DE PESQUISA ÚNICA NO TOPO (NOVA)
+  // 🔴 BARRA DE PESQUISA ÚNICA NO TOPO
   const searchBar = `
     <div class="secondary-filters-search-wrapper">
       <div class="secondary-filter-search">
@@ -290,13 +324,14 @@ function initCollapsibleFilters() {
     });
   });
 
-  // Abrir ambas as primeiras sections por defeito
-  if (sections.length >= 2) {
+  // Abrir apenas a primeira secção (Categoria Principal) por defeito
+  if (sections.length >= 1) {
     sections[0].classList.add('open');
     sections[0].querySelector('.filter-section-body')?.classList.add('open');
-    sections[1].classList.add('open');
-    sections[1].querySelector('.filter-section-body')?.classList.add('open');
   }
+  
+  // Não abrir a segunda secção (Filtros Adicionais) automaticamente
+  // Será aberta apenas quando o utilizador selecionar uma categoria
 }
 
 // ============================================================
@@ -311,6 +346,7 @@ function applyFiltersFromURL() {
     if (select) {
       select.value = primaryId;
       selectedPrimaryId = parseInt(primaryId);
+      showSecondaryFiltersSection();
       renderSecondaryFilters();
     }
   }
@@ -414,6 +450,7 @@ function clearPrimaryFilter() {
   if (select) select.value = '';
   selectedPrimaryId = null;
   selectedSecondaryFilters = {};
+  hideSecondaryFiltersSection();
   renderSecondaryFilters();
   applyFilters();
   renderActiveFilterTags();
@@ -439,6 +476,7 @@ function clearAllFilters() {
     if (el) el.value = '';
   });
 
+  hideSecondaryFiltersSection();
   renderSecondaryFilters();
   applyFilters();
   renderActiveFilterTags();

@@ -1,6 +1,8 @@
 // ============================================================
-// CUSTOM SELECT DROPDOWN - BRUTALISTA
+// CUSTOM SELECT DROPDOWN - BRUTALISTA (MELHORADO)
 // Substitui o select nativo por um custom com estilo brutalista
+// - Mostra texto completo (não trunca)
+// - Opção padrão selecionada automaticamente
 // ============================================================
 
 class BrutalSelect {
@@ -27,11 +29,12 @@ class BrutalSelect {
       element: opt
     }));
 
-    // Se existir um valor selecionado, guardar
-    if (this.select.value) {
-      this.selectedValue = this.select.value;
-      const opt = this.select.options[this.select.selectedIndex];
-      this.selectedText = opt.text;
+    // Encontrar a opção selecionada (com atributo selected ou a primeira)
+    const selectedOpt = this.originalOptions.find(opt => opt.selected) || this.originalOptions[0];
+    
+    if (selectedOpt) {
+      this.selectedValue = selectedOpt.value;
+      this.selectedText = selectedOpt.text;
     } else {
       this.selectedText = 'Selecione...';
     }
