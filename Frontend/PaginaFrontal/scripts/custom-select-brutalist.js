@@ -108,7 +108,7 @@ class BrutalSelect {
     this.select.value = value;
 
     // Atualizar a trigger
-    this.trigger.querySelector('.brute-select-value').textContent = this.escapeHtml(text);
+    this.trigger.querySelector('.brute-select-value').textContent = text;
 
     // Atualizar visual das opções
     this.renderOptions();
