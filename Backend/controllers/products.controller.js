@@ -53,7 +53,7 @@ exports.getProducts = async (req, res) => {
       LEFT JOIN categories           c     ON c.id = pcat.category_id
       WHERE p.is_active = true
       GROUP BY p.id, pc_main.id, pc_main.name, pc_main.slug,
-               pc_main.description, pc_main.icon, pc_main.image,
+               pc_main.description, pc_main.image,
                pc_main.is_active, pc_main.display_order,
                pc_main.created_at, pc_main.updated_at
       ORDER BY p.created_at DESC
@@ -90,7 +90,7 @@ exports.getProductById = async (req, res) => {
       LEFT JOIN categories           c     ON c.id = pcat.category_id
       WHERE p.id = $1
       GROUP BY p.id, pc_main.id, pc_main.name, pc_main.slug,
-               pc_main.description, pc_main.icon, pc_main.image,
+               pc_main.description, pc_main.image,
                pc_main.is_active, pc_main.display_order,
                pc_main.created_at, pc_main.updated_at
     `, [req.params.id]);
@@ -237,13 +237,8 @@ exports.updateProduct = async (req, res) => {
     }
 
     await dbClient.query('COMMIT');
-
-    const result = await dbClient.query(
-      'SELECT * FROM products WHERE id = $1',
-      [productId]
-    );
-    console.log('✅ Produto atualizado:', result.rows[0].name);
-    res.json(result.rows[0]);
+    console.log('✅ Produto atualizado:', productId);
+    res.json({ success: true });
   } catch (err) {
     await dbClient.query('ROLLBACK');
     console.error('Erro ao atualizar produto:', err);
@@ -253,27 +248,12 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// ===== DELETE PRODUCT (soft delete) =====
+// ===== DELETE PRODUCT =====
 exports.deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
-
-    const result = await client.query(
-      'SELECT model_file, images FROM products WHERE id = $1',
-      [productId]
-    );
-    const product = result.rows[0];
-
-    if (product) {
-      if (product.model_file) deleteFile(product.model_file, 'models');
-      if (product.images?.length) product.images.forEach(img => deleteFile(img, 'images'));
-    }
-
-    await client.query(`
-      UPDATE products SET is_active = false, updated_at = NOW() WHERE id = $1
-    `, [productId]);
-
-    res.json({ success: true, message: 'Produto eliminado com sucesso' });
+    const { id } = req.params;
+    await client.query('DELETE FROM products WHERE id = $1', [id]);
+    res.json({ success: true });
   } catch (err) {
     console.error('Erro ao eliminar produto:', err);
     res.status(500).json({ error: 'Erro ao eliminar produto' });
@@ -298,17 +278,17 @@ exports.getPrimaryCategories = async (req, res) => {
 // ===== CREATE PRIMARY CATEGORY =====
 exports.createPrimaryCategory = async (req, res) => {
   try {
-    const { name, description, icon, display_order } = req.body;
+    const { name, description, display_order } = req.body;
     const slug = name.toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
       .replace(/-+/g, '-');
 
     const result = await client.query(`
-      INSERT INTO primary_categories (name, slug, description, icon, display_order)
-      VALUES ($1,$2,$3,$4,$5)
+      INSERT INTO primary_categories (name, slug, description, display_order)
+      VALUES ($1,$2,$3,$4)
       RETURNING *
-    `, [name, slug, description || '', icon || '📂', display_order || 0]);
+    `, [name, slug, description || '', display_order || 0]);
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -321,14 +301,14 @@ exports.createPrimaryCategory = async (req, res) => {
 exports.updatePrimaryCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, icon, display_order, is_active } = req.body;
+    const { name, description, display_order, is_active } = req.body;
 
     const result = await client.query(`
       UPDATE primary_categories
-      SET name=$1, description=$2, icon=$3, display_order=$4, is_active=$5, updated_at=NOW()
-      WHERE id=$6
+      SET name=$1, description=$2, display_order=$3, is_active=$4, updated_at=NOW()
+      WHERE id=$5
       RETURNING *
-    `, [name, description, icon, display_order, is_active, id]);
+    `, [name, description, display_order, is_active, id]);
 
     if (!result.rows.length) {
       return res.status(404).json({ error: 'Categoria não encontrada' });

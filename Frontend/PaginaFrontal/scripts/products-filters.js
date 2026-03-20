@@ -1,5 +1,5 @@
 // ============================================================
-// products-filters.js (CORRIGIDO - DROPDOWN PARA CATEGORIA PRINCIPAL)
+// products-filters.js (CORRIGIDO - SEM ÍCONES)
 // Gestão da sidebar de filtros com FILTROS SECUNDÁRIOS DINÂMICOS:
 //   - Carregar categorias primárias da API
 //   - Carregar estrutura de filtros secundários do JSON
@@ -7,6 +7,7 @@
 //   - Sections colapsáveis (MÚLTIPLAS ABERTAS SIMULTANEAMENTE)
 //   - Active filter tags na toolbar
 //   - ALTERADO: SELECT DROPDOWN para categoria principal (em vez de radio buttons)
+//   - REMOVIDO: Referências aos ícones (icon field)
 // ============================================================
 
 const API_BASE = '';
@@ -87,7 +88,7 @@ async function loadFiltersData() {
 
 // ============================================================
 // RENDER CATEGORIAS PRIMÁRIAS (SELECT DROPDOWN)
-// ALTERADO: Usar <select> em vez de radio buttons
+// ALTERADO: Remover referências aos ícones
 // ============================================================
 function renderPrimaryFilters() {
   const container = document.getElementById('primaryCategoryFilters');
@@ -98,12 +99,12 @@ function renderPrimaryFilters() {
     return;
   }
 
-  // Criar o select dropdown
+  // Criar o select dropdown (SEM ÍCONES)
   const selectHTML = `
     <select id="primaryCategorySelect" class="primary-category-select">
-      <option value="">🏠 Todas as Categorias</option>
+      <option value="">Todas as Categorias</option>
       ${primaryCategories.map(cat => `
-        <option value="${cat.id}">${cat.icon || '📁'} ${cat.name}</option>
+        <option value="${cat.id}">${cat.name}</option>
       `).join('')}
     </select>
   `;
@@ -206,47 +207,74 @@ function renderSecondaryFilters() {
     });
   });
 
-  // ============================================================
-  // 🔴 EVENT LISTENER PARA BARRA DE PESQUISA ÚNICA (NOVA)
-  // ============================================================
+  // Funcionalidade de pesquisa
   const searchInput = document.getElementById('secondaryFiltersSearch');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
-      const searchText = e.target.value.toLowerCase().trim();
-      const allLabels = container.querySelectorAll('.filter-label');
+      const searchTerm = e.target.value.toLowerCase();
+      const labels = container.querySelectorAll('.filter-label');
       
-      // Filtrar todas as labels
-      allLabels.forEach(label => {
-        const filterText = label.getAttribute('data-filter-text');
-        const isMatch = filterText.includes(searchText);
-        
-        if (isMatch || searchText === '') {
-          label.classList.remove('hidden');
+      labels.forEach(label => {
+        const text = label.getAttribute('data-filter-text');
+        if (searchTerm === '' || text.includes(searchTerm)) {
+          label.style.display = 'flex';
         } else {
-          label.classList.add('hidden');
+          label.style.display = 'none';
         }
       });
     });
-  }
 
-  // Botão limpar pesquisa
-  const clearBtn = container.querySelector('.secondary-filter-search-clear');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', (e) => {
-      const input = clearBtn.previousElementSibling;
-      input.value = '';
-      input.focus();
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
+    // Clear button
+    const clearBtn = container.querySelector('.secondary-filter-search-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+      });
+    }
   }
 }
 
 // ============================================================
-// SECTIONS COLAPSÁVEIS
-// MÚLTIPLAS PODEM ESTAR ABERTAS AO MESMO TEMPO
+// APPLY FILTERS (chamado pelo products-page.js)
+// ============================================================
+function applyFilters() {
+  // Constructing the URL com os filtros atuais
+  const url = new URL(window.location);
+  
+  // Limpar parâmetros antigos
+  url.searchParams.delete('primary');
+  
+  // Adicionar novos parâmetros
+  if (selectedPrimaryId) {
+    url.searchParams.set('primary', selectedPrimaryId);
+  }
+
+  // Passar todos os filtros secundários num único parâmetro
+  if (Object.keys(selectedSecondaryFilters).length > 0) {
+    const secondaryStr = JSON.stringify(selectedSecondaryFilters);
+    url.searchParams.set('secondary', secondaryStr);
+  } else {
+    url.searchParams.delete('secondary');
+  }
+
+  // Atualizar URL
+  window.history.replaceState({}, '', url);
+
+  // Disparar evento customizado para products-page.js processar
+  document.dispatchEvent(new CustomEvent('filtersApplied', {
+    detail: {
+      primaryCategoryId: selectedPrimaryId,
+      secondaryFilters: selectedSecondaryFilters
+    }
+  }));
+}
+
+// ============================================================
+// INIT COLLAPSIBLE FILTERS
 // ============================================================
 function initCollapsibleFilters() {
-  const sections = document.querySelectorAll('.filter-section[data-collapsible]');
+  const sections = document.querySelectorAll('[data-collapsible]');
 
   sections.forEach(section => {
     const toggle  = section.querySelector('.filter-section-toggle');
