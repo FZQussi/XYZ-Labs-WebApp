@@ -5,18 +5,13 @@ const path = require('path');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
-const REQUIRED_ENV = ['JWT_SECRET', 'DATABASE_URL', 'EMAIL_USER', 'EMAIL_PASS'];
-const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
-if (missingEnv.length) {
-  console.error(`❌ Variáveis de ambiente em falta: ${missingEnv.join(', ')}`);
-  process.exit(1);
-}
-
+// ===== IMPORTS =====
 const authRoutes       = require('./auth');
 const adminRoutes      = require('./admin');
 const productRoutes    = require('./routes/products.routes');
 const userRoutes       = require('./routes/users.routes');
 const categoriesRoutes = require('./routes/categories.routes');
+const filtersRoutes    = require('./routes/filters.routes');        // ← NOVO
 const orderRoutes      = require('./routes/orders.routes');
 const contactRoutes    = require('./routes/contact.routes');
 const forgotRoutes     = require('./routes/forgot.routes');
@@ -27,6 +22,7 @@ const { globalLimiter } = require('./middlewares/rateLimiter.middleware');
 const app = express();
 const port = process.env.PORT || 3001;
 
+// ===== MIDDLEWARE =====
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(globalLimiter);
 app.use(morgan('[:date[iso]] :method :url :status :res[content-length] - :response-time ms'));
@@ -35,7 +31,8 @@ const allowedOrigins = [
   'http://localhost:3000', 'http://127.0.0.1:3000',
   'http://localhost:5500', 'http://127.0.0.1:5500',
   'http://localhost:5501', 'http://127.0.0.1:5501',
-  'http://localhost:8080', 'http://127.0.0.1:8080'
+  'http://localhost:8080', 'http://127.0.0.1:8080',
+  'http://app:3000', 'http://frontend:3000'  // ← Docker services
 ];
 
 app.use(cors({
@@ -50,7 +47,6 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// ===== AUMENTAR LIMITE DE TAMANHO PARA UPLOADS =====
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
@@ -62,17 +58,17 @@ app.use('/reset-password', resetRoutes);
 // ===== ROTAS =====
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
-
-
 app.use('/api/categories', categoriesRoutes);
-app.use('/categories', categoriesRoutes);  
+app.use('/categories', categoriesRoutes);
 
-// Produtos
-app.use('/products',     productRoutes);
+// ← NOVA ROTA PARA FILTROS
+app.use('/filters', filtersRoutes);
+app.use('/api/filters', filtersRoutes);
+
+app.use('/products', productRoutes);
 app.use('/api/products', productRoutes);
-
-app.use('/users',   userRoutes);
-app.use('/orders',  orderRoutes);
+app.use('/users', userRoutes);
+app.use('/orders', orderRoutes);
 app.use('/contact', contactRoutes);
 
 app.get('/', (_, res) => res.send('Backend a funcionar 🚀'));
@@ -86,8 +82,10 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`✅ Servidor a correr em http://localhost:${port}`);
   console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
-  console.log(`📤 Limite de upload: 101MB (Nginx: 100MB | Express: 100MB)`);
-  console.log(`✅ Servidor a correr em http://localhost:${port}`);
-  console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
-  console.log(`📤 Limite de upload: 101MB (Nginx: 100MB | Express: 100MB)`);
+  console.log(`📤 Limite de upload: 100MB`);
+  console.log(`💾 Cache: Em memória (sem Redis)`);
+  console.log(`🔧 Rotas de filtros disponíveis:`);
+  console.log(`   - GET  /api/v1/categories/:categoryId/filters (público, com cache)`);
+  console.log(`   - POST /api/admin/categories/:categoryId/filters (admin)`);
+  console.log(`   - PUT  /api/admin/filters/:filterId (admin)`);
 });

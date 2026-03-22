@@ -1,0 +1,423 @@
+/* ============================================
+   FILTERS - ESTILOS
+   ============================================ */
+
+/* Seções */
+.filters-section {
+  padding: 24px;
+  border: 3px solid #000;
+  background: #fff;
+  margin-bottom: 24px;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.filters-section h3 {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Filter Card */
+.filter-card {
+  padding: 16px;
+  border: 2px solid #000;
+  background: #f9f9f9;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.filter-card:hover {
+  background: #f0f0f0;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.filter-title strong {
+  font-size: 15px;
+  min-width: 150px;
+}
+
+.filter-key {
+  background: #000;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.filter-type {
+  background: #2563eb;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.filter-desc {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0 0 0;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-edit-btn,
+.filter-view-tags-btn {
+  padding: 8px 12px;
+  border: 2px solid #000;
+  background: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-edit-btn:hover,
+.filter-view-tags-btn:hover {
+  background: #000;
+  color: #fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Tag Card */
+.tag-card {
+  padding: 12px 16px;
+  border: 2px solid #2563eb;
+  background: #f0f8ff;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.tag-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #2563eb;
+}
+
+.tag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.tag-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.tag-info strong {
+  min-width: 120px;
+  font-size: 14px;
+}
+
+.tag-key {
+  background: #2563eb;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.tag-count {
+  background: #e5e7eb;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.tag-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.tag-edit-btn,
+.tag-delete-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #000;
+  background: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-edit-btn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #2563eb;
+}
+
+.tag-delete-btn:hover {
+  background: #f44336;
+  border-color: #f44336;
+  color: #fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #f44336;
+}
+
+/* Modal Styles for Filters */
+#filterModal .modal-content,
+#tagModal .modal-content {
+  max-width: 600px;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #000;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  background: #fff;
+  transition: border 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+.btn-primary,
+.btn-danger,
+.btn-secondary {
+  padding: 12px 24px;
+  border: 3px solid #000;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #2563eb;
+}
+
+.btn-danger {
+  background: #f44336;
+  color: #fff;
+  border-color: #f44336;
+}
+
+.btn-danger:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #f44336;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #000;
+}
+
+.btn-secondary:hover {
+  background: #000;
+  color: #fff;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Select/Combo Box */
+select {
+  cursor: pointer;
+}
+
+/* Disabled State */
+button:disabled,
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading State */
+.loading-state {
+  padding: 32px;
+  text-align: center;
+  color: #999;
+  font-weight: bold;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 48px;
+  text-align: center;
+  border: 2px dashed #ccc;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filters-section {
+    padding: 16px;
+  }
+
+  .filter-header,
+  .tag-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-title,
+  .tag-info {
+    flex-wrap: wrap;
+  }
+
+  .filter-actions,
+  .tag-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-danger,
+  .btn-secondary {
+    width: 100%;
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-card,
+.tag-card {
+  animation: slideIn 0.2s ease;
+}
+
+/* Success Message */
+.success-message {
+  padding: 12px 16px;
+  border-left: 4px solid #4caf50;
+  background: #f1f8f4;
+  color: #2e7d32;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* Error Message */
+.error-message {
+  padding: 12px 16px;
+  border-left: 4px solid #f44336;
+  background: #fef1f0;
+  color: #c62828;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* Info Message */
+.info-message {
+  padding: 12px 16px;
+  border-left: 4px solid #2196f3;
+  background: #e3f2fd;
+  color: #1565c0;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
