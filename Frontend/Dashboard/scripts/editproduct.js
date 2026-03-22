@@ -15,8 +15,6 @@
 
   // Categoria principal
   const primaryCatSelect = editModal?.querySelector('#editPrimaryCategory');
-  // Categorias secundárias
-  const secondaryContainer = editModal?.querySelector('#editSecondaryCategories');
   // Editor rich text
   const editDescEditor = editModal?.querySelector('#editDescEditor');
 
@@ -225,31 +223,26 @@
 
   // ===== POPULAR CATEGORIAS =====
   function populateEditCategories(product) {
-    // Categoria primária
-    if (primaryCatSelect) {
-      primaryCatSelect.innerHTML = '<option value="">-- Categoria Principal --</option>';
-      (window._primaryCategories || []).forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = `${c.icon || ''} ${c.name}`;
-        primaryCatSelect.appendChild(opt);
-      });
-      if (product?.primary_category?.id) {
-        primaryCatSelect.value = product.primary_category.id;
-      }
-    }
-
-    // Categorias secundárias (checkboxes)
-    if (secondaryContainer) {
-      const selectedIds = (product?.secondary_categories || []).map(c => c.id);
-      secondaryContainer.innerHTML = (window._secondaryCategories || []).map(c => `
-        <label class="sec-cat-checkbox">
-          <input type="checkbox" value="${c.id}" class="sec-cat-input" ${selectedIds.includes(c.id) ? 'checked' : ''}>
-          <span class="sec-cat-badge role-${c.category_role || 'secondary'}">${c.category_role === 'tag' ? '🏷️' : '📌'} ${c.name}</span>
-        </label>
-      `).join('');
+    if (!primaryCatSelect) return;
+    primaryCatSelect.innerHTML = '<option value="">-- Categoria Principal --</option>';
+    (window._primaryCategories || []).forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.icon || '📂'} ${c.name}`;
+      primaryCatSelect.appendChild(opt);
+    });
+    if (product?.primary_category?.id) {
+      primaryCatSelect.value = product.primary_category.id;
     }
   }
+
+  // Ao mudar categoria principal, recarregar filtros automaticamente
+  primaryCatSelect?.addEventListener('change', (e) => {
+    const newCatId = e.target.value;
+    if (currentProduct && newCatId) {
+      loadProductFilterTags(currentProduct.id, newCatId);
+    }
+  });
 
   // ===== IMAGENS =====
   async function loadProductImages(productId) {
@@ -629,19 +622,17 @@
     const primaryCatId = primaryCatSelect?.value;
     if (!primaryCatId) return alert('Seleciona uma categoria principal');
 
-    const secIds = Array.from(
-      secondaryContainer?.querySelectorAll('.sec-cat-input:checked') || []
-    ).map(cb => parseInt(cb.value));
-
     const descriptionHtml = editDescEditor?.innerHTML || '';
 
+    const submitBtn = editForm.querySelector('button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ A guardar...'; }
+
     const formData = new FormData();
-    formData.append('name',                   editName.value);
-    formData.append('price',                  editPrice.value);
-    formData.append('description',            descriptionHtml);
-    formData.append('stock',                  editStock.checked);
-    formData.append('primary_category_id',    primaryCatId);
-    formData.append('secondary_category_ids', JSON.stringify(secIds));
+    formData.append('name',                editName.value);
+    formData.append('price',               editPrice.value);
+    formData.append('description',         descriptionHtml);
+    formData.append('stock',               editStock.checked);
+    formData.append('primary_category_id', primaryCatId);
 
     try {
       const res = await fetch(`${API_BASE}/products/${editId.value}`, {
@@ -655,11 +646,12 @@
       window.reloadProducts?.();
     } catch (err) {
       alert(err.message || 'Erro ao guardar alterações');
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '💾 GUARDAR ALTERAÇÕES'; }
     }
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Reagir se categorias carregarem depois
     document.addEventListener('categoriesLoaded', () => {
       if (currentProduct) populateEditCategories(currentProduct);
     });

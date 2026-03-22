@@ -199,6 +199,20 @@
         font-style: italic;
       }
 
+      .filter-tag-pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border: 2px solid #2563eb;
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        font-weight: bold;
+        background: #eff6ff;
+        color: #1d4ed8;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        margin: 2px 2px 2px 0;
+      }
+
       /* ---- Célula de stock ---- */
       .product-cell-stock {
         border-right: 2px solid #000;
@@ -321,7 +335,7 @@
       <span>IMAGEM</span>
       <span>NOME / DESCRIÇÃO</span>
       <span>CAT. PRINCIPAL</span>
-      <span>TAGS / SEC.</span>
+      <span>CATEGORIAS & FILTROS</span>
       <span>PREÇO / STOCK</span>
       <span>AÇÕES</span>
     `;
@@ -379,10 +393,32 @@
       const secCatsHTML = secs.length
         ? secs.map(c =>
             `<span class="sec-cat-pill role-${c.category_role || 'secondary'}">
-              ${c.category_role === 'tag' ? '🏷️ ' : ''}${window.encodeHTML ? window.encodeHTML(c.name) : c.name}
+              ${c.category_role === 'tag' ? '🏷️ ' : '📌 '}${window.encodeHTML ? window.encodeHTML(c.name) : c.name}
              </span>`
           ).join('')
-        : `<span class="no-sec-cats">Sem tags</span>`;
+        : '';
+
+      // — Filter tags (novo sistema) —
+      const filterTags = p.filter_tags || [];
+      // Agrupar por filtro para mostrar organizados
+      const groupedFilters = {};
+      filterTags.forEach(t => {
+        const key = String(t.filter_id);
+        if (!groupedFilters[key]) groupedFilters[key] = { name: t.filter_name, tags: [] };
+        groupedFilters[key].tags.push(t);
+      });
+      const filterTagsHTML = Object.values(groupedFilters).map(g =>
+        g.tags.map(t =>
+          `<span class="filter-tag-pill" title="${window.encodeHTML ? window.encodeHTML(g.name) : g.name}">
+            🔧 ${window.encodeHTML ? window.encodeHTML(t.tag_name) : t.tag_name}
+           </span>`
+        ).join('')
+      ).join('');
+
+      const hasAnyCats = secs.length > 0 || filterTags.length > 0;
+      const combinedCatsHTML = hasAnyCats
+        ? (secCatsHTML + filterTagsHTML)
+        : `<span class="no-sec-cats">—</span>`;
 
       // — Stock —
       const stockBadge = p.stock
@@ -409,7 +445,7 @@
         </div>
 
         <div class="product-cell product-cell-sec-cats">
-          ${secCatsHTML}
+          ${combinedCatsHTML}
         </div>
 
         <div class="product-cell product-cell-stock">
@@ -453,11 +489,15 @@
       if (priceMin && Number(p.price) < priceMin)           return false;
       if (priceMax && Number(p.price) > priceMax)           return false;
       if (category) {
-        const pcMatch = (p.primary_category?.name || '').toLowerCase().includes(category);
-        const scMatch = (p.secondary_categories || []).some(c =>
+        const pcMatch  = (p.primary_category?.name || '').toLowerCase().includes(category);
+        const scMatch  = (p.secondary_categories || []).some(c =>
           c.name.toLowerCase().includes(category)
         );
-        if (!pcMatch && !scMatch) return false;
+        const ftMatch  = (p.filter_tags || []).some(t =>
+          t.tag_name.toLowerCase().includes(category) ||
+          t.filter_name.toLowerCase().includes(category)
+        );
+        if (!pcMatch && !scMatch && !ftMatch) return false;
       }
       return true;
     });
