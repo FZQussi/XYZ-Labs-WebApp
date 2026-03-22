@@ -12,80 +12,28 @@
 
 const API_BASE = '';
 
-let primaryCategories   = [];
-let categoriesStructure = {}; // Estrutura de filtros secundários por categoria
-let selectedPrimaryId   = null;
-let selectedSecondaryFilters = {}; // { filterId: [tag ids] }
-
-// ============================================================
-// DETECTAR CAMINHO CORRETO DO JSON (PROCURA NA PASTA /scripts/)
-// ============================================================
-async function loadCategoriesStructure() {
-  // Tentar múltiplos caminhos possíveis (a maioria procura em /scripts/ onde está este ficheiro)
-  const possiblePaths = [
-    './categories-structure.json',                    // Mesma pasta (recomendado)
-    '../scripts/categories-structure.json',           // Vindo de pages/
-    '../../PaginaFrontal/scripts/categories-structure.json',  // Caminho completo
-    '/scripts/categories-structure.json',             // Raiz
-  ];
-
-  for (const path of possiblePaths) {
-    try {
-      const response = await fetch(path);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`✅ JSON carregado com sucesso de: ${path}`);
-        return data;
-      }
-    } catch (err) {
-      // Continuar a tentar o próximo caminho
-      continue;
-    }
-  }
-
-  // Se chegou aqui, nenhum caminho funcionou
-  console.error('❌ Não foi possível carregar categories-structure.json');
-  console.error('Caminhos tentados:', possiblePaths);
-  console.error('O ficheiro deve estar em: /PaginaFrontal/scripts/categories-structure.json');
-  return { categories: [] };
-}
+let primaryCategories        = [];
+let selectedPrimaryId        = null;
+let selectedSecondaryFilters = {}; // { filterKey: [tag ids] }
 
 // ============================================================
 // CARREGAR DADOS
 // ============================================================
 async function loadFiltersData() {
   try {
-    // Carregar categorias primárias
     const primRes = await fetch(`${API_BASE}/api/categories/primary`);
-    if (!primRes.ok) {
-      throw new Error(`Erro ao carregar categorias primárias: ${primRes.status}`);
-    }
+    if (!primRes.ok) throw new Error(`Erro ao carregar categorias: ${primRes.status}`);
     primaryCategories = await primRes.json();
-    console.log('✅ Categorias primárias carregadas:', primaryCategories);
-
-    // Carregar estrutura de filtros secundários do JSON
-    const structData = await loadCategoriesStructure();
-    
-    // Converter para map para fácil acesso por ID
-    if (structData.categories) {
-      structData.categories.forEach(cat => {
-        categoriesStructure[cat.id] = cat;
-      });
-      console.log('✅ Estrutura de filtros carregada:', categoriesStructure);
-    }
+    console.log('✅ Categorias primárias carregadas:', primaryCategories.length);
 
     renderPrimaryFilters();
-    
-    // Inicialmente, esconder a secção de filtros adicionais
     hideSecondaryFiltersSection();
-    
     applyFiltersFromURL();
   } catch (err) {
     console.error('Erro ao carregar dados de filtros:', err);
     const container = document.getElementById('primaryCategoryFilters');
     if (container) {
-      container.innerHTML = `<p style="color: red; padding: 10px;">⚠️ Erro ao carregar filtros. Verifique a consola (F12).</p>`;
+      container.innerHTML = `<p style="color:red;padding:10px">⚠️ Erro ao carregar filtros.</p>`;
     }
   }
 }
@@ -120,7 +68,7 @@ function renderPrimaryFilters() {
     selectEl.addEventListener('change', () => {
       const value = selectEl.value;
       selectedPrimaryId = value ? parseInt(value) : null;
-      selectedSecondaryFilters = {}; // Limpar filtros secundários ao trocar de categoria
+      selectedSecondaryFilters = {};
       
       if (selectedPrimaryId) {
         showSecondaryFiltersSection();
@@ -128,7 +76,7 @@ function renderPrimaryFilters() {
         hideSecondaryFiltersSection();
       }
       
-      renderSecondaryFilters();
+      renderSecondaryFilters(); // async — não precisa de await aqui
       applyFilters();
       renderActiveFilterTags();
     });
@@ -160,146 +108,138 @@ function showSecondaryFiltersSection() {
 }
 
 // ============================================================
-// RENDER FILTROS SECUNDÁRIOS (dinâmicos conforme a categoria primária)
+// RENDER FILTROS SECUNDÁRIOS (carregados da API)
 // ============================================================
-function renderSecondaryFilters() {
+async function renderSecondaryFilters() {
   const container = document.getElementById('secondaryCategoryFilters');
   if (!container) return;
 
-  // Se nenhuma categoria primária selecionada, secção já está escondida
   if (!selectedPrimaryId) {
     container.innerHTML = '';
     return;
   }
 
-  // Obter estrutura de filtros para a categoria selecionada
-  const catStructure = categoriesStructure[selectedPrimaryId];
-  if (!catStructure || !catStructure.secondaryFilters || !catStructure.secondaryFilters.length) {
-    container.innerHTML = '<p class="no-secondary-filters">Sem filtros disponíveis para esta categoria.</p>';
-    return;
-  }
+  container.innerHTML = '<p style="padding:10px;color:#666;font-size:13px">⏳ A carregar filtros...</p>';
 
-  // 🔴 BARRA DE PESQUISA ÚNICA NO TOPO
-  const searchBar = `
-    <div class="secondary-filters-search-wrapper">
-      <div class="secondary-filter-search">
-        <input 
-          type="text" 
-          class="secondary-filters-search-input"
-          placeholder="Procurar em todos os filtros..." 
-          id="secondaryFiltersSearch">
-        <button class="secondary-filter-search-clear" type="button">✕</button>
-      </div>
-    </div>
-  `;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/categories/${selectedPrimaryId}/filters`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const filters = await res.json();
 
-  // Renderizar cada grupo de filtros (Marca, Modelo, Ano, etc.)
-  const filterGroupsHTML = catStructure.secondaryFilters.map(filterGroup => `
-    <div class="secondary-filter-group" data-group-key="${filterGroup.key}">
-      <h4>${filterGroup.name}</h4>
-      
-      <div class="secondary-filter-options" data-group-key="${filterGroup.key}">
-        ${filterGroup.tags.map(tag => `
-          <label class="filter-label" data-filter-text="${tag.name.toLowerCase()}" data-group-key="${filterGroup.key}">
-            <input 
-              type="checkbox" 
-              value="${tag.id}" 
-              data-name="${tag.name}"
-              data-group-key="${filterGroup.key}"
-              class="secondary-filter-checkbox">
-            <span>${tag.name}</span>
-          </label>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
+    if (!filters.length) {
+      container.innerHTML = '<p class="no-secondary-filters">Sem filtros disponíveis para esta categoria.</p>';
+      return;
+    }
 
-  container.innerHTML = searchBar + filterGroupsHTML;
+    // Barra de pesquisa única no topo
+    const searchBar = `
+      <div class="secondary-filters-search-wrapper">
+        <div class="secondary-filter-search">
+          <input type="text" class="secondary-filters-search-input"
+            placeholder="Procurar filtros..." id="secondaryFiltersSearch">
+          <button class="secondary-filter-search-clear" type="button">✕</button>
+        </div>
+      </div>`;
 
-  // Adicionar event listeners aos checkboxes
-  container.querySelectorAll('.secondary-filter-checkbox').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const groupKey = cb.getAttribute('data-group-key');
-      if (!selectedSecondaryFilters[groupKey]) {
-        selectedSecondaryFilters[groupKey] = [];
-      }
-      if (cb.checked) {
-        selectedSecondaryFilters[groupKey].push(parseInt(cb.value));
-      } else {
-        selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey].filter(id => id !== parseInt(cb.value));
-      }
-      applyFilters();
-      renderActiveFilterTags();
-    });
-  });
+    // Um bloco por filtro com as suas tags como checkboxes
+    const filterGroupsHTML = filters.map(filter => {
+      const tags = (filter.tags || []).filter(t => t.is_active !== false);
+      if (!tags.length) return '';
 
-  // Restaurar checkboxes se houver filtros já selecionados
-  Object.keys(selectedSecondaryFilters).forEach(groupKey => {
-    selectedSecondaryFilters[groupKey].forEach(tagId => {
-      const cb = container.querySelector(`.secondary-filter-checkbox[value="${tagId}"]`);
-      if (cb) cb.checked = true;
-    });
-  });
+      return `
+        <div class="secondary-filter-group" data-group-key="${filter.filter_key}">
+          <h4>${filter.filter_name}</h4>
+          <div class="secondary-filter-options" data-group-key="${filter.filter_key}">
+            ${tags.map(tag => `
+              <label class="filter-label"
+                data-filter-text="${tag.tag_name.toLowerCase()}"
+                data-group-key="${filter.filter_key}">
+                <input type="checkbox"
+                  value="${tag.id}"
+                  data-name="${tag.tag_name}"
+                  data-group-key="${filter.filter_key}"
+                  class="secondary-filter-checkbox">
+                <span>${tag.tag_name}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>`;
+    }).filter(Boolean).join('');
 
-  // Funcionalidade de pesquisa
-  const searchInput = document.getElementById('secondaryFiltersSearch');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const labels = container.querySelectorAll('.filter-label');
-      
-      labels.forEach(label => {
-        const text = label.getAttribute('data-filter-text');
-        if (searchTerm === '' || text.includes(searchTerm)) {
-          label.style.display = 'flex';
+    container.innerHTML = searchBar + filterGroupsHTML;
+
+    // Event listeners nos checkboxes
+    container.querySelectorAll('.secondary-filter-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const groupKey = cb.getAttribute('data-group-key');
+        if (!selectedSecondaryFilters[groupKey]) selectedSecondaryFilters[groupKey] = [];
+        if (cb.checked) {
+          selectedSecondaryFilters[groupKey].push(parseInt(cb.value));
         } else {
-          label.style.display = 'none';
+          selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey].filter(id => id !== parseInt(cb.value));
         }
+        applyFilters();
+        renderActiveFilterTags();
       });
     });
 
-    // Clear button
-    const clearBtn = container.querySelector('.secondary-filter-search-clear');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
+    // Restaurar checkboxes de filtros já selecionados
+    Object.keys(selectedSecondaryFilters).forEach(groupKey => {
+      selectedSecondaryFilters[groupKey].forEach(tagId => {
+        const cb = container.querySelector(`.secondary-filter-checkbox[value="${tagId}"]`);
+        if (cb) cb.checked = true;
+      });
+    });
+
+    // Pesquisa nos filtros
+    const searchInput = document.getElementById('secondaryFiltersSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', e => {
+        const term = e.target.value.toLowerCase();
+        container.querySelectorAll('.filter-label').forEach(label => {
+          const text = label.getAttribute('data-filter-text');
+          label.style.display = (term === '' || text.includes(term)) ? 'flex' : 'none';
+        });
+      });
+      container.querySelector('.secondary-filter-search-clear')?.addEventListener('click', () => {
         searchInput.value = '';
         searchInput.dispatchEvent(new Event('input'));
       });
     }
+
+  } catch (err) {
+    console.error('Erro ao carregar filtros secundários:', err);
+    container.innerHTML = '<p style="color:red;padding:10px">❌ Erro ao carregar filtros.</p>';
   }
 }
 
 // ============================================================
-// APPLY FILTERS (chamado pelo products-page.js)
+// APPLY FILTERS
 // ============================================================
 function applyFilters() {
-  // Constructing the URL com os filtros atuais
   const url = new URL(window.location);
   
-  // Limpar parâmetros antigos
   url.searchParams.delete('primary');
+  url.searchParams.delete('secondary');
   
-  // Adicionar novos parâmetros
   if (selectedPrimaryId) {
     url.searchParams.set('primary', selectedPrimaryId);
   }
 
-  // Passar todos os filtros secundários num único parâmetro
-  if (Object.keys(selectedSecondaryFilters).length > 0) {
-    const secondaryStr = JSON.stringify(selectedSecondaryFilters);
-    url.searchParams.set('secondary', secondaryStr);
-  } else {
-    url.searchParams.delete('secondary');
+  // selectedSecondaryFilters: { filterKey: [tagId, ...] }
+  // Serializar todos os tagIds selecionados para a URL
+  const allSelectedTagIds = Object.values(selectedSecondaryFilters).flat();
+  if (allSelectedTagIds.length > 0) {
+    url.searchParams.set('secondary', JSON.stringify(selectedSecondaryFilters));
   }
 
-  // Atualizar URL
   window.history.replaceState({}, '', url);
 
-  // Disparar evento customizado para products-page.js processar
   document.dispatchEvent(new CustomEvent('filtersApplied', {
     detail: {
-      primaryCategoryId: selectedPrimaryId,
-      secondaryFilters: selectedSecondaryFilters
+      primaryCategoryId:   selectedPrimaryId,
+      secondaryFilters:    selectedSecondaryFilters,  // { filterKey: [tagIds] }
+      selectedTagIds:      allSelectedTagIds           // lista plana de tag IDs selecionados
     }
   }));
 }
@@ -337,7 +277,7 @@ function initCollapsibleFilters() {
 // ============================================================
 // APPLY FILTERS FROM URL
 // ============================================================
-function applyFiltersFromURL() {
+async function applyFiltersFromURL() {
   const params = new URLSearchParams(window.location.search);
 
   const primaryId = params.get('primary');
@@ -347,8 +287,23 @@ function applyFiltersFromURL() {
       select.value = primaryId;
       selectedPrimaryId = parseInt(primaryId);
       showSecondaryFiltersSection();
-      renderSecondaryFilters();
+      await renderSecondaryFilters();
     }
+  }
+
+  // Restaurar filtros secundários da URL
+  const secondaryParam = params.get('secondary');
+  if (secondaryParam) {
+    try {
+      selectedSecondaryFilters = JSON.parse(secondaryParam);
+      // Marcar checkboxes correspondentes
+      Object.keys(selectedSecondaryFilters).forEach(groupKey => {
+        selectedSecondaryFilters[groupKey].forEach(tagId => {
+          const cb = document.querySelector(`.secondary-filter-checkbox[value="${tagId}"]`);
+          if (cb) cb.checked = true;
+        });
+      });
+    } catch (_) { selectedSecondaryFilters = {}; }
   }
 
   const search = params.get('search');

@@ -104,8 +104,9 @@ class ProductDetailsApp {
 
     const otherProducts = allProducts.filter(p => p.id != currentProductId);
 
-    const currentCategoryIds = current.primary_category ? [current.primary_category.id] : [];
-    const currentMaterial = current.material || '';
+    const currentCategoryId = current.primary_category?.id;
+    // Recolher IDs das filter tags do produto atual para comparação
+    const currentTagIds = new Set((current.filter_tags || []).map(ft => ft.tag_id));
     const currentNameWords = (current.name || '')
       .toLowerCase()
       .split(' ')
@@ -114,25 +115,22 @@ class ProductDetailsApp {
     const scoredProducts = otherProducts.map(product => {
       let score = 0;
 
-      // ===== categoria principal em comum =====
-      if (product.primary_category && currentCategoryIds.includes(product.primary_category.id)) {
+      // Categoria principal em comum — peso maior
+      if (product.primary_category?.id && product.primary_category.id === currentCategoryId) {
         score += 3;
       }
 
-      // ===== material igual =====
-      if (product.material && product.material === currentMaterial) {
-        score += 2;
-      }
+      // Filter tags em comum — 1 ponto por cada tag partilhada
+      const productTagIds = (product.filter_tags || []).map(ft => ft.tag_id);
+      const sharedTags = productTagIds.filter(id => currentTagIds.has(id));
+      score += sharedTags.length;
 
-      // ===== nome parecido =====
+      // Nome parecido
       const productName = (product.name || '').toLowerCase();
-      const nameMatch = currentNameWords.some(word =>
-        productName.includes(word)
-      );
-      if (nameMatch) score += 1;
+      if (currentNameWords.some(word => productName.includes(word))) score += 1;
 
-      // ===== random pequeno =====
-      score += Math.random();
+      // Pequeno random para variar
+      score += Math.random() * 0.5;
 
       return { product, score };
     });
@@ -215,7 +213,7 @@ class ProductRenderer {
     tagsContainer.innerHTML = '';
     const product = State.currentProduct;
 
-    // Categoria principal primeiro
+    // Categoria principal
     if (product.primary_category) {
       const tag = document.createElement('span');
       tag.className = 'product-tag primary';
@@ -223,11 +221,13 @@ class ProductRenderer {
       tagsContainer.appendChild(tag);
     }
 
-    // Categorias secundárias a seguir
-    (product.secondary_categories || []).forEach(cat => {
+    // Filter tags (novo sistema) — agrupadas por filtro
+    const filterTags = product.filter_tags || [];
+    filterTags.forEach(ft => {
       const tag = document.createElement('span');
-      tag.className = 'product-tag';
-      tag.textContent = cat.name;
+      tag.className = 'product-tag filter';
+      tag.title = ft.filter_name; // tooltip com o nome do filtro
+      tag.textContent = ft.tag_name;
       tagsContainer.appendChild(tag);
     });
   }
@@ -249,13 +249,8 @@ class ProductRenderer {
   }
 
   static renderSpecifications() {
-    const specMaterial = document.getElementById('specMaterial');
     const specCategory = document.getElementById('specCategory');
-    const specStock = document.getElementById('specStock');
-
-    if (specMaterial) {
-      specMaterial.textContent = State.currentProduct.material || 'PLA';
-    }
+    const specStock    = document.getElementById('specStock');
 
     if (specCategory) {
       const primary = State.currentProduct.primary_category;
@@ -264,8 +259,33 @@ class ProductRenderer {
 
     if (specStock) {
       const inStock = !!State.currentProduct.stock;
-      specStock.textContent = inStock ? 'Disponível' : 'Esgotado';
-      specStock.style.color = inStock ? 'green' : 'red';
+      specStock.textContent  = inStock ? 'Disponível' : 'Esgotado';
+      specStock.style.color  = inStock ? 'green' : 'red';
+    }
+
+    // Renderizar especificações dinâmicas a partir dos filter_tags
+    const specsContainer = document.getElementById('specsDynamic');
+    if (specsContainer) {
+      const filterTags = State.currentProduct.filter_tags || [];
+      if (!filterTags.length) {
+        specsContainer.innerHTML = '';
+        return;
+      }
+
+      // Agrupar por filtro
+      const grouped = {};
+      filterTags.forEach(ft => {
+        const key = String(ft.filter_id);
+        if (!grouped[key]) grouped[key] = { name: ft.filter_name, tags: [] };
+        grouped[key].tags.push(ft.tag_name);
+      });
+
+      specsContainer.innerHTML = Object.values(grouped).map(g => `
+        <div class="spec-row">
+          <span class="spec-label">${g.name}:</span>
+          <span class="spec-value">${g.tags.join(', ')}</span>
+        </div>
+      `).join('');
     }
   }
 
