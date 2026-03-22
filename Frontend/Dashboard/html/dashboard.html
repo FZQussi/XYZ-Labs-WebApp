@@ -395,6 +395,10 @@
         <span class="nav-icon">📋</span>
         <span>Encomendas</span>
       </button>
+      <button data-tab="filters" class="nav-btn">
+        <span class="nav-icon">🔧</span>
+        <span>Filtros</span>
+      </button>
       <button data-tab="priceCalculator" class="nav-btn">
         <span class="nav-icon">🧮</span>
         <span>Calculadora Preços</span>
@@ -568,6 +572,46 @@
             <div class="loading-state" style="padding:16px">⏳ A carregar...</div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ FILTROS ============ -->
+    <section id="filters" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">🔧 GESTÃO DE FILTROS</h2>
+        <p style="color: #666; font-size: 13px; margin-top: 4px; font-family: 'Courier New', monospace;">Cria filtros dinâmicos para cada categoria de produtos</p>
+      </header>
+
+      <!-- STEP 1: Selecionar Categoria -->
+      <div class="cat-section-card" style="margin-bottom: 24px;">
+        <div class="cat-section-header">
+          <span>📂 PASSO 1: Seleciona uma Categoria Principal</span>
+        </div>
+        <div style="padding: 16px;">
+          <select id="filterCategorySelect" class="primary-cat-select">
+            <option value="">-- A carregar categorias... --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STEP 2: Gestão de Filtros -->
+      <div class="cat-section-card" id="filtersManagementSection" style="display: none; margin-bottom: 24px;">
+        <div class="cat-section-header">
+          <span>🎯 PASSO 2: Filtros da Categoria</span>
+          <button class="btn-primary" id="addFilterBtn" style="font-size:12px;padding:6px 12px;">➕ Novo Filtro</button>
+        </div>
+        <div id="filtersList" style="padding: 16px; display: grid; gap: 12px; min-height: 60px;">
+          <div class="loading-state" style="padding:16px">Seleciona uma categoria para ver os filtros.</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Detalhes do Filtro Selecionado -->
+      <div class="cat-section-card" id="filterDetailsSection" style="display: none;">
+        <div class="cat-section-header">
+          <span>📌 PASSO 3: Tags do Filtro — <span id="selectedFilterName" style="color: #00FFFF;">—</span></span>
+          <button class="btn-primary" id="addTagBtn" style="font-size:12px;padding:6px 12px;">➕ Novo Tag</button>
+        </div>
+        <div id="tagsList" style="padding: 16px; display: grid; gap: 12px; min-height: 60px;"></div>
       </div>
     </section>
 
@@ -1096,6 +1140,87 @@
   </div>
 
   <!-- =========================================================
+       MODAIS DE FILTROS
+       ========================================================= -->
+
+  <!-- Modal: Criar/Editar Filtro -->
+  <div id="filterModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="filterModalTitle">Novo Filtro</h3>
+        <button class="modal-close" data-close="filter">×</button>
+      </div>
+      <form id="filterForm" class="modal-form">
+        <input type="hidden" id="filterId">
+        <div class="form-group">
+          <label>Chave do Filtro (lowercase, sem espaços) *</label>
+          <input type="text" id="filterKey" placeholder="ex: marca, modelo, ano" required>
+        </div>
+        <div class="form-group">
+          <label>Nome do Filtro *</label>
+          <input type="text" id="filterName" placeholder="ex: Marca, Modelo, Ano" required>
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="filterType">
+            <option value="multi-select">Multi-Select</option>
+            <option value="single-select">Single Select</option>
+            <option value="range">Range</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="filterDescription" rows="3" placeholder="Descrição ou ajuda para este filtro"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Ordem de Exibição</label>
+          <input type="number" id="filterOrder" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="filterActive" checked> Ativo</label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">💾 Guardar Filtro</button>
+          <button type="button" id="deleteFilterBtn" class="btn-danger" style="display: none;">🗑️ Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Criar/Editar Tag -->
+  <div id="tagModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="tagModalTitle">Novo Tag</h3>
+        <button class="modal-close" data-close="tag">×</button>
+      </div>
+      <form id="tagForm" class="modal-form">
+        <input type="hidden" id="tagId">
+        <input type="hidden" id="tagFilterId">
+        <div class="form-group">
+          <label>Nome do Tag *</label>
+          <input type="text" id="tagName" placeholder="ex: BMW, Preto, 2024" required>
+        </div>
+        <div class="form-group">
+          <label>Chave (será gerada automaticamente)</label>
+          <input type="text" id="tagKey" placeholder="auto-gerada" disabled>
+        </div>
+        <div class="form-group">
+          <label>Ordem de Exibição</label>
+          <input type="number" id="tagOrder" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="tagActive" checked> Ativo</label>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">💾 Guardar Tag</button>
+          <button type="button" id="deleteTagBtn" class="btn-danger" style="display: none;">🗑️ Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
        SCRIPTS
        ========================================================= -->
   <script src="/Dashboard/scripts/security.js"></script>
@@ -1111,5 +1236,6 @@
   <script src="/Dashboard/scripts/image-order-manager.js"></script>
   <script src="/Dashboard/scripts/price-calculator.js"></script>
   <script src="/Dashboard/scripts/orders.js"></script>
+  <script src="/Dashboard/scripts/filters.js"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ const adminRoutes      = require('./admin');
 const productRoutes    = require('./routes/products.routes');
 const userRoutes       = require('./routes/users.routes');
 const categoriesRoutes = require('./routes/categories.routes');
-const filtersRoutes    = require('./routes/filters.routes');        // ← NOVO
+const filtersRoutes    = require('./routes/filters.routes');
 const orderRoutes      = require('./routes/orders.routes');
 const contactRoutes    = require('./routes/contact.routes');
 const forgotRoutes     = require('./routes/forgot.routes');
@@ -32,7 +32,7 @@ const allowedOrigins = [
   'http://localhost:5500', 'http://127.0.0.1:5500',
   'http://localhost:5501', 'http://127.0.0.1:5501',
   'http://localhost:8080', 'http://127.0.0.1:8080',
-  'http://app:3000', 'http://frontend:3000'  // ← Docker services
+  'http://app:3000', 'http://frontend:3000'
 ];
 
 app.use(cors({
@@ -61,9 +61,9 @@ app.use('/admin', adminRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/categories', categoriesRoutes);
 
-// ← NOVA ROTA PARA FILTROS
-app.use('/filters', filtersRoutes);
-app.use('/api/filters', filtersRoutes);
+// Filtros montados na raiz — as rotas internas já têm os prefixos completos
+// ex: /api/admin/categories/:id/filters, /api/v1/categories/:id/filters
+app.use('/', filtersRoutes);
 
 app.use('/products', productRoutes);
 app.use('/api/products', productRoutes);
@@ -84,8 +84,14 @@ app.listen(port, () => {
   console.log(`🔒 Helmet | CORS (${allowedOrigins.length} origens) | Rate limit ativos`);
   console.log(`📤 Limite de upload: 100MB`);
   console.log(`💾 Cache: Em memória (sem Redis)`);
-  console.log(`🔧 Rotas de filtros disponíveis:`);
-  console.log(`   - GET  /api/v1/categories/:categoryId/filters (público, com cache)`);
-  console.log(`   - POST /api/admin/categories/:categoryId/filters (admin)`);
-  console.log(`   - PUT  /api/admin/filters/:filterId (admin)`);
+  console.log(`🔧 Rotas de filtros ativas:`);
+  console.log(`   PUBLIC  GET  /api/v1/categories/:id/filters`);
+  console.log(`   ADMIN   GET  /api/admin/categories/:id/filters`);
+  console.log(`   ADMIN   POST /api/admin/categories/:id/filters`);
+  console.log(`   ADMIN   PUT  /api/admin/filters/:id`);
+  console.log(`   ADMIN   DEL  /api/admin/filters/:id`);
+  console.log(`   ADMIN   GET  /api/admin/filters/:id/tags`);
+  console.log(`   ADMIN   POST /api/admin/filters/:id/tags`);
+  console.log(`   ADMIN   PUT  /api/admin/tags/:id`);
+  console.log(`   ADMIN   DEL  /api/admin/tags/:id`);
 });

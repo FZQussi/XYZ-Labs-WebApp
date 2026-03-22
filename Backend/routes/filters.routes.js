@@ -11,48 +11,30 @@ const filterTagsController = require('../controllers/filterTags.controller');
 const productFilterTagsController = require('../controllers/productFilterTags.controller');
 const filterTranslationsController = require('../controllers/filterTranslations.controller');
 
-/**
- * ═════════════════════════════════════════════════
- * ROTAS PÚBLICAS (SEM AUTENTICAÇÃO)
- * ═════════════════════════════════════════════════
- */
+// =============================================================
+// ROTAS PÚBLICAS (sem autenticação, com cache)
+// Montadas em server.js como: app.use('/', filtersRoutes)
+// URL final: GET /api/v1/categories/:id/filters
+// =============================================================
 
-/**
- * GET /api/v1/categories/:categoryId/filters
- * 
- * Obter filtros de uma categoria (com cache)
- * Usado pela página de produtos para renderizar filtros
- */
 router.get(
   '/api/v1/categories/:primaryCategoryId/filters',
-  cacheMiddleware('filters', 3600), // Cache 1 hora
+  cacheMiddleware('filters', 3600),
   categoryFiltersController.getFiltersForCategory
 );
 
-/**
- * GET /api/v1/categories/:categoryId/filters/public
- * 
- * Alias alternativo
- */
 router.get(
   '/api/v1/categories/:primaryCategoryId/filters/public',
   cacheMiddleware('filters', 3600),
   categoryFiltersController.getFiltersForCategory
 );
 
-/**
- * ═════════════════════════════════════════════════
- * ROTAS ADMIN (REQUEREM AUTENTICAÇÃO + ROLE ADMIN)
- * ═════════════════════════════════════════════════
- */
+// =============================================================
+// ROTAS ADMIN — CATEGORY FILTERS
+// URL final: /api/admin/categories/:id/filters
+// =============================================================
 
-// ──── CATEGORY FILTERS ────
-
-/**
- * GET /api/admin/categories/:categoryId/filters
- * 
- * Obter filtros para edição no dashboard (com translations)
- */
+// GET  /api/admin/categories/:primaryCategoryId/filters
 router.get(
   '/api/admin/categories/:primaryCategoryId/filters',
   auth,
@@ -60,20 +42,7 @@ router.get(
   categoryFiltersController.getFiltersForCategoryAdmin
 );
 
-/**
- * POST /api/admin/categories/:categoryId/filters
- * 
- * Criar novo filtro
- * 
- * Body:
- * {
- *   "filter_key": "brand",
- *   "filter_name": "Marca",
- *   "filter_type": "multi-select",
- *   "display_order": 1,
- *   "description": "Marca do automóvel"
- * }
- */
+// POST /api/admin/categories/:primaryCategoryId/filters
 router.post(
   '/api/admin/categories/:primaryCategoryId/filters',
   auth,
@@ -81,13 +50,7 @@ router.post(
   categoryFiltersController.createFilter
 );
 
-/**
- * PUT /api/admin/filters/:filterId
- * 
- * Atualizar filtro
- * 
- * Body: { "filter_name": "Marca", "is_active": true, ... }
- */
+// PUT  /api/admin/filters/:filterId
 router.put(
   '/api/admin/filters/:filterId',
   auth,
@@ -95,11 +58,7 @@ router.put(
   categoryFiltersController.updateFilter
 );
 
-/**
- * DELETE /api/admin/filters/:filterId
- * 
- * Deletar filtro
- */
+// DELETE /api/admin/filters/:filterId
 router.delete(
   '/api/admin/filters/:filterId',
   auth,
@@ -107,13 +66,7 @@ router.delete(
   categoryFiltersController.deleteFilter
 );
 
-/**
- * PUT /api/admin/filters/:filterId/reorder
- * 
- * Reordenar filtros
- * 
- * Body: { "order": [1001, 1003, 1002] }
- */
+// PUT /api/admin/filters/:filterId/reorder
 router.put(
   '/api/admin/filters/:filterId/reorder',
   auth,
@@ -121,13 +74,11 @@ router.put(
   categoryFiltersController.reorderFilters
 );
 
-// ──── FILTER TAGS ────
+// =============================================================
+// ROTAS ADMIN — FILTER TAGS
+// =============================================================
 
-/**
- * GET /api/admin/filters/:filterId/tags
- * 
- * Obter tags de um filtro
- */
+// GET  /api/admin/filters/:filterId/tags
 router.get(
   '/api/admin/filters/:filterId/tags',
   auth,
@@ -135,17 +86,7 @@ router.get(
   filterTagsController.getTagsForFilter
 );
 
-/**
- * POST /api/admin/filters/:filterId/tags
- * 
- * Criar novo tag
- * 
- * Body:
- * {
- *   "tag_name": "BMW",
- *   "tag_key": "bmw" (opcional, gerado automaticamente)
- * }
- */
+// POST /api/admin/filters/:filterId/tags
 router.post(
   '/api/admin/filters/:filterId/tags',
   auth,
@@ -153,13 +94,7 @@ router.post(
   filterTagsController.createTag
 );
 
-/**
- * PUT /api/admin/tags/:tagId
- * 
- * Atualizar tag
- * 
- * Body: { "tag_name": "BMW", "is_active": true, ... }
- */
+// PUT  /api/admin/tags/:tagId
 router.put(
   '/api/admin/tags/:tagId',
   auth,
@@ -167,11 +102,7 @@ router.put(
   filterTagsController.updateTag
 );
 
-/**
- * DELETE /api/admin/tags/:tagId
- * 
- * Deletar tag
- */
+// DELETE /api/admin/tags/:tagId
 router.delete(
   '/api/admin/tags/:tagId',
   auth,
@@ -179,13 +110,7 @@ router.delete(
   filterTagsController.deleteTag
 );
 
-/**
- * PUT /api/admin/filters/:filterId/tags/reorder
- * 
- * Reordenar tags
- * 
- * Body: { "order": [2001, 2003, 2002] }
- */
+// PUT /api/admin/filters/:filterId/tags/reorder
 router.put(
   '/api/admin/filters/:filterId/tags/reorder',
   auth,
@@ -193,12 +118,7 @@ router.put(
   filterTagsController.reorderTags
 );
 
-/**
- * PUT /api/admin/categories/:categoryId/tags/update-counts
- * 
- * Atualizar contagem de produtos por tag
- * (Útil para cron jobs ou manual trigger)
- */
+// PUT /api/admin/categories/:categoryId/tags/update-counts
 router.put(
   '/api/admin/categories/:categoryId/tags/update-counts',
   auth,
@@ -206,25 +126,17 @@ router.put(
   filterTagsController.updateProductCounts
 );
 
-// ──── PRODUCT FILTER TAGS ────
+// =============================================================
+// ROTAS PRODUTO — FILTER TAGS
+// =============================================================
 
-/**
- * GET /api/products/:productId/filter-tags
- * 
- * Obter tags de um produto
- */
+// GET    /api/products/:productId/filter-tags
 router.get(
   '/api/products/:productId/filter-tags',
   productFilterTagsController.getProductFilterTags
 );
 
-/**
- * POST /api/products/:productId/filter-tags
- * 
- * Adicionar tag a um produto
- * 
- * Body: { "filter_tag_id": 2001 }
- */
+// POST   /api/products/:productId/filter-tags
 router.post(
   '/api/products/:productId/filter-tags',
   auth,
@@ -232,11 +144,7 @@ router.post(
   productFilterTagsController.addTagToProduct
 );
 
-/**
- * DELETE /api/products/:productId/filter-tags/:tagId
- * 
- * Remover tag de um produto
- */
+// DELETE /api/products/:productId/filter-tags/:tagId
 router.delete(
   '/api/products/:productId/filter-tags/:tagId',
   auth,
@@ -244,13 +152,7 @@ router.delete(
   productFilterTagsController.removeTagFromProduct
 );
 
-/**
- * PUT /api/products/:productId/filter-tags
- * 
- * Substituir TODOS os tags de um produto
- * 
- * Body: { "filter_tags": [2001, 3001, 3002] }
- */
+// PUT    /api/products/:productId/filter-tags
 router.put(
   '/api/products/:productId/filter-tags',
   auth,
@@ -258,13 +160,11 @@ router.put(
   productFilterTagsController.replaceProductFilterTags
 );
 
-// ──── TRANSLATIONS (i18n) ────
+// =============================================================
+// ROTAS ADMIN — TRANSLATIONS
+// =============================================================
 
-/**
- * GET /api/admin/filters/:filterId/translations
- * 
- * Obter traduções de um filtro
- */
+// GET  /api/admin/filters/:filterId/translations
 router.get(
   '/api/admin/filters/:filterId/translations',
   auth,
@@ -272,17 +172,7 @@ router.get(
   filterTranslationsController.getFilterTranslations
 );
 
-/**
- * POST /api/admin/filters/:filterId/translations
- * 
- * Adicionar tradução
- * 
- * Body:
- * {
- *   "language_code": "es",
- *   "translated_name": "Marca"
- * }
- */
+// POST /api/admin/filters/:filterId/translations
 router.post(
   '/api/admin/filters/:filterId/translations',
   auth,
@@ -290,11 +180,7 @@ router.post(
   filterTranslationsController.createFilterTranslation
 );
 
-/**
- * PUT /api/admin/tags/:tagId/translations
- * 
- * Traduzir um tag
- */
+// PUT  /api/admin/tags/:tagId/translations
 router.put(
   '/api/admin/tags/:tagId/translations',
   auth,
