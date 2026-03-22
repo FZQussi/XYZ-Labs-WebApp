@@ -122,13 +122,13 @@
     `).join('');
 
     list.querySelectorAll('.filter-tags-btn').forEach(btn => {
-      btn.addEventListener('click', () => selectFilterForTags(parseInt(btn.dataset.id)));
+      btn.addEventListener('click', () => selectFilterForTags(btn.dataset.id));
     });
     list.querySelectorAll('.filter-edit-btn').forEach(btn => {
-      btn.addEventListener('click', () => openFilterModal(parseInt(btn.dataset.id)));
+      btn.addEventListener('click', () => openFilterModal(btn.dataset.id));
     });
     list.querySelectorAll('.filter-delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => deleteFilter(parseInt(btn.dataset.id)));
+      btn.addEventListener('click', () => deleteFilter(btn.dataset.id));
     });
   }
 
@@ -151,7 +151,7 @@
 
     if (filterId) {
       // Editar — buscar dados do state em memória
-      const filter = filtersData.find(f => f.id === filterId);
+      const filter = filtersData.find(f => String(f.id) === String(filterId));
       if (!filter) return;
 
       idInput.value    = filter.id;
@@ -240,7 +240,7 @@
   // 5. ELIMINAR FILTRO
   // ============================================================
   async function deleteFilter(filterId) {
-    const filter = filtersData.find(f => f.id === filterId);
+    const filter = filtersData.find(f => String(f.id) === String(filterId));
     const nome   = filter ? filter.filter_name : `#${filterId}`;
     const tagsN  = Array.isArray(filter?.tags) ? filter.tags.length : '?';
 
@@ -255,7 +255,7 @@
       if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
 
       // Se o filtro eliminado era o selecionado, esconder secção de tags
-      if (selectedFilterId === filterId) {
+      if (String(selectedFilterId) === String(filterId)) {
         selectedFilterId = null;
         document.getElementById('filterDetailsSection').style.display = 'none';
       }
@@ -272,7 +272,7 @@
   // ============================================================
   async function selectFilterForTags(filterId) {
     selectedFilterId = filterId;
-    const filter = filtersData.find(f => f.id === filterId);
+    const filter = filtersData.find(f => String(f.id) === String(filterId));
 
     const nameEl = document.getElementById('selectedFilterName');
     if (nameEl) nameEl.textContent = filter ? filter.filter_name : `#${filterId}`;
@@ -332,10 +332,10 @@
     `).join('');
 
     list.querySelectorAll('.tag-edit-btn').forEach(btn => {
-      btn.addEventListener('click', () => openTagModal(parseInt(btn.dataset.id)));
+      btn.addEventListener('click', () => openTagModal(btn.dataset.id));
     });
     list.querySelectorAll('.tag-delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => deleteTag(parseInt(btn.dataset.id)));
+      btn.addEventListener('click', () => deleteTag(btn.dataset.id));
     });
   }
 
@@ -356,7 +356,7 @@
     document.getElementById('tagFilterId').value = selectedFilterId;
 
     if (tagId) {
-      const tag = tagsData.find(t => t.id === tagId);
+      const tag = tagsData.find(t => String(t.id) === String(tagId));
       if (!tag) return;
 
       idInput.value    = tag.id;
@@ -428,7 +428,7 @@
   // 10. ELIMINAR TAG
   // ============================================================
   async function deleteTag(tagId) {
-    const tag   = tagsData.find(t => t.id === tagId);
+    const tag   = tagsData.find(t => String(t.id) === String(tagId));
     const nome  = tag ? tag.tag_name : `#${tagId}`;
     const count = tag?.product_count || 0;
 

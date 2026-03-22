@@ -46,34 +46,20 @@ exports.getProducts = async (req, res) => {
             )
           ) FILTER (WHERE c.id IS NOT NULL),
           '[]'
-        ) AS secondary_categories,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object(
-              'tag_id',      ft.id,
-              'tag_name',    ft.tag_name,
-              'tag_key',     ft.tag_key,
-              'filter_id',   cf.id,
-              'filter_name', cf.filter_name,
-              'filter_key',  cf.filter_key
-            )
-          ) FILTER (WHERE ft.id IS NOT NULL),
-          '[]'
-        ) AS filter_tags
+        ) AS secondary_categories
       FROM products p
       LEFT JOIN primary_categories pc_main ON pc_main.id = p.primary_category_id
       LEFT JOIN product_categories  pcat   ON pcat.product_id = p.id
       LEFT JOIN categories           c     ON c.id = pcat.category_id
-      LEFT JOIN product_filter_tags  pft   ON pft.product_id = p.id
-      LEFT JOIN filter_tags          ft    ON ft.id = pft.filter_tag_id
-      LEFT JOIN category_filters     cf    ON cf.id = ft.filter_id
       WHERE p.is_active = true
       GROUP BY p.id, pc_main.id, pc_main.name, pc_main.slug,
-               pc_main.description, pc_main.image, pc_main.icon,
+               pc_main.description, pc_main.image,
                pc_main.is_active, pc_main.display_order,
                pc_main.created_at, pc_main.updated_at
       ORDER BY p.created_at DESC
-    \`);
+    `);
+
+    
 
     res.json(result.rows);
   } catch (err) {
@@ -97,30 +83,14 @@ exports.getProductById = async (req, res) => {
             )
           ) FILTER (WHERE c.id IS NOT NULL),
           '[]'
-        ) AS secondary_categories,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object(
-              'tag_id',      ft.id,
-              'tag_name',    ft.tag_name,
-              'tag_key',     ft.tag_key,
-              'filter_id',   cf.id,
-              'filter_name', cf.filter_name,
-              'filter_key',  cf.filter_key
-            )
-          ) FILTER (WHERE ft.id IS NOT NULL),
-          '[]'
-        ) AS filter_tags
+        ) AS secondary_categories
       FROM products p
       LEFT JOIN primary_categories pc_main ON pc_main.id = p.primary_category_id
       LEFT JOIN product_categories  pcat   ON pcat.product_id = p.id
       LEFT JOIN categories           c     ON c.id = pcat.category_id
-      LEFT JOIN product_filter_tags  pft   ON pft.product_id = p.id
-      LEFT JOIN filter_tags          ft    ON ft.id = pft.filter_tag_id
-      LEFT JOIN category_filters     cf    ON cf.id = ft.filter_id
       WHERE p.id = $1
       GROUP BY p.id, pc_main.id, pc_main.name, pc_main.slug,
-               pc_main.description, pc_main.image, pc_main.icon,
+               pc_main.description, pc_main.image,
                pc_main.is_active, pc_main.display_order,
                pc_main.created_at, pc_main.updated_at
     `, [req.params.id]);

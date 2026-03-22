@@ -1024,6 +1024,7 @@
       <div class="modal-header"><h3>EDITAR PRODUTO: <span id="editProductName"></span></h3><button class="modal-close" data-close="edit">×</button></div>
       <div class="modal-tabs">
         <button class="modal-tab-btn active" data-tab="edit-details">📋 Detalhes</button>
+        <button class="modal-tab-btn" data-tab="edit-filters">🏷️ Filtros</button>
         <button class="modal-tab-btn" data-tab="edit-model">🎨 Modelo 3D</button>
         <button class="modal-tab-btn" data-tab="edit-images">🖼️ Imagens</button>
       </div>
@@ -1059,6 +1060,31 @@
               <button type="button" id="deleteProductBtn" class="btn-danger">🗑️ ELIMINAR PRODUTO</button>
             </div>
           </form>
+        </div>
+        <div id="tab-edit-filters" class="modal-tab-content">
+          <div style="padding: 4px 0 16px 0">
+            <p style="font-family:'Courier New',monospace;font-size:12px;color:#666;margin:0 0 16px 0">
+              Associa filtros e tags a este produto. Os filtros são baseados na categoria principal.
+            </p>
+
+            <!-- Estado de carregamento / sem categoria -->
+            <div id="editFiltersLoading" style="padding:24px;text-align:center;font-family:'Courier New',monospace;color:#888">
+              ⏳ A carregar filtros...
+            </div>
+
+            <!-- Container de filtros do produto -->
+            <div id="editFiltersContainer" style="display:none">
+              <!-- Filtros gerados dinamicamente pelo editproduct.js -->
+            </div>
+
+            <!-- Ações -->
+            <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+              <button type="button" id="saveFilterTagsBtn" class="btn-primary" style="flex-shrink:0">
+                💾 GUARDAR FILTROS
+              </button>
+              <span id="saveFilterTagsMsg" style="font-family:'Courier New',monospace;font-size:12px;color:#666"></span>
+            </div>
+          </div>
         </div>
         <div id="tab-edit-model" class="modal-tab-content">
           <div class="model-edit-container">
@@ -1112,6 +1138,7 @@
       <div class="modal-header"><h3 id="viewName"></h3><button class="modal-close" data-close="view">×</button></div>
       <div class="modal-tabs">
         <button class="modal-tab-btn active" data-tab="details">📋 Detalhes</button>
+        <button class="modal-tab-btn" data-tab="filters">🏷️ Filtros</button>
         <button class="modal-tab-btn" data-tab="model">🎨 Modelo 3D</button>
         <button class="modal-tab-btn" data-tab="images">🖼️ Imagens</button>
       </div>
@@ -1124,6 +1151,11 @@
             <div class="detail-row"><span class="detail-label">Categoria Principal:</span><span class="detail-value" id="viewPrimaryCategory"></span></div>
             <div class="detail-row"><span class="detail-label">Categorias Secundárias:</span><span class="detail-value sec-cats-view" id="viewSecondaryCategories"></span></div>
             <div class="detail-row full-width"><span class="detail-label">Descrição:</span><div class="detail-description desc-rendered" id="viewDescription"></div></div>
+          </div>
+        </div>
+        <div id="tab-filters" class="modal-tab-content">
+          <div id="viewFilterTags" style="padding:8px 0">
+            <div class="loading-state">⏳ A carregar filtros...</div>
           </div>
         </div>
         <div id="tab-model" class="modal-tab-content">
@@ -1150,38 +1182,55 @@
         <h3 id="filterModalTitle">Novo Filtro</h3>
         <button class="modal-close" data-close="filter">×</button>
       </div>
+      <!-- Contexto: categoria a que pertence -->
+      <div id="filterModalContext" style="display:none;padding:8px 24px;background:#f5f5f5;border-bottom:2px solid #000;font-family:'Courier New',monospace;font-size:12px;color:#666">
+        📂 Categoria: <strong id="filterModalCategoryName">—</strong>
+      </div>
       <form id="filterForm" class="modal-form">
         <input type="hidden" id="filterId">
-        <div class="form-group">
-          <label>Chave do Filtro (lowercase, sem espaços) *</label>
-          <input type="text" id="filterKey" placeholder="ex: marca, modelo, ano" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome do Filtro *</label>
+            <input type="text" id="filterName" placeholder="ex: Marca, Modelo, Cor" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select id="filterType">
+              <option value="multi-select">Multi-Select (várias opções)</option>
+              <option value="checkbox">Checkbox (verdadeiro/falso)</option>
+              <option value="range">Range (intervalo numérico)</option>
+              <option value="search">Search (pesquisa de texto)</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
-          <label>Nome do Filtro *</label>
-          <input type="text" id="filterName" placeholder="ex: Marca, Modelo, Ano" required>
+          <label>Chave Interna * <small style="font-weight:normal;text-transform:none;color:#888">(gerada automaticamente — apenas letras, números e _)</small></label>
+          <input type="text" id="filterKey" placeholder="ex: marca, modelo_ano, cor_principal" required autocomplete="off"
+                 style="font-family:'Courier New',monospace">
+          <small id="filterKeyHint" style="display:none;margin-top:4px;font-size:11px;color:#888;font-family:'Courier New',monospace">
+            🔒 A chave não pode ser alterada após a criação
+          </small>
         </div>
         <div class="form-group">
-          <label>Tipo *</label>
-          <select id="filterType">
-            <option value="multi-select">Multi-Select</option>
-            <option value="single-select">Single Select</option>
-            <option value="range">Range</option>
-          </select>
+          <label>Descrição / Ajuda <small style="font-weight:normal;text-transform:none;color:#888">(opcional)</small></label>
+          <textarea id="filterDescription" rows="2" placeholder="Texto de ajuda exibido ao lado do filtro..."></textarea>
         </div>
-        <div class="form-group">
-          <label>Descrição</label>
-          <textarea id="filterDescription" rows="3" placeholder="Descrição ou ajuda para este filtro"></textarea>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ordem de Exibição</label>
+            <input type="number" id="filterOrder" value="0" min="0">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;padding-top:28px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="filterActive" checked style="width:18px;height:18px">
+              Filtro ativo (visível na loja)
+            </label>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Ordem de Exibição</label>
-          <input type="number" id="filterOrder" value="0" min="0">
-        </div>
-        <div class="form-group">
-          <label><input type="checkbox" id="filterActive" checked> Ativo</label>
-        </div>
+        <div id="filterFormError" style="display:none;padding:10px 14px;background:#fff0f0;border:2px solid #f44336;font-family:'Courier New',monospace;font-size:12px;color:#c62828;margin-bottom:8px"></div>
         <div class="modal-actions">
-          <button type="submit" class="btn-primary">💾 Guardar Filtro</button>
-          <button type="button" id="deleteFilterBtn" class="btn-danger" style="display: none;">🗑️ Eliminar</button>
+          <button type="submit" class="btn-primary" id="filterSubmitBtn">💾 Guardar Filtro</button>
+          <button type="button" id="deleteFilterBtn" class="btn-danger" style="display:none">🗑️ Eliminar Filtro</button>
         </div>
       </form>
     </div>
@@ -1194,27 +1243,45 @@
         <h3 id="tagModalTitle">Novo Tag</h3>
         <button class="modal-close" data-close="tag">×</button>
       </div>
+      <!-- Contexto: filtro a que pertence -->
+      <div id="tagModalContext" style="display:none;padding:8px 24px;background:#f5f5f5;border-bottom:2px solid #000;font-family:'Courier New',monospace;font-size:12px;color:#666">
+        🎯 Filtro: <strong id="tagModalFilterName">—</strong>
+      </div>
       <form id="tagForm" class="modal-form">
         <input type="hidden" id="tagId">
         <input type="hidden" id="tagFilterId">
         <div class="form-group">
           <label>Nome do Tag *</label>
-          <input type="text" id="tagName" placeholder="ex: BMW, Preto, 2024" required>
+          <input type="text" id="tagName" placeholder="ex: BMW, Vermelho, XL, 2024" required autocomplete="off">
         </div>
         <div class="form-group">
-          <label>Chave (será gerada automaticamente)</label>
-          <input type="text" id="tagKey" placeholder="auto-gerada" disabled>
+          <label>Chave Interna <small style="font-weight:normal;text-transform:none;color:#888">(opcional — gerada automaticamente se vazio)</small></label>
+          <input type="text" id="tagKey" placeholder="gerada automaticamente" autocomplete="off"
+                 style="font-family:'Courier New',monospace">
+          <small style="display:block;margin-top:4px;font-size:11px;color:#888;font-family:'Courier New',monospace">
+            Usada internamente para identificar o tag. Podes deixar em branco.
+          </small>
         </div>
-        <div class="form-group">
-          <label>Ordem de Exibição</label>
-          <input type="number" id="tagOrder" value="0" min="0">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ordem de Exibição</label>
+            <input type="number" id="tagOrder" value="0" min="0">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;padding-top:28px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="tagActive" checked style="width:18px;height:18px">
+              Tag ativo (visível na loja)
+            </label>
+          </div>
         </div>
-        <div class="form-group">
-          <label><input type="checkbox" id="tagActive" checked> Ativo</label>
+        <!-- Info de produtos (só aparece na edição) -->
+        <div id="tagProductCountInfo" style="display:none;padding:10px 14px;background:#eff6ff;border:2px solid #2563eb;font-family:'Courier New',monospace;font-size:12px;color:#1d4ed8;margin-bottom:8px">
+          📊 Este tag está associado a <strong id="tagProductCountValue">0</strong> produto(s)
         </div>
+        <div id="tagFormError" style="display:none;padding:10px 14px;background:#fff0f0;border:2px solid #f44336;font-family:'Courier New',monospace;font-size:12px;color:#c62828;margin-bottom:8px"></div>
         <div class="modal-actions">
-          <button type="submit" class="btn-primary">💾 Guardar Tag</button>
-          <button type="button" id="deleteTagBtn" class="btn-danger" style="display: none;">🗑️ Eliminar</button>
+          <button type="submit" class="btn-primary" id="tagSubmitBtn">💾 Guardar Tag</button>
+          <button type="button" id="deleteTagBtn" class="btn-danger" style="display:none">🗑️ Eliminar Tag</button>
         </div>
       </form>
     </div>

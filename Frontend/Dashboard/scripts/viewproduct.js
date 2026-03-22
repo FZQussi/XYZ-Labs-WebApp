@@ -32,6 +32,52 @@
     });
   });
 
+  function encodeHTML(str) {
+    const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML;
+  }
+
+  // ===== RENDERIZAR FILTER TAGS =====
+  function renderFilterTags(filterTags) {
+    const container = document.getElementById('viewFilterTags');
+    if (!container) return;
+
+    const tags = filterTags || [];
+
+    if (!tags.length) {
+      container.innerHTML = `
+        <div style="padding:32px;text-align:center;font-family:'Courier New',monospace;color:#888">
+          Nenhum filtro atribuído a este produto.
+        </div>`;
+      return;
+    }
+
+    // Agrupar tags por filtro
+    const grouped = {};
+    tags.forEach(t => {
+      const key = String(t.filter_id);
+      if (!grouped[key]) {
+        grouped[key] = { filter_name: t.filter_name, filter_key: t.filter_key, tags: [] };
+      }
+      grouped[key].tags.push(t);
+    });
+
+    container.innerHTML = Object.values(grouped).map(group => `
+      <div style="margin-bottom:16px;border:2px solid #e5e7eb;padding:12px 16px;">
+        <div style="font-family:'Courier New',monospace;font-weight:bold;font-size:13px;margin-bottom:10px;color:#333">
+          ${encodeHTML(group.filter_name)}
+          <span style="font-size:11px;background:#f0f0f0;border:1px solid #ccc;padding:1px 6px;margin-left:6px;font-weight:normal">${encodeHTML(group.filter_key)}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${group.tags.map(t => `
+            <span style="padding:5px 12px;border:2px solid #000;background:#000;color:#fff;font-family:'Courier New',monospace;font-size:12px;font-weight:bold">
+              🏷️ ${encodeHTML(t.tag_name)}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
   document.addEventListener('openViewProductModal', e => {
     const p = e.detail;
 
@@ -62,6 +108,9 @@
         ? secs.map(c => `<span class="sec-cat-badge">${c.name}</span>`).join(' ')
         : '<span style="color:#aaa">Nenhuma</span>';
     }
+
+    // Filter tags
+    renderFilterTags(p.filter_tags || []);
 
     // Modelo 3D
     if (modelViewer) {

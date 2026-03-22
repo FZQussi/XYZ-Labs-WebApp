@@ -83,8 +83,145 @@
       editModal.querySelectorAll('.modal-tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       editModal.querySelector(`#tab-${tabName}`)?.classList.add('active');
+      // Carregar filtros quando a aba for aberta
+      if (tabName === 'edit-filters' && currentProduct) {
+        loadProductFilterTags(currentProduct.id, currentProduct.primary_category?.id);
+      }
     });
   });
+
+  // ===== FILTER TAGS =====
+  async function loadProductFilterTags(productId, primaryCategoryId) {
+    const loading   = document.getElementById('editFiltersLoading');
+    const container = document.getElementById('editFiltersContainer');
+    if (!container) return;
+
+    if (!primaryCategoryId) {
+      if (loading) { loading.style.display = 'block'; loading.textContent = '⚠️ Este produto não tem categoria principal definida. Atribui uma categoria primeiro.'; }
+      return;
+    }
+
+    if (loading) { loading.style.display = 'block'; loading.textContent = '⏳ A carregar filtros...'; }
+    container.style.display = 'none';
+    container.innerHTML = '';
+
+    try {
+      // Buscar filtros disponíveis para a categoria e tags já atribuídas ao produto
+      const [filtersRes, productTagsRes] = await Promise.all([
+        fetch(`${API_BASE}/api/admin/categories/${primaryCategoryId}/filters`, {
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        }),
+        fetch(`${API_BASE}/api/products/${productId}/filter-tags`, {
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
+        })
+      ]);
+
+      const filters     = filtersRes.ok     ? await filtersRes.json()     : [];
+      const productTags = productTagsRes.ok  ? await productTagsRes.json() : [];
+
+      // IDs das tags já atribuídas ao produto
+      const assignedTagIds = new Set(productTags.map(t => String(t.tag_id || t.filter_tag_id)));
+
+      if (!filters.length) {
+        container.innerHTML = `
+          <div style="padding:24px;text-align:center;font-family:'Courier New',monospace;color:#888">
+            Nenhum filtro criado para a categoria deste produto.<br>
+            <small>Vai a <strong>Filtros</strong> para criar filtros para esta categoria.</small>
+          </div>`;
+        if (loading) loading.style.display = 'none';
+        container.style.display = 'block';
+        return;
+      }
+
+      // Renderizar um bloco por filtro com as suas tags como checkboxes
+      container.innerHTML = filters.map(filter => {
+        const tags = filter.tags || [];
+        if (!tags.length) return `
+          <div style="margin-bottom:16px;border:2px solid #e5e7eb;padding:12px 16px;">
+            <div style="font-family:'Courier New',monospace;font-weight:bold;font-size:13px;margin-bottom:6px">
+              ${encodeHTMLedit(filter.filter_name)}
+              <span style="font-size:11px;background:#000;color:#fff;padding:1px 6px;margin-left:6px">${encodeHTMLedit(filter.filter_type)}</span>
+            </div>
+            <div style="font-size:12px;color:#aaa;font-family:'Courier New',monospace">Sem tags criadas para este filtro.</div>
+          </div>`;
+
+        return `
+          <div style="margin-bottom:16px;border:2px solid #e5e7eb;padding:12px 16px;">
+            <div style="font-family:'Courier New',monospace;font-weight:bold;font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+              ${encodeHTMLedit(filter.filter_name)}
+              <span style="font-size:11px;background:#000;color:#fff;padding:1px 6px">${encodeHTMLedit(filter.filter_type)}</span>
+              ${filter.description ? `<span style="font-size:11px;color:#888;font-weight:normal">${encodeHTMLedit(filter.description)}</span>` : ''}
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              ${tags.map(tag => `
+                <label class="sec-cat-checkbox" style="cursor:pointer">
+                  <input type="checkbox"
+                    class="filter-tag-checkbox"
+                    value="${tag.id}"
+                    data-filter-id="${filter.id}"
+                    ${assignedTagIds.has(String(tag.id)) ? 'checked' : ''}
+                    style="display:none">
+                  <span class="sec-cat-badge" style="${assignedTagIds.has(String(tag.id)) ? 'background:#000;color:#fff' : ''}">
+                    🏷️ ${encodeHTMLedit(tag.tag_name)}
+                    ${tag.product_count ? `<small style="opacity:0.6;margin-left:4px">(${tag.product_count})</small>` : ''}
+                  </span>
+                </label>
+              `).join('')}
+            </div>
+          </div>`;
+      }).join('');
+
+      // Toggle visual dos checkboxes (mesma lógica que sec-cat-badge)
+      container.querySelectorAll('.filter-tag-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const badge = cb.nextElementSibling;
+          if (cb.checked) { badge.style.background = '#000'; badge.style.color = '#fff'; }
+          else            { badge.style.background = '';    badge.style.color = '';     }
+        });
+      });
+
+      if (loading) loading.style.display = 'none';
+      container.style.display = 'block';
+    } catch (err) {
+      console.error('Erro ao carregar filter tags:', err);
+      if (loading) { loading.style.display = 'block'; loading.textContent = '❌ Erro ao carregar filtros.'; }
+    }
+  }
+
+  function encodeHTMLedit(str) {
+    const d = document.createElement('div'); d.textContent = String(str); return d.innerHTML;
+  }
+
+  async function saveFilterTags(productId) {
+    const container = document.getElementById('editFiltersContainer');
+    const saveBtn   = document.getElementById('saveFilterTagsBtn');
+    const saveMsg   = document.getElementById('saveFilterTagsMsg');
+    if (!container || !saveBtn) return;
+
+    const checkedIds = Array.from(
+      container.querySelectorAll('.filter-tag-checkbox:checked')
+    ).map(cb => parseInt(cb.value));
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '⏳ A guardar...';
+    if (saveMsg) saveMsg.textContent = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/products/${productId}/filter-tags`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filter_tags: checkedIds })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
+      if (saveMsg) { saveMsg.textContent = '✅ Guardado!'; setTimeout(() => { if (saveMsg) saveMsg.textContent = ''; }, 3000); }
+    } catch (err) {
+      if (saveMsg) saveMsg.textContent = '❌ ' + err.message;
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = '💾 GUARDAR FILTROS';
+    }
+  }
 
   // ===== POPULAR CATEGORIAS =====
   function populateEditCategories(product) {
@@ -225,12 +362,24 @@
 
     await loadProductImages(currentProduct.id);
     tabButtons?.[0]?.click();
+
+    // Reset aba de filtros
+    const filtersLoading = document.getElementById('editFiltersLoading');
+    const filtersContainer = document.getElementById('editFiltersContainer');
+    if (filtersLoading) { filtersLoading.style.display = 'block'; filtersLoading.textContent = '⏳ A carregar filtros...'; }
+    if (filtersContainer) { filtersContainer.style.display = 'none'; filtersContainer.innerHTML = ''; }
+
     showModal();
   });
 
   // ===== FECHAR / ELIMINAR =====
   editCloseBtn?.addEventListener('click', hideModal);
   deleteBtn?.addEventListener('click', deleteProduct);
+
+  // ===== GUARDAR FILTER TAGS =====
+  document.getElementById('saveFilterTagsBtn')?.addEventListener('click', () => {
+    if (currentProduct) saveFilterTags(currentProduct.id);
+  });
 
   // ===== MODELO 3D UPLOAD =====
   editModelFile?.addEventListener('change', (e) => {
