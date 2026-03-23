@@ -121,7 +121,8 @@ function applyFilters() {
     // Ler estado actual dos filtros (do products-filters.js)
     const primaryId       = typeof selectedPrimaryId !== 'undefined' ? selectedPrimaryId : null;
     const secFilters      = typeof selectedSecondaryFilters !== 'undefined' ? selectedSecondaryFilters : {};
-    const activeGroupKeys = Object.keys(secFilters).filter(k => secFilters[k]?.length > 0);
+    // Grupos ativos: tem estado definido (qualquer tipo nao-nulo)
+    const activeGroupKeys = Object.keys(secFilters).filter(k => secFilters[k] != null);
 
     console.group('🔍 applyFilters');
     console.log('  categoria primária:', primaryId);
@@ -149,19 +150,55 @@ function applyFilters() {
         if (!product.primary_category || product.primary_category.id !== primaryId) return false;
       }
 
-      // Filtros adicionais — verificar contra filter_tags do produto
-      // Lógica AND entre grupos: produto precisa de ter pelo menos 1 tag de cada grupo ativo
+      // Filtros adicionais — logica AND entre grupos ativos
+      // O formato de secFilters mudou para: { filterKey: { type, tagIds?|min/max?|value? } }
       for (const groupKey of activeGroupKeys) {
-        const selectedTagIds = secFilters[groupKey]; // array de IDs de tags selecionadas neste grupo
-        if (!selectedTagIds?.length) continue;
+        const filterState = secFilters[groupKey];
+        if (!filterState) continue;
 
-        // Verificar se o produto tem pelo menos uma das tags selecionadas neste grupo
-        const productFilterTags = product.filter_tags || [];
-        const hasMatchInGroup = productFilterTags.some(ft =>
-          selectedTagIds.includes(ft.tag_id) || selectedTagIds.includes(Number(ft.tag_id))
-        );
+        const productFilterTags = (product.filter_tags || []).filter(ft => ft.filter_key === groupKey);
 
-        if (!hasMatchInGroup) return false;
+        if (filterState.type === 'multi') {
+          // Verificar se o produto tem pelo menos uma das tags selecionadas
+          const selectedTagIds = filterState.tagIds || [];
+          if (!selectedTagIds.length) continue;
+          const hasMatch = productFilterTags.some(ft =>
+            selectedTagIds.includes(ft.tag_id) || selectedTagIds.includes(Number(ft.tag_id))
+          );
+          if (!hasMatch) return false;
+
+        } else if (filterState.type === 'range') {
+          // Verificar se o produto tem pelo menos 1 tag cujo nome seja um numero dentro do range
+          const { min, max } = filterState;
+          if (min == null && max == null) continue;
+          const hasMatch = productFilterTags.some(ft => {
+            const val = Number(ft.tag_name);
+            if (isNaN(val)) return false;
+            if (min != null && val < min) return false;
+            if (max != null && val > max) return false;
+            return true;
+          });
+          if (!hasMatch) return false;
+
+        } else if (filterState.type === 'search') {
+          // Verificar se o produto tem pelo menos 1 tag cujo nome contenha o texto
+          const term = (filterState.value || '').toLowerCase().trim();
+          if (!term) continue;
+          const hasMatch = productFilterTags.some(ft =>
+            (ft.tag_name || '').toLowerCase().includes(term)
+          );
+          if (!hasMatch) return false;
+
+        } else {
+          // Formato legado: array plano de tagIds (compatibilidade)
+          if (Array.isArray(filterState)) {
+            if (!filterState.length) continue;
+            const hasMatch = productFilterTags.some(ft =>
+              filterState.includes(ft.tag_id) || filterState.includes(Number(ft.tag_id))
+            );
+            if (!hasMatch) return false;
+          }
+        }
       }
 
       return true;

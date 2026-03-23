@@ -380,3 +380,109 @@ exports.reorderFilters = async (req, res) => {
     res.status(500).json({ error: err.message || 'Erro ao reordenar filtros' });
   }
 };
+/**
+ * POST /api/admin/cache/filters/clear
+ * Limpar cache de filtros manualmente (debugging / após alterações diretas na BD)
+ */
+exports.clearFiltersCache = async (req, res) => {
+  try {
+    const { clearAllCache, getCacheKeys } = require('../utils/cache');
+    
+    // Listar antes
+    const keysBefore = getCacheKeys().filter(k => k.startsWith('filters:'));
+    
+    // Limpar só as chaves de filtros
+    const { invalidateCache } = require('../utils/cache');
+    await invalidateCache('filters:*');
+    
+    // Tambem limpar /api/v1/categories (caso haja variantes de URL)
+    await invalidateCache('/api/v1/categories');
+    
+    console.log(`Cache de filtros limpo. Chaves removidas: ${keysBefore.length}`);
+    res.json({ 
+      success: true, 
+      message: `${keysBefore.length} entradas de cache removidas`,
+      removed: keysBefore
+    });
+  } catch (err) {
+    console.error('Erro ao limpar cache:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * GET /api/v1/categories/:primaryCategoryId/filters/debug
+ * Mostra TODOS os filtros da categoria (incluindo inativos) para diagnostico
+ */
+exports.debugFiltersForCategory = async (req, res) => {
+  try {
+    const { primaryCategoryId } = req.params;
+
+    // Filtros - TODOS, incluindo inativos
+    const filtersResult = await client.query(`
+      SELECT 
+        cf.id,
+        cf.filter_key,
+        cf.filter_name,
+        cf.filter_type,
+        cf.display_order,
+        cf.is_active,
+        cf.primary_category_id,
+        (
+          SELECT json_agg(
+            json_build_object(
+              'id', ft.id,
+              'tag_name', ft.tag_name,
+              'tag_key', ft.tag_key,
+              'is_active', ft.is_active,
+              'product_count', ft.product_count
+            ) ORDER BY ft.display_order
+          )
+          FROM filter_tags ft WHERE ft.filter_id = cf.id
+        ) as all_tags
+      FROM category_filters cf
+      WHERE cf.primary_category_id = $1
+      ORDER BY cf.display_order, cf.id
+    `, [primaryCategoryId]);
+
+    // Tags orfas (filter_id aponta para filtro noutra categoria)
+    const orphanResult = await client.query(`
+      SELECT DISTINCT
+        pft.product_id,
+        ft.id as tag_id,
+        ft.tag_name,
+        ft.tag_key,
+        cf.id as filter_id,
+        cf.filter_key,
+        cf.filter_name,
+        cf.filter_type,
+        cf.primary_category_id as filter_category_id,
+        cf.is_active as filter_is_active,
+        p.name as product_name,
+        p.primary_category_id as product_category_id
+      FROM product_filter_tags pft
+      JOIN products p ON p.id = pft.product_id
+      JOIN filter_tags ft ON ft.id = pft.filter_tag_id
+      JOIN category_filters cf ON cf.id = ft.filter_id
+      WHERE p.primary_category_id = $1
+        AND cf.primary_category_id != $1
+    `, [primaryCategoryId]);
+
+    res.json({
+      categoryId: parseInt(primaryCategoryId),
+      allFiltersInDB: filtersResult.rows,
+      totalFilters: filtersResult.rows.length,
+      activeFilters: filtersResult.rows.filter(f => f.is_active).length,
+      inactiveFilters: filtersResult.rows.filter(f => !f.is_active).length,
+      orphanTags: orphanResult.rows,
+      orphanTagsCount: orphanResult.rows.length,
+      message: orphanResult.rows.length > 0 
+        ? 'ATENCAO: existem produtos com tags de filtros de outras categorias!'
+        : 'OK: todos os tags dos produtos pertencem a filtros desta categoria'
+    });
+
+  } catch (err) {
+    console.error('Erro no debug de filtros:', err);
+    res.status(500).json({ error: err.message });
+  }
+};

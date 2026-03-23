@@ -72,19 +72,38 @@ exports.cacheMiddleware = (prefix, ttl = 3600) => {
  */
 exports.invalidateCache = async (pattern) => {
   try {
+    let deleted = 0;
+
     if (pattern.endsWith('*')) {
-      // Pattern wildcard
+      // Wildcard no fim: prefixo exato
       const prefix = pattern.slice(0, -1);
       for (const key of cacheStore.keys()) {
         if (key.startsWith(prefix)) {
           cacheStore.delete(key);
+          deleted++;
+        }
+      }
+    } else if (pattern.includes('*')) {
+      // Wildcard no meio: transformar em regex simples
+      const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+      for (const key of cacheStore.keys()) {
+        if (regex.test(key)) {
+          cacheStore.delete(key);
+          deleted++;
         }
       }
     } else {
-      // Chave específica
-      cacheStore.delete(pattern);
+      // Sem wildcard: apagar a chave exata E qualquer chave que contenha o padrão
+      // Ex: "filters:13" vai apagar "filters:/api/v1/categories/13/filters"
+      for (const key of cacheStore.keys()) {
+        if (key === pattern || key.includes(pattern)) {
+          cacheStore.delete(key);
+          deleted++;
+        }
+      }
     }
-    console.log(`✓ Cache invalidated: ${pattern}`);
+
+    console.log(`✓ Cache invalidated: ${pattern} (${deleted} entradas removidas)`);
   } catch (err) {
     console.warn('Cache invalidation error (ignorado):', err.message);
   }
@@ -136,6 +155,13 @@ exports.cleanupExpiredCache = () => {
   }
   
   return cleaned;
+};
+
+/**
+ * Listar todas as chaves de cache (para debugging)
+ */
+exports.getCacheKeys = () => {
+  return Array.from(cacheStore.keys());
 };
 
 // Rodar cleanup a cada 30 minutos

@@ -188,4 +188,38 @@ router.put(
   filterTranslationsController.updateTagTranslation
 );
 
+// =============================================================
+// ROTA DEBUG (publica para facilitar diagnostico — remover em producao)
+// GET /api/v1/categories/:primaryCategoryId/filters/debug
+// =============================================================
+
+router.get(
+  '/api/v1/categories/:primaryCategoryId/filters/debug',
+  categoryFiltersController.debugFiltersForCategory
+);
+
+// =============================================================
+// ROTA ADMIN — CACHE
+// =============================================================
+
+// POST /api/admin/cache/filters/clear  — limpar cache de filtros (debugging)
+router.post(
+  '/api/admin/cache/filters/clear',
+  auth,
+  admin,
+  categoryFiltersController.clearFiltersCache
+);
+
+// GET /api/admin/cache/filters/keys  — listar chaves de cache (debugging)
+router.get(
+  '/api/admin/cache/filters/keys',
+  auth,
+  admin,
+  (req, res) => {
+    const { getCacheKeys } = require('../utils/cache');
+    const keys = getCacheKeys().filter(k => k.includes('filters') || k.includes('categories'));
+    res.json({ keys, total: keys.length });
+  }
+);
+
 module.exports = router;
