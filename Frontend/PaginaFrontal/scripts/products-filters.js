@@ -1,14 +1,60 @@
 // ============================================================
-// products-filters.js (MELHORADO - FILTROS ADICIONAIS DINÂMICOS)
-// Gestão da sidebar de filtros com FILTROS SECUNDÁRIOS DINÂMICOS:
-//   - Carregar categorias primárias da API
-//   - Carregar estrutura de filtros secundários do JSON
-//   - Mostrar/esconder filtros secundários conforme a categoria primária selecionada
-//   - Sections colapsáveis (MÚLTIPLAS ABERTAS SIMULTANEAMENTE)
-//   - Active filter tags na toolbar
-//   - ✅ NOVA: Secção de Filtros Adicionais aparece apenas após selecionar categoria
-//   - REMOVIDO: Referências aos ícones (icon field)
+// products-filters.js — Filtros dinâmicos da página de produtos
 // ============================================================
+
+// CSS para os contadores de produtos nos filtros da sidebar
+(function injectFilterSidebarStyles() {
+  if (document.getElementById('filter-sidebar-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'filter-sidebar-styles';
+  style.textContent = `
+    .filter-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group-header h4 {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+    }
+    .filter-group-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 18px;
+      padding: 0 5px;
+      background: #000;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      border-radius: 2px;
+    }
+    .filter-tag-count {
+      color: #9ca3af;
+      font-size: 10px;
+      font-weight: normal;
+      margin-left: 3px;
+    }
+    .filter-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    .filter-label:hover {
+      color: #000;
+      font-weight: bold;
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
 const API_BASE = '';
 
@@ -67,6 +113,10 @@ function renderPrimaryFilters() {
   if (selectEl) {
     selectEl.addEventListener('change', () => {
       const value = selectEl.value;
+
+      // Ignorar disparo automático do BrutalSelect ao inicializar (valor vazio)
+      if (value === '' && selectedPrimaryId === null) return;
+
       selectedPrimaryId = value ? parseInt(value) : null;
       selectedSecondaryFilters = {};
       
@@ -76,7 +126,7 @@ function renderPrimaryFilters() {
         hideSecondaryFiltersSection();
       }
       
-      renderSecondaryFilters(); // async — não precisa de await aqui
+      renderSecondaryFilters();
       applyFilters();
       renderActiveFilterTags();
     });
@@ -122,16 +172,26 @@ async function renderSecondaryFilters() {
   container.innerHTML = '<p style="padding:10px;color:#666;font-size:13px">⏳ A carregar filtros...</p>';
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/categories/${selectedPrimaryId}/filters`);
+    const res = await fetch(`${API_BASE}/api/v1/categories/${selectedPrimaryId}/filters`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const filters = await res.json();
+    const data = await res.json();
+    // A API retorna { categoryId, categoryName, filters: [...], generatedAt }
+    const filters = Array.isArray(data) ? data : (data.filters || []);
+
+    console.group('🏷️ Filtros carregados para categoria', selectedPrimaryId);
+    console.log('  total de filtros:', filters.length);
+    filters.forEach(f => {
+      const tags = (f.tags || []).filter(t => t.is_active !== false);
+      console.log(`  [${f.filter_key}] ${f.filter_name} — ${tags.length} tags:`, tags.map(t => `${t.tag_name}(${t.product_count ?? 0})`));
+    });
+    console.groupEnd();
 
     if (!filters.length) {
       container.innerHTML = '<p class="no-secondary-filters">Sem filtros disponíveis para esta categoria.</p>';
       return;
     }
 
-    // Barra de pesquisa única no topo
+    // Barra de pesquisa no topo
     const searchBar = `
       <div class="secondary-filters-search-wrapper">
         <div class="secondary-filter-search">
@@ -141,27 +201,45 @@ async function renderSecondaryFilters() {
         </div>
       </div>`;
 
-    // Um bloco por filtro com as suas tags como checkboxes
+    // Um bloco colapsável por filtro, com contagem de produtos em cada tag
     const filterGroupsHTML = filters.map(filter => {
-      const tags = (filter.tags || []).filter(t => t.is_active !== false);
+      // A API pública devolve { id, name, key, count, active } — normalizar campos
+      const rawTags = (filter.tags || []).map(t => ({
+        ...t,
+        tag_name:      t.tag_name      ?? t.name  ?? '',
+        product_count: t.product_count ?? t.count  ?? 0,
+        is_active:     t.is_active     !== undefined ? t.is_active : (t.active !== undefined ? t.active : true),
+      }));
+      const tags = rawTags.filter(t => t.is_active !== false);
       if (!tags.length) return '';
+
+      // Contagem total de produtos com pelo menos 1 tag deste filtro
+      const totalWithFilter = tags.reduce((sum, t) => sum + (Number(t.product_count) || 0), 0);
+      const countBadge = totalWithFilter > 0
+        ? `<span class="filter-group-count">${totalWithFilter}</span>`
+        : '';
 
       return `
         <div class="secondary-filter-group" data-group-key="${filter.filter_key}">
-          <h4>${filter.filter_name}</h4>
+          <div class="filter-group-header">
+            <h4>${filter.filter_name}${countBadge}</h4>
+          </div>
           <div class="secondary-filter-options" data-group-key="${filter.filter_key}">
-            ${tags.map(tag => `
-              <label class="filter-label"
-                data-filter-text="${tag.tag_name.toLowerCase()}"
-                data-group-key="${filter.filter_key}">
-                <input type="checkbox"
-                  value="${tag.id}"
-                  data-name="${tag.tag_name}"
-                  data-group-key="${filter.filter_key}"
-                  class="secondary-filter-checkbox">
-                <span>${tag.tag_name}</span>
-              </label>
-            `).join('')}
+            ${tags.map(tag => {
+              const count = Number(tag.product_count) || 0;
+              const countStr = count > 0 ? `<span class="filter-tag-count">(${count})</span>` : '';
+              return `
+                <label class="filter-label"
+                  data-filter-text="${tag.tag_name.toLowerCase()}"
+                  data-group-key="${filter.filter_key}">
+                  <input type="checkbox"
+                    value="${tag.id}"
+                    data-name="${tag.tag_name}"
+                    data-group-key="${filter.filter_key}"
+                    class="secondary-filter-checkbox">
+                  <span>${tag.tag_name}${countStr}</span>
+                </label>`;
+            }).join('')}
           </div>
         </div>`;
     }).filter(Boolean).join('');
@@ -176,8 +254,10 @@ async function renderSecondaryFilters() {
         if (cb.checked) {
           selectedSecondaryFilters[groupKey].push(parseInt(cb.value));
         } else {
-          selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey].filter(id => id !== parseInt(cb.value));
+          selectedSecondaryFilters[groupKey] = selectedSecondaryFilters[groupKey]
+            .filter(id => id !== parseInt(cb.value));
         }
+        console.log('🔄 Filtros secundários atualizados:', selectedSecondaryFilters);
         applyFilters();
         renderActiveFilterTags();
       });
@@ -200,11 +280,24 @@ async function renderSecondaryFilters() {
           const text = label.getAttribute('data-filter-text');
           label.style.display = (term === '' || text.includes(term)) ? 'flex' : 'none';
         });
+        // Mostrar/esconder grupos vazios
+        container.querySelectorAll('.secondary-filter-group').forEach(group => {
+          const anyVisible = [...group.querySelectorAll('.filter-label')]
+            .some(l => l.style.display !== 'none');
+          group.style.display = anyVisible ? '' : 'none';
+        });
       });
       container.querySelector('.secondary-filter-search-clear')?.addEventListener('click', () => {
         searchInput.value = '';
         searchInput.dispatchEvent(new Event('input'));
       });
+    }
+
+    // Abrir a secção de filtros adicionais automaticamente
+    const filterSection = container.closest('[data-collapsible]');
+    if (filterSection && !filterSection.classList.contains('open')) {
+      filterSection.classList.add('open');
+      filterSection.querySelector('.filter-section-body')?.classList.add('open');
     }
 
   } catch (err) {

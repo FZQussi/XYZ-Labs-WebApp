@@ -1,11 +1,39 @@
 // ============================================================
-// products-page.js (CORRIGIDO)
-// Gestão de produtos:
-//   - Carregar e renderizar produtos
-//   - Aplicar filtros dinâmicos (lê estado do products-filters.js)
-//   - Paginação e ordenação
-//   - Melhor tratamento de erros
+// products-page.js
 // ============================================================
+
+// Injetar estilos para tags de filtros nos cards
+(function injectFilterTagStyles() {
+  if (document.getElementById('filter-tag-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'filter-tag-styles';
+  style.textContent = `
+    .tag.tag-filter {
+      display: inline-block;
+      padding: 2px 7px;
+      border: 1px solid #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.3px;
+      margin: 1px 2px 1px 0;
+    }
+    .tag.tag-filter-more {
+      display: inline-block;
+      padding: 2px 6px;
+      border: 1px solid #9ca3af;
+      background: #f3f4f6;
+      color: #6b7280;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      margin: 1px 0;
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
 
 
@@ -20,15 +48,12 @@ const productsPerPage = 56;
 async function loadProducts() {
   try {
     console.log('📦 A carregar produtos...');
-    const res = await fetch(`${API_BASE}/api/products`);
+    const res = await fetch(`${API_BASE}/products`);
     
-    if (!res.ok) {
-      throw new Error(`Erro HTTP ${res.status} ao carregar produtos`);
-    }
+    if (!res.ok) throw new Error(`Erro HTTP ${res.status} ao carregar produtos`);
 
     const data = await res.json();
     
-    // Garantir que é um array
     if (!Array.isArray(data)) {
       console.error('❌ API retornou dados inválidos:', data);
       throw new Error('API retornou estrutura inesperada - esperado array');
@@ -37,7 +62,29 @@ async function loadProducts() {
     allProducts = data;
     filteredProducts = [...allProducts];
     
-    console.log(`✅ ${allProducts.length} produtos carregados`);
+    console.group(`✅ ${allProducts.length} produtos carregados`);
+    
+    // Log de diagnóstico: verificar estrutura do primeiro produto
+    if (allProducts.length > 0) {
+      const sample = allProducts[0];
+      console.log('📋 Exemplo de produto:', sample.name);
+      console.log('  primary_category:', sample.primary_category);
+      console.log('  filter_tags:', sample.filter_tags);
+      console.log('  filter_tags count:', (sample.filter_tags || []).length);
+
+      // Contar produtos com filter_tags
+      const withTags   = allProducts.filter(p => (p.filter_tags || []).length > 0).length;
+      const withoutTags = allProducts.length - withTags;
+      console.log(`  produtos com filter_tags: ${withTags} | sem: ${withoutTags}`);
+
+      // Mostrar todos os filter_keys únicos presentes nos produtos
+      const allTagKeys = new Set(
+        allProducts.flatMap(p => (p.filter_tags || []).map(ft => ft.filter_key))
+      );
+      console.log('  filter_keys únicos nos produtos:', [...allTagKeys]);
+    }
+
+    console.groupEnd();
     updateProductsCount();
     renderProducts();
   } catch (err) {
@@ -51,65 +98,77 @@ async function loadProducts() {
 
 // ============================================================
 // APPLY FILTERS
-// Lê o estado do products-filters.js (selectedPrimaryId, selectedSecondaryFilters, etc.)
+// Lê o estado do products-filters.js via evento filtersApplied
 // ============================================================
+let _lastFilterDetail = {}; // cache do último evento filtersApplied
+
+document.addEventListener('filtersApplied', (e) => {
+  _lastFilterDetail = e.detail || {};
+});
+
 function applyFilters() {
   try {
-    // Validar que allProducts é um array
     if (!Array.isArray(allProducts)) {
       console.warn('⚠️ allProducts não é um array, ignorando filtros');
       return;
     }
 
-    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
-    const minPrice   = parseFloat(document.getElementById('minPrice')?.value) || 0;
-    const maxPrice   = parseFloat(document.getElementById('maxPrice')?.value) || Infinity;
-    const stockValue = document.getElementById('filterStock')?.value || '';
+    const searchTerm  = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+    const minPrice    = parseFloat(document.getElementById('minPrice')?.value) || 0;
+    const maxPrice    = parseFloat(document.getElementById('maxPrice')?.value) || Infinity;
+    const stockValue  = document.getElementById('filterStock')?.value || '';
+
+    // Ler estado actual dos filtros (do products-filters.js)
+    const primaryId       = typeof selectedPrimaryId !== 'undefined' ? selectedPrimaryId : null;
+    const secFilters      = typeof selectedSecondaryFilters !== 'undefined' ? selectedSecondaryFilters : {};
+    const activeGroupKeys = Object.keys(secFilters).filter(k => secFilters[k]?.length > 0);
+
+    console.group('🔍 applyFilters');
+    console.log('  categoria primária:', primaryId);
+    console.log('  filtros adicionais:', secFilters);
+    console.log('  grupos ativos:', activeGroupKeys);
+    console.log('  pesquisa:', searchTerm || '—');
 
     filteredProducts = allProducts.filter(product => {
-      if (!product) return false; // Validar produto
+      if (!product) return false;
 
       const price = Number(product.price) || 0;
 
-      // Filtro de pesquisa
-      if (searchTerm && !(product.name || '').toLowerCase().includes(searchTerm)) {
-        return false;
-      }
+      // Pesquisa por nome
+      if (searchTerm && !(product.name || '').toLowerCase().includes(searchTerm)) return false;
 
-      // Filtro de preço
-      if (price < minPrice || price > maxPrice) {
-        return false;
-      }
+      // Preço
+      if (price < minPrice || price > maxPrice) return false;
 
-      // Filtro de stock
+      // Stock
       if (stockValue === 'true'  && !product.stock) return false;
       if (stockValue === 'false' &&  product.stock) return false;
 
-      // Filtro de categoria primária
-      if (typeof selectedPrimaryId !== 'undefined' && selectedPrimaryId !== null) {
-        if (!product.primary_category || product.primary_category.id !== selectedPrimaryId) {
-          return false;
-        }
+      // Categoria primária
+      if (primaryId !== null) {
+        if (!product.primary_category || product.primary_category.id !== primaryId) return false;
       }
 
-      // Filtros secundários (AND — produto tem todos os filtros selecionados)
-      if (typeof selectedSecondaryFilters !== 'undefined' && Object.keys(selectedSecondaryFilters).length > 0) {
-        for (const groupKey of Object.keys(selectedSecondaryFilters)) {
-          const selectedTagIds = selectedSecondaryFilters[groupKey];
-          if (!Array.isArray(selectedTagIds) || selectedTagIds.length === 0) continue;
+      // Filtros adicionais — verificar contra filter_tags do produto
+      // Lógica AND entre grupos: produto precisa de ter pelo menos 1 tag de cada grupo ativo
+      for (const groupKey of activeGroupKeys) {
+        const selectedTagIds = secFilters[groupKey]; // array de IDs de tags selecionadas neste grupo
+        if (!selectedTagIds?.length) continue;
 
-          // O produto precisa ter pelo menos uma tag de cada grupo selecionado
-          const secondaryCategories = product.secondary_categories || [];
-          const productHasTag = secondaryCategories.some(cat => 
-            selectedTagIds.includes(cat.id)
-          );
+        // Verificar se o produto tem pelo menos uma das tags selecionadas neste grupo
+        const productFilterTags = product.filter_tags || [];
+        const hasMatchInGroup = productFilterTags.some(ft =>
+          selectedTagIds.includes(ft.tag_id) || selectedTagIds.includes(Number(ft.tag_id))
+        );
 
-          if (!productHasTag) return false;
-        }
+        if (!hasMatchInGroup) return false;
       }
 
       return true;
     });
+
+    console.log('  produtos após filtro:', filteredProducts.length, '/', allProducts.length);
+    console.groupEnd();
 
     currentPage = 1;
     updateProductsCount();
@@ -171,13 +230,34 @@ function renderProducts() {
     grid.innerHTML = paginated.map(product => {
       const image = product.images?.[0] || '/lib/images/placeholder.jpg';
 
+      // Categoria principal
       const primaryTag = product.primary_category
         ? `<span class="tag tag-primary">${product.primary_category.name}</span>`
         : '';
 
-      const secTags = (product.secondary_categories || [])
-        .map(c => `<span class="tag tag-secondary">${c.name}</span>`)
+      // Filter tags agrupadas por filtro, com contador
+      const filterTags = product.filter_tags || [];
+
+      // Agrupar por filter_name para mostrar "Marca: BMW, Audi"
+      const grouped = {};
+      filterTags.forEach(ft => {
+        const key = ft.filter_key;
+        if (!grouped[key]) grouped[key] = { name: ft.filter_name, tags: [] };
+        grouped[key].tags.push(ft.tag_name);
+      });
+
+      // Mostrar até 3 tags individualmente, o resto como "+N"
+      const MAX_VISIBLE = 3;
+      const allTagNames = filterTags.map(ft => ft.tag_name);
+      const visibleTags = allTagNames.slice(0, MAX_VISIBLE)
+        .map(name => `<span class="tag tag-filter">${name}</span>`)
         .join('');
+      const extraCount = allTagNames.length - MAX_VISIBLE;
+      const extraBadge = extraCount > 0
+        ? `<span class="tag tag-filter-more">+${extraCount}</span>`
+        : '';
+
+      const tagsHTML = primaryTag + visibleTags + extraBadge;
 
       return `
         <div class="product-card" data-id="${product.id}">
@@ -187,7 +267,7 @@ function renderProducts() {
           </div>
           <div class="product-info">
             <h3>${product.name}</h3>
-            <div class="product-tags">${primaryTag}${secTags}</div>
+            <div class="product-tags">${tagsHTML}</div>
             <div class="product-footer">
               <span class="product-price">€${Number(product.price || 0).toFixed(2)}</span>
               <div class="product-actions">
