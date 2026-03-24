@@ -11,16 +11,61 @@
   const style = document.createElement('style');
   style.id = 'filter-sidebar-styles';
   style.textContent = `
+    /* ---- RESET BOX-SIZING para toda a sidebar ---- */
+    .filters-sidebar *,
+    .filters-sidebar *::before,
+    .filters-sidebar *::after {
+      box-sizing: border-box;
+    }
+
+    /* ---- SIDEBAR SCROLL ---- */
+    /* Garante que a sidebar tem scroll vertical e nao deixa conteudo sair */
+    .filters-sidebar {
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* ---- FILTER-LIST-SCROLL: scroll interno por seccao ---- */
+    .filter-list-scroll {
+      overflow-y: auto;
+      overflow-x: hidden;
+      max-height: 240px;
+      width: 100%;
+    }
+
+    /* ---- GRUPOS DE FILTROS ---- */
+    .secondary-filter-group {
+      width: 100%;
+      overflow: hidden; /* impede filhos de sair */
+    }
+
+    .secondary-filter-options {
+      width: 100%;
+      overflow: hidden;
+      padding: 4px 0 8px;
+    }
+
+    /* ---- CABECALHO DO GRUPO ---- */
     .filter-group-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      width: 100%;
+      overflow: hidden;
     }
     .filter-group-header h4 {
       display: flex;
       align-items: center;
       gap: 6px;
       margin: 0;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
     }
     .filter-group-count {
       display: inline-flex;
@@ -35,45 +80,74 @@
       font-weight: 700;
       font-family: 'Courier New', monospace;
       border-radius: 2px;
+      flex-shrink: 0;
     }
     .filter-tag-count {
       color: #9ca3af;
       font-size: 10px;
       font-weight: normal;
       margin-left: 3px;
+      flex-shrink: 0;
     }
+
+    /* ---- LABEL DO CHECKBOX ---- */
     .filter-label {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 6px;
       padding: 4px 0;
       cursor: pointer;
       font-family: 'Courier New', monospace;
       font-size: 12px;
+      width: 100%;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+    .filter-label span {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .filter-label input[type="checkbox"] {
+      flex-shrink: 0;
+      margin-top: 2px;
     }
     .filter-label:hover { color: #000; font-weight: bold; }
 
     /* ---- RANGE ---- */
-    .filter-range-wrapper { padding: 6px 0 10px; }
+    .filter-range-wrapper {
+      padding: 6px 0 10px;
+      width: 100%;
+    }
     .filter-range-row {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
+      width: 100%;
     }
     .filter-range-input {
-      width: 72px;
+      width: 68px;
+      min-width: 0;
       padding: 5px 6px;
       border: 2px solid #000;
       font-family: 'Courier New', monospace;
       font-size: 12px;
       background: #fff;
       -moz-appearance: textfield;
+      flex-shrink: 1;
     }
     .filter-range-input::-webkit-outer-spin-button,
     .filter-range-input::-webkit-inner-spin-button { -webkit-appearance: none; }
     .filter-range-input:focus { outline: none; border-color: #2563eb; }
-    .filter-range-sep { font-size: 11px; color: #666; font-family: 'Courier New', monospace; }
+    .filter-range-sep {
+      font-size: 11px;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      flex-shrink: 0;
+    }
     .filter-range-apply {
       padding: 5px 10px;
       border: 2px solid #000;
@@ -84,6 +158,8 @@
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.3px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     .filter-range-apply:hover { background: #333; }
     .filter-range-hint {
@@ -91,12 +167,15 @@
       font-size: 10px;
       color: #9ca3af;
       margin-top: 5px;
+      width: 100%;
+      overflow-wrap: break-word;
     }
 
     /* ---- SEARCH ---- */
     .filter-search-wrapper {
       padding: 6px 0 10px;
       position: relative;
+      width: 100%;
     }
     .filter-search-input {
       width: 100%;
@@ -106,6 +185,7 @@
       font-size: 12px;
       background: #fff;
       box-sizing: border-box;
+      display: block;
     }
     .filter-search-input:focus { outline: none; border-color: #2563eb; }
     .filter-search-clear-btn {
@@ -123,19 +203,63 @@
     }
     .filter-search-clear-btn:hover { color: #000; }
 
+    /* ---- BARRA DE PESQUISA NOS FILTROS ---- */
+    .secondary-filters-search-wrapper {
+      padding: 0 0 10px;
+      width: 100%;
+    }
+    .secondary-filter-search {
+      display: flex;
+      gap: 0;
+      width: 100%;
+    }
+    .secondary-filters-search-input {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 8px;
+      border: 2px solid #000;
+      border-right: none;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    .secondary-filters-search-input:focus { outline: none; border-color: #2563eb; }
+    .secondary-filter-search-clear {
+      padding: 5px 8px;
+      border: 2px solid #000;
+      background: #f3f4f6;
+      cursor: pointer;
+      font-size: 12px;
+      flex-shrink: 0;
+      font-family: 'Courier New', monospace;
+    }
+    .secondary-filter-search-clear:hover { background: #e5e7eb; }
+
     /* ---- TYPE BADGE ---- */
     .filter-type-badge {
       display: inline-block;
-      padding: 1px 5px;
+      padding: 1px 4px;
       font-family: 'Courier New', monospace;
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border: 1px solid currentColor;
-      margin-left: 6px;
+      margin-left: 4px;
       vertical-align: middle;
       opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* ---- SEM OPCOES ---- */
+    .no-secondary-filters,
+    .secondary-filter-options p {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #9ca3af;
+      padding: 4px 0;
+      margin: 0;
     }
   `;
   document.head.appendChild(style);
