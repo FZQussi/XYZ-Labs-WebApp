@@ -261,6 +261,167 @@
       padding: 4px 0;
       margin: 0;
     }
+
+    /* ---- DUAL RANGE SLIDER ---- */
+    .range-slider-wrapper {
+      width: 100%;
+      padding: 10px 0 4px;
+    }
+
+    /* Valores min/max exibidos acima do slider */
+    .range-values-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 6px;
+    }
+    .range-value-bubble {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #000;
+      background: #f3f4f6;
+      border: 2px solid #000;
+      padding: 2px 7px;
+      min-width: 44px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .range-value-sep {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+
+    /* Track container — dois inputs sobrepostos */
+    .range-track-container {
+      position: relative;
+      height: 28px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Track preenchida (barra entre os dois thumbs) */
+    .range-track-fill {
+      position: absolute;
+      height: 4px;
+      background: #000;
+      border-radius: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Track de fundo */
+    .range-track-container::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #d1d5db;
+      border-radius: 0;
+    }
+
+    /* Inputs range — ambos sobrepostos */
+    .range-slider-input {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      pointer-events: none;
+      outline: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Thumb */
+    .range-slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 0;
+      cursor: pointer;
+      pointer-events: all;
+      position: relative;
+      z-index: 3;
+      box-shadow: 2px 2px 0 #000;
+      transition: box-shadow 0.1s;
+    }
+    .range-slider-input::-webkit-slider-thumb:hover {
+      background: #000;
+      box-shadow: 3px 3px 0 #333;
+    }
+    .range-slider-input::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 0;
+      cursor: pointer;
+      pointer-events: all;
+      box-shadow: 2px 2px 0 #000;
+    }
+    .range-slider-input::-moz-range-thumb:hover {
+      background: #000;
+    }
+
+    /* Inputs numéricos abaixo do slider */
+    .range-inputs-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .range-number-input {
+      width: 68px;
+      min-width: 0;
+      padding: 4px 6px;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: #fff;
+      -moz-appearance: textfield;
+      flex-shrink: 1;
+      text-align: center;
+    }
+    .range-number-input::-webkit-outer-spin-button,
+    .range-number-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .range-number-input:focus { outline: none; border-color: #2563eb; }
+    .range-inputs-sep {
+      font-size: 11px;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      flex-shrink: 0;
+    }
+    .range-apply-btn {
+      padding: 4px 10px;
+      border: 2px solid #000;
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .range-apply-btn:hover { background: #333; }
+    .range-hint {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+      width: 100%;
+    }
   `;
   document.head.appendChild(style);
 })();
@@ -592,30 +753,58 @@ function renderRangeBody(filter, tags) {
     .filter(n => !isNaN(n))
     .sort((a, b) => a - b);
 
-  const minAvail = numericValues.length ? numericValues[0] : '';
-  const maxAvail = numericValues.length ? numericValues[numericValues.length - 1] : '';
+  const hasValues = numericValues.length > 0;
+  const minAvail  = hasValues ? numericValues[0]                        : 0;
+  const maxAvail  = hasValues ? numericValues[numericValues.length - 1] : 100;
+  const step      = (maxAvail - minAvail) <= 30 ? 1 : 1; // sempre step 1
 
-  const hintText = numericValues.length
-    ? `<p class="filter-range-hint">Disponivel: ${minAvail} a ${maxAvail}</p>`
-    : `<p class="filter-range-hint">Sem valores no intervalo</p>`;
+  const hint = hasValues
+    ? `<p class="range-hint">Disponivel: ${minAvail} a ${maxAvail}</p>`
+    : `<p class="range-hint">Sem valores disponiveis</p>`;
+
+  const k = filter.filter_key;
 
   return `
-    <div class="filter-range-wrapper">
-      <div class="filter-range-row">
-        <input type="number" class="filter-range-input"
-          id="range-min-${filter.filter_key}"
-          placeholder="${minAvail || 'Min'}"
-          data-group-key="${filter.filter_key}"
-          data-range-role="min">
-        <span class="filter-range-sep">—</span>
-        <input type="number" class="filter-range-input"
-          id="range-max-${filter.filter_key}"
-          placeholder="${maxAvail || 'Max'}"
-          data-group-key="${filter.filter_key}"
-          data-range-role="max">
-        <button class="filter-range-apply" data-group-key="${filter.filter_key}" type="button">OK</button>
+    <div class="range-slider-wrapper" data-group-key="${k}"
+         data-min-avail="${minAvail}" data-max-avail="${maxAvail}">
+
+      <!-- Bolhas de valor actuais -->
+      <div class="range-values-display">
+        <span class="range-value-bubble" id="range-bubble-min-${k}">${minAvail}</span>
+        <span class="range-value-sep">—</span>
+        <span class="range-value-bubble" id="range-bubble-max-${k}">${maxAvail}</span>
       </div>
-      ${hintText}
+
+      <!-- Slider duplo -->
+      <div class="range-track-container" id="range-track-${k}">
+        <div class="range-track-fill" id="range-fill-${k}"></div>
+        <input type="range" class="range-slider-input" id="range-slider-min-${k}"
+          min="${minAvail}" max="${maxAvail}" step="${step}"
+          value="${minAvail}"
+          data-group-key="${k}" data-slider-role="min">
+        <input type="range" class="range-slider-input" id="range-slider-max-${k}"
+          min="${minAvail}" max="${maxAvail}" step="${step}"
+          value="${maxAvail}"
+          data-group-key="${k}" data-slider-role="max">
+      </div>
+
+      <!-- Inputs numericos + botao OK -->
+      <div class="range-inputs-row">
+        <input type="number" class="range-number-input"
+          id="range-min-${k}"
+          placeholder="${minAvail}"
+          value="${minAvail}"
+          data-group-key="${k}" data-range-role="min">
+        <span class="range-inputs-sep">—</span>
+        <input type="number" class="range-number-input"
+          id="range-max-${k}"
+          placeholder="${maxAvail}"
+          value="${maxAvail}"
+          data-group-key="${k}" data-range-role="max">
+        <button class="range-apply-btn" data-group-key="${k}" type="button">OK</button>
+      </div>
+
+      ${hint}
     </div>`;
 }
 
@@ -640,26 +829,107 @@ function attachFilterListeners(filter, container) {
   const groupKey = filter.filter_key;
 
   if (type === 'range') {
-    const applyBtn = container.querySelector(`.filter-range-apply[data-group-key="${groupKey}"]`);
-    const minInput = container.querySelector(`#range-min-${groupKey}`);
-    const maxInput = container.querySelector(`#range-max-${groupKey}`);
+    const k          = groupKey;
+    const applyBtn   = container.querySelector(`.range-apply-btn[data-group-key="${k}"]`);
+    const minNumber  = container.querySelector(`#range-min-${k}`);
+    const maxNumber  = container.querySelector(`#range-max-${k}`);
+    const sliderMin  = container.querySelector(`#range-slider-min-${k}`);
+    const sliderMax  = container.querySelector(`#range-slider-max-${k}`);
+    const bubbleMin  = container.querySelector(`#range-bubble-min-${k}`);
+    const bubbleMax  = container.querySelector(`#range-bubble-max-${k}`);
+    const fill       = container.querySelector(`#range-fill-${k}`);
+    const wrapper    = container.querySelector(`.range-slider-wrapper[data-group-key="${k}"]`);
+
+    const minAvail = Number(wrapper?.dataset.minAvail ?? 0);
+    const maxAvail = Number(wrapper?.dataset.maxAvail ?? 100);
+    const range    = maxAvail - minAvail || 1;
+
+    // Atualiza a barra preenchida entre os dois thumbs
+    const updateFill = () => {
+      if (!fill || !sliderMin || !sliderMax) return;
+      const minPct = ((Number(sliderMin.value) - minAvail) / range) * 100;
+      const maxPct = ((Number(sliderMax.value) - minAvail) / range) * 100;
+      fill.style.left  = minPct + '%';
+      fill.style.width = (maxPct - minPct) + '%';
+    };
+
+    // Sincroniza tudo a partir dos sliders
+    const syncFromSliders = () => {
+      let lo = Number(sliderMin.value);
+      let hi = Number(sliderMax.value);
+
+      // Garantir que min <= max (os dois thumbs nao se cruzam)
+      if (lo > hi) {
+        // Descobrir qual foi o que se moveu pelo z-index
+        if (document.activeElement === sliderMin) {
+          sliderMin.value = hi;
+          lo = hi;
+        } else {
+          sliderMax.value = lo;
+          hi = lo;
+        }
+      }
+
+      if (bubbleMin) bubbleMin.textContent = lo;
+      if (bubbleMax) bubbleMax.textContent = hi;
+      if (minNumber) minNumber.value = lo;
+      if (maxNumber) maxNumber.value = hi;
+      updateFill();
+    };
+
+    // Sincroniza tudo a partir dos inputs numericos
+    const syncFromNumbers = () => {
+      let lo = minNumber?.value !== '' ? Number(minNumber.value) : minAvail;
+      let hi = maxNumber?.value !== '' ? Number(maxNumber.value) : maxAvail;
+
+      // Clamp aos limites disponiveis
+      lo = Math.max(minAvail, Math.min(lo, maxAvail));
+      hi = Math.max(minAvail, Math.min(hi, maxAvail));
+      if (lo > hi) hi = lo;
+
+      if (sliderMin) sliderMin.value = lo;
+      if (sliderMax) sliderMax.value = hi;
+      if (bubbleMin) bubbleMin.textContent = lo;
+      if (bubbleMax) bubbleMax.textContent = hi;
+      if (minNumber) minNumber.value = lo;
+      if (maxNumber) maxNumber.value = hi;
+      updateFill();
+    };
 
     const applyRange = () => {
-      const minVal = (minInput?.value !== '') ? Number(minInput.value) : null;
-      const maxVal = (maxInput?.value !== '') ? Number(maxInput.value) : null;
+      syncFromNumbers();
+      const minVal = minNumber?.value !== '' ? Number(minNumber.value) : null;
+      const maxVal = maxNumber?.value !== '' ? Number(maxNumber.value) : null;
+      const isFullRange = (minVal === minAvail && maxVal === maxAvail);
 
-      if (minVal === null && maxVal === null) {
-        delete selectedSecondaryFilters[groupKey];
+      if (minVal === null && maxVal === null || isFullRange) {
+        delete selectedSecondaryFilters[k];
       } else {
-        selectedSecondaryFilters[groupKey] = { type: 'range', min: minVal, max: maxVal };
+        selectedSecondaryFilters[k] = { type: 'range', min: minVal, max: maxVal };
       }
       applyFilters();
       renderActiveFilterTags();
     };
 
+    // Event listeners nos sliders — reactivo (sem necessidade de OK)
+    sliderMin?.addEventListener('input', () => {
+      syncFromSliders();
+      applyRange();
+    });
+    sliderMax?.addEventListener('input', () => {
+      syncFromSliders();
+      applyRange();
+    });
+
+    // Event listeners nos inputs numericos
     applyBtn?.addEventListener('click', applyRange);
-    minInput?.addEventListener('keydown', e => { if (e.key === 'Enter') applyRange(); });
-    maxInput?.addEventListener('keydown', e => { if (e.key === 'Enter') applyRange(); });
+    minNumber?.addEventListener('keydown', e => { if (e.key === 'Enter') applyRange(); });
+    maxNumber?.addEventListener('keydown', e => { if (e.key === 'Enter') applyRange(); });
+    minNumber?.addEventListener('input', syncFromNumbers);
+    maxNumber?.addEventListener('input', syncFromNumbers);
+
+    // Inicializar fill
+    updateFill();
 
   } else if (type === 'search') {
     const input    = container.querySelector(`#search-input-${groupKey}`);
@@ -728,10 +998,35 @@ function restoreFilterState(container) {
       });
 
     } else if (state.type === 'range') {
-      const minInput = container.querySelector(`#range-min-${groupKey}`);
-      const maxInput = container.querySelector(`#range-max-${groupKey}`);
-      if (minInput && state.min != null) minInput.value = state.min;
-      if (maxInput && state.max != null) maxInput.value = state.max;
+      const minInput  = container.querySelector(`#range-min-${groupKey}`);
+      const maxInput  = container.querySelector(`#range-max-${groupKey}`);
+      const sliderMin = container.querySelector(`#range-slider-min-${groupKey}`);
+      const sliderMax = container.querySelector(`#range-slider-max-${groupKey}`);
+      const bubbleMin = container.querySelector(`#range-bubble-min-${groupKey}`);
+      const bubbleMax = container.querySelector(`#range-bubble-max-${groupKey}`);
+      const fill      = container.querySelector(`#range-fill-${groupKey}`);
+      const wrapper   = container.querySelector(`.range-slider-wrapper[data-group-key="${groupKey}"]`);
+      const minAvail  = Number(wrapper?.dataset.minAvail ?? 0);
+      const maxAvail  = Number(wrapper?.dataset.maxAvail ?? 100);
+
+      if (state.min != null) {
+        if (minInput)  minInput.value  = state.min;
+        if (sliderMin) sliderMin.value = state.min;
+        if (bubbleMin) bubbleMin.textContent = state.min;
+      }
+      if (state.max != null) {
+        if (maxInput)  maxInput.value  = state.max;
+        if (sliderMax) sliderMax.value = state.max;
+        if (bubbleMax) bubbleMax.textContent = state.max;
+      }
+      // Atualizar fill
+      if (fill && sliderMin && sliderMax) {
+        const range  = maxAvail - minAvail || 1;
+        const minPct = ((Number(sliderMin.value) - minAvail) / range) * 100;
+        const maxPct = ((Number(sliderMax.value) - minAvail) / range) * 100;
+        fill.style.left  = minPct + '%';
+        fill.style.width = (maxPct - minPct) + '%';
+      }
 
     } else if (state.type === 'search') {
       const input = container.querySelector(`#search-input-${groupKey}`);
@@ -967,7 +1262,24 @@ function clearPrimaryFilter() {
 
 function clearSecondaryFilters() {
   document.querySelectorAll('.secondary-filter-checkbox').forEach(cb => cb.checked = false);
-  document.querySelectorAll('.filter-range-input').forEach(inp => inp.value = '');
+  document.querySelectorAll('.range-number-input, .filter-range-input').forEach(inp => {
+    const k       = inp.dataset.groupKey;
+    const wrapper = k ? document.querySelector(`.range-slider-wrapper[data-group-key="${k}"]`) : null;
+    inp.value = inp.dataset.rangeRole === 'min' || inp.dataset.sliderRole === 'min'
+      ? (wrapper?.dataset.minAvail ?? '')
+      : (wrapper?.dataset.maxAvail ?? '');
+  });
+  document.querySelectorAll('.range-slider-input').forEach(inp => {
+    const k       = inp.dataset.groupKey;
+    const wrapper = k ? document.querySelector(`.range-slider-wrapper[data-group-key="${k}"]`) : null;
+    inp.value = inp.dataset.sliderRole === 'min'
+      ? (wrapper?.dataset.minAvail ?? inp.min)
+      : (wrapper?.dataset.maxAvail ?? inp.max);
+  });
+  document.querySelectorAll('.range-track-fill').forEach(fill => {
+    fill.style.left = '0%';
+    fill.style.width = '100%';
+  });
   document.querySelectorAll('.filter-search-input').forEach(inp => inp.value = '');
   selectedSecondaryFilters = {};
   applyFilters();
@@ -982,7 +1294,24 @@ function clearAllFilters() {
   _loadedFilters = [];
 
   document.querySelectorAll('.secondary-filter-checkbox').forEach(cb => cb.checked = false);
-  document.querySelectorAll('.filter-range-input').forEach(inp => inp.value = '');
+  document.querySelectorAll('.range-number-input, .filter-range-input').forEach(inp => {
+    const k       = inp.dataset.groupKey;
+    const wrapper = k ? document.querySelector(`.range-slider-wrapper[data-group-key="${k}"]`) : null;
+    inp.value = inp.dataset.rangeRole === 'min' || inp.dataset.sliderRole === 'min'
+      ? (wrapper?.dataset.minAvail ?? '')
+      : (wrapper?.dataset.maxAvail ?? '');
+  });
+  document.querySelectorAll('.range-slider-input').forEach(inp => {
+    const k       = inp.dataset.groupKey;
+    const wrapper = k ? document.querySelector(`.range-slider-wrapper[data-group-key="${k}"]`) : null;
+    inp.value = inp.dataset.sliderRole === 'min'
+      ? (wrapper?.dataset.minAvail ?? inp.min)
+      : (wrapper?.dataset.maxAvail ?? inp.max);
+  });
+  document.querySelectorAll('.range-track-fill').forEach(fill => {
+    fill.style.left = '0%';
+    fill.style.width = '100%';
+  });
   document.querySelectorAll('.filter-search-input').forEach(inp => inp.value = '');
   ['minPrice', 'maxPrice', 'filterStock', 'searchInput'].forEach(id => {
     const el = document.getElementById(id);
