@@ -3,8 +3,6 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth.middleware');
 const admin = require('../middlewares/admin.middleware');
-const { cacheMiddleware } = require('../middlewares/cache.middleware');
-
 // Controllers
 const categoryFiltersController = require('../controllers/categoryFilters.controller');
 const filterTagsController = require('../controllers/filterTags.controller');
@@ -19,13 +17,11 @@ const filterTranslationsController = require('../controllers/filterTranslations.
 
 router.get(
   '/api/v1/categories/:primaryCategoryId/filters',
-  cacheMiddleware('filters', 3600),
   categoryFiltersController.getFiltersForCategory
 );
 
 router.get(
   '/api/v1/categories/:primaryCategoryId/filters/public',
-  cacheMiddleware('filters', 3600),
   categoryFiltersController.getFiltersForCategory
 );
 
