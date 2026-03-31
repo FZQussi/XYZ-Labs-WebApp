@@ -17,6 +17,7 @@ const contactRoutes    = require('./routes/contact.routes');
 const forgotRoutes     = require('./routes/forgot.routes');
 const resetRoutes      = require('./routes/reset.routes');
 const dashboardRoutes  = require('./routes/Dashboard.routes');
+const materialsColorsRoutes = require('./routes/materialsColors.routes');
 const { globalLimiter } = require('./middlewares/rateLimiter.middleware');
 
 const app = express();
@@ -60,7 +61,8 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/categories', categoriesRoutes);
-
+app.use('/data', materialsColorsRoutes);  // compatibilidade com fetch('../data/options.json')
+app.use('/api', materialsColorsRoutes);   // rotas admin e públicas da API
 // Filtros montados na raiz — as rotas internas já têm os prefixos completos
 // ex: /api/admin/categories/:id/filters, /api/v1/categories/:id/filters
 app.use('/', filtersRoutes);
