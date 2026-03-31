@@ -265,71 +265,68 @@
     /* ---- DUAL RANGE SLIDER ---- */
     .range-slider-wrapper {
       width: 100%;
-      padding: 10px 0 4px;
+      padding: 8px 0 4px;
     }
 
-    /* Valores min/max exibidos acima do slider */
+    /* Valores min/max — linha simples, sem boxes */
     .range-values-display {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 12px;
     }
     .range-value-bubble {
       font-family: 'Courier New', monospace;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       color: #000;
-      background: #f3f4f6;
-      border: 2px solid #000;
-      padding: 2px 7px;
-      min-width: 44px;
-      text-align: center;
-      flex-shrink: 0;
+      background: none;
+      border: none;
+      padding: 0;
+      min-width: 0;
+    }
+    .range-value-bubble:last-child {
+      text-align: right;
     }
     .range-value-sep {
       font-family: 'Courier New', monospace;
       font-size: 11px;
-      color: #9ca3af;
-      flex-shrink: 0;
+      color: #aaa;
     }
 
-    /* Track container — dois inputs sobrepostos */
+    /* Track container */
     .range-track-container {
       position: relative;
-      height: 28px;
+      height: 24px;
       width: 100%;
       display: flex;
       align-items: center;
     }
 
-    /* Track preenchida (barra entre os dois thumbs) */
-    .range-track-fill {
-      position: absolute;
-      height: 4px;
-      background: #000;
-      border-radius: 0;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Track de fundo */
+    /* Track de fundo — linha fina */
     .range-track-container::before {
       content: '';
       position: absolute;
       left: 0;
       right: 0;
-      height: 4px;
-      background: #d1d5db;
-      border-radius: 0;
+      height: 2px;
+      background: #ccc;
     }
 
-    /* Inputs range — ambos sobrepostos */
+    /* Barra preenchida — grossa e preta */
+    .range-track-fill {
+      position: absolute;
+      height: 6px;
+      background: #000;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Inputs range sobrepostos */
     .range-slider-input {
       position: absolute;
       width: 100%;
-      height: 4px;
+      height: 6px;
       appearance: none;
       -webkit-appearance: none;
       background: transparent;
@@ -339,38 +336,34 @@
       padding: 0;
     }
 
-    /* Thumb */
+    /* Thumb — quadrado sólido */
     .range-slider-input::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border: 3px solid #000;
+      width: 14px;
+      height: 14px;
+      background: #000;
+      border: none;
       border-radius: 0;
       cursor: pointer;
       pointer-events: all;
       position: relative;
       z-index: 3;
-      box-shadow: 2px 2px 0 #000;
-      transition: box-shadow 0.1s;
     }
-    .range-slider-input::-webkit-slider-thumb:hover {
-      background: #000;
-      box-shadow: 3px 3px 0 #333;
+    .range-slider-input::-webkit-slider-thumb:active {
+      background: #333;
     }
     .range-slider-input::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      background: #fff;
-      border: 3px solid #000;
+      width: 14px;
+      height: 14px;
+      background: #000;
+      border: none;
       border-radius: 0;
       cursor: pointer;
       pointer-events: all;
-      box-shadow: 2px 2px 0 #000;
     }
-    .range-slider-input::-moz-range-thumb:hover {
-      background: #000;
+    .range-slider-input::-moz-range-thumb:active {
+      background: #333;
     }
 
     /* Inputs numéricos abaixo do slider */
@@ -378,27 +371,28 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 10px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
     .range-number-input {
-      width: 68px;
+      width: 64px;
       min-width: 0;
       padding: 4px 6px;
-      border: 2px solid #000;
+      border: none;
+      border-bottom: 2px solid #000;
       font-family: 'Courier New', monospace;
       font-size: 12px;
-      background: #fff;
+      background: transparent;
       -moz-appearance: textfield;
       flex-shrink: 1;
       text-align: center;
     }
     .range-number-input::-webkit-outer-spin-button,
     .range-number-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .range-number-input:focus { outline: none; border-color: #2563eb; }
+    .range-number-input:focus { outline: none; border-bottom-color: #000; }
     .range-inputs-sep {
       font-size: 11px;
-      color: #666;
+      color: #aaa;
       font-family: 'Courier New', monospace;
       flex-shrink: 0;
     }
@@ -413,13 +407,14 @@
       cursor: pointer;
       flex-shrink: 0;
       white-space: nowrap;
+      letter-spacing: 1px;
     }
     .range-apply-btn:hover { background: #333; }
     .range-hint {
       font-family: 'Courier New', monospace;
       font-size: 10px;
-      color: #9ca3af;
-      margin-top: 4px;
+      color: #aaa;
+      margin-top: 6px;
       width: 100%;
     }
   `;
@@ -698,7 +693,18 @@ function renderFilterGroup(filter) {
       </div>`;
   }
 
-  const totalWithFilter = tags.reduce((sum, t) => sum + (Number(t.product_count) || 0), 0);
+  // Contar produtos reais que têm pelo menos uma tag deste grupo
+  let totalWithFilter = 0;
+  if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
+    const tagIds = new Set(tags.map(t => String(t.id)));
+    totalWithFilter = allProducts.filter(p =>
+      (p.filter_tags || []).some(ft =>
+        ft.filter_key === filter.filter_key && tagIds.has(String(ft.tag_id))
+      )
+    ).length;
+  } else {
+    totalWithFilter = tags.reduce((sum, t) => sum + (Number(t.product_count) || 0), 0);
+  }
   const countBadge = totalWithFilter > 0
     ? `<span class="filter-group-count">${totalWithFilter}</span>`
     : '';
@@ -730,7 +736,16 @@ function renderFilterGroup(filter) {
 // ---- Checkbox / Multi-select ----
 function renderCheckboxBody(filter, tags) {
   return tags.map(tag => {
-    const count = Number(tag.product_count) || 0;
+    let count = 0;
+    if (typeof allProducts !== 'undefined' && allProducts.length > 0) {
+      count = allProducts.filter(p =>
+        (p.filter_tags || []).some(ft =>
+          ft.filter_key === filter.filter_key && String(ft.tag_id) === String(tag.id)
+        )
+      ).length;
+    } else {
+      count = Number(tag.product_count) || 0;
+    }
     const countStr = count > 0 ? `<span class="filter-tag-count">(${count})</span>` : '';
     return `
       <label class="filter-label"
@@ -1357,7 +1372,15 @@ async function initFilters() {
   });
 
   ['minPrice', 'maxPrice'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', renderActiveFilterTags);
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      if (el.value !== '' && Number(el.value) < 0) el.value = 0;
+      renderActiveFilterTags();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === '-') e.preventDefault();
+    });
   });
   document.getElementById('filterStock')?.addEventListener('change', renderActiveFilterTags);
   document.getElementById('searchInput')?.addEventListener('input', renderActiveFilterTags);
