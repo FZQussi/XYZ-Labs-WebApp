@@ -5,17 +5,19 @@
 
 
 ================================================================================
-  1. TABELAS (16)
+  1. TABELAS (18)
 ================================================================================
 
   public.categories
   public.category_filters
+  public.colors                  ← NOVO
   public.files
   public.filter_audit_log
   public.filter_feature_flags
   public.filter_tags
   public.filter_translations
   public.login_history
+  public.materials               ← NOVO
   public.order_items
   public.orders
   public.password_reset_tokens
@@ -106,6 +108,54 @@
 
   TRIGGERS:
     update_category_filters_timestamp  BEFORE UPDATE → update_filter_timestamps()
+
+
+--------------------------------------------------------------------------------
+  TABLE: colors                                                          [NOVO]
+  Desc: Cores disponíveis por material para impressão 3D
+--------------------------------------------------------------------------------
+  COLUNAS:
+    id             integer       NOT NULL  DEFAULT nextval('colors_id_seq')
+    name           varchar(150)  NOT NULL
+    slug           varchar(150)  NOT NULL
+    material_id    integer       NOT NULL  → materials(id) ON DELETE CASCADE
+    hex_code       varchar(7)    NOT NULL  DEFAULT '#000000'  CHECK (hex_code ~ '^#[0-9A-Fa-f]{6}$')
+    gradient       text
+    sample_image   text
+    finish         varchar(30)   NOT NULL  DEFAULT 'glossy'
+                                            CHECK IN ('glossy','matte','transparent','metallic','satin','other')
+    category       varchar(30)   NOT NULL  DEFAULT 'basic'
+                                            CHECK IN ('basic','vibrant','pastel','special','metallic','other')
+    multiplier     numeric(5,3)  NOT NULL  DEFAULT 1.000  CHECK (multiplier > 0)
+    is_active      boolean       NOT NULL  DEFAULT true
+    is_featured    boolean       NOT NULL  DEFAULT false
+    display_order  integer                 DEFAULT 0
+    created_at     timestamp     NOT NULL  DEFAULT CURRENT_TIMESTAMP
+    updated_at     timestamp     NOT NULL  DEFAULT CURRENT_TIMESTAMP
+
+  ÍNDICES:
+    colors_pkey           PRIMARY KEY (id)
+    colors_slug_key       UNIQUE (slug)
+    idx_colors_material   (material_id)
+    idx_colors_active     (is_active)
+    idx_colors_finish     (finish)
+    idx_colors_category   (category)
+    idx_colors_slug       (slug)
+
+  FOREIGN KEYS:
+    colors_material_id_fkey → materials(id) ON DELETE CASCADE
+
+  TRIGGERS:
+    trg_colors_updated_at  BEFORE UPDATE → update_colors_updated_at()
+
+  DADOS DE EXEMPLO (inseridos):
+    Branco (branco-pla), Preto (preto-pla), Tri-Color (tricolor-pla),
+    Dourado Metálico (dourado-metalico-pla), Prateado Metálico (prateado-metalico-pla),
+    Mármore Branco (marmore-branco-pla)  → material: pla
+    Preto (preto-abs)                    → material: abs
+    Branco (branco-petg), Preto (preto-petg), Azul Escuro (azul-escuro-petg),
+    Verde Escuro (verde-escuro-petg), Creme (creme-petg),
+    Galaxy Roxo (galaxy-roxo-petg), Galaxy Azul (galaxy-azul-petg) → material: petg
 
 
 --------------------------------------------------------------------------------
@@ -257,6 +307,54 @@
 
   FOREIGN KEYS:
     login_history_user_id_fkey → users(id) ON DELETE CASCADE
+
+
+--------------------------------------------------------------------------------
+  TABLE: materials                                                       [NOVO]
+  Desc: Materiais de impressão 3D disponíveis (PLA, ABS, PETG, etc.)
+--------------------------------------------------------------------------------
+  COLUNAS:
+    id               integer       NOT NULL  DEFAULT nextval('materials_id_seq')
+    name             varchar(150)  NOT NULL
+    slug             varchar(150)  NOT NULL
+    category         varchar(50)   NOT NULL  DEFAULT 'pla'
+                                              CHECK IN ('pla','abs','petg','tpu','specialty','flexible','other')
+    badge            varchar(50)
+    description      text
+    gradient         text
+    image_url        text
+    multiplier       numeric(5,3)  NOT NULL  DEFAULT 1.000  CHECK (multiplier > 0)
+    price_per_kg_min numeric(8,2)
+    price_per_kg_max numeric(8,2)
+    prop_resistance  smallint               DEFAULT 0   CHECK (0..100)
+    prop_flexibility smallint               DEFAULT 0   CHECK (0..100)
+    prop_durability  smallint               DEFAULT 0   CHECK (0..100)
+    specs            jsonb         NOT NULL  DEFAULT '[]'
+    temp_min         smallint
+    temp_max         smallint
+    is_active        boolean       NOT NULL  DEFAULT true
+    is_featured      boolean       NOT NULL  DEFAULT false
+    display_order    integer                 DEFAULT 0
+    created_at       timestamp     NOT NULL  DEFAULT CURRENT_TIMESTAMP
+    updated_at       timestamp     NOT NULL  DEFAULT CURRENT_TIMESTAMP
+
+  ÍNDICES:
+    materials_pkey          PRIMARY KEY (id)
+    materials_slug_key      UNIQUE (slug)
+    idx_materials_active    (is_active)
+    idx_materials_category  (category)
+    idx_materials_slug      (slug)
+
+  REFERENCIADA POR:
+    colors.material_id → materials(id) ON DELETE CASCADE
+
+  TRIGGERS:
+    trg_materials_updated_at  BEFORE UPDATE → update_materials_updated_at()
+
+  DADOS DE EXEMPLO (inseridos):
+    PLA Standard (pla)  — multiplier: 1.000 | €20-25/kg | temp: 190-220°C
+    ABS          (abs)  — multiplier: 1.300 | €25-30/kg | temp: 220-250°C
+    PETG         (petg) — multiplier: 1.200 | €28-35/kg | temp: 220-250°C
 
 
 --------------------------------------------------------------------------------
@@ -487,28 +585,31 @@
 
 
 ================================================================================
-  3. TRIGGERS (7)
+  3. TRIGGERS (9)
 ================================================================================
 
   Tabela                | Trigger                              | Evento        | Função
   ----------------------|--------------------------------------|---------------|------------------------------------------
   categories            | update_categories_timestamp          | BEFORE UPDATE | update_categories_updated_at()
   category_filters      | update_category_filters_timestamp    | BEFORE UPDATE | update_filter_timestamps()
+  colors                | trg_colors_updated_at                | BEFORE UPDATE | update_colors_updated_at()          [NOVO]
   filter_tags           | update_filter_tags_timestamp         | BEFORE UPDATE | update_filter_timestamps()
   filter_translations   | update_filter_translations_timestamp | BEFORE UPDATE | update_filter_timestamps()
+  materials             | trg_materials_updated_at             | BEFORE UPDATE | update_materials_updated_at()       [NOVO]
   orders                | update_orders_updated_at             | BEFORE UPDATE | update_orders_updated_at()
   primary_categories    | update_primary_categories_timestamp  | BEFORE UPDATE | update_primary_categories_updated_at()
   products              | update_products_updated_at           | BEFORE UPDATE | update_updated_at_column()
 
 
 ================================================================================
-  4. FOREIGN KEYS / RELAÇÕES (17)
+  4. FOREIGN KEYS / RELAÇÕES (19)
 ================================================================================
 
   Tabela                  | Coluna              | → Tabela Referenciada | Coluna | ON DELETE
   ------------------------|---------------------|-----------------------|--------|----------
   categories              | parent_id           | categories            | id     | CASCADE
   category_filters        | primary_category_id | primary_categories    | id     | CASCADE
+  colors                  | material_id         | materials             | id     | CASCADE   [NOVO]
   filter_feature_flags    | filter_tag_id       | filter_tags           | id     | CASCADE
   filter_feature_flags    | filter_id           | category_filters      | id     | CASCADE
   filter_tags             | filter_id           | category_filters      | id     | CASCADE
@@ -527,7 +628,7 @@
 
 
 ================================================================================
-  5. ÍNDICES (62)
+  5. ÍNDICES (74)
 ================================================================================
 
   Tabela                  | Índice                                               | Definição
@@ -544,6 +645,13 @@
   category_filters        | idx_category_filters_active                          | btree (is_active)
   category_filters        | idx_category_filters_category                        | btree (primary_category_id)
   category_filters        | idx_category_filters_key                             | btree (filter_key)
+  colors                  | colors_pkey                                          | UNIQUE btree (id)          [NOVO]
+  colors                  | colors_slug_key                                      | UNIQUE btree (slug)        [NOVO]
+  colors                  | idx_colors_material                                  | btree (material_id)        [NOVO]
+  colors                  | idx_colors_active                                    | btree (is_active)          [NOVO]
+  colors                  | idx_colors_finish                                    | btree (finish)             [NOVO]
+  colors                  | idx_colors_category                                  | btree (category)           [NOVO]
+  colors                  | idx_colors_slug                                      | btree (slug)               [NOVO]
   files                   | files_pkey                                           | UNIQUE btree (id)
   filter_audit_log        | filter_audit_log_pkey                                | UNIQUE btree (id)
   filter_audit_log        | idx_audit_log_created                                | btree (created_at)
@@ -568,6 +676,11 @@
   login_history           | login_history_pkey                                   | UNIQUE btree (id)
   login_history           | idx_login_history_date                               | btree (logged_at DESC)
   login_history           | idx_login_history_user                               | btree (user_id)
+  materials               | materials_pkey                                       | UNIQUE btree (id)          [NOVO]
+  materials               | materials_slug_key                                   | UNIQUE btree (slug)        [NOVO]
+  materials               | idx_materials_active                                 | btree (is_active)          [NOVO]
+  materials               | idx_materials_category                               | btree (category)           [NOVO]
+  materials               | idx_materials_slug                                   | btree (slug)               [NOVO]
   order_items             | order_items_pkey                                     | UNIQUE btree (id)
   order_items             | idx_order_items_order_id                             | btree (order_id)
   orders                  | orders_pkey                                          | UNIQUE btree (id)
@@ -597,17 +710,19 @@
 
 
 ================================================================================
-  6. SEQUÊNCIAS (16)
+  6. SEQUÊNCIAS (18)
 ================================================================================
 
   categories_id_seq1
   category_filters_id_seq
+  colors_id_seq                  ← NOVO
   files_id_seq
   filter_audit_log_id_seq
   filter_feature_flags_id_seq
   filter_tags_id_seq
   filter_translations_id_seq
   login_history_id_seq
+  materials_id_seq               ← NOVO
   order_items_id_seq
   orders_id_seq
   password_reset_tokens_id_seq
@@ -630,7 +745,7 @@
 
 
 ================================================================================
-  8. FUNÇÕES (8)
+  8. FUNÇÕES (10)
 ================================================================================
 
   get_category_breadcrumb(category_id_input integer)
@@ -642,14 +757,18 @@
     Desc: Devolve todos os descendentes de uma categoria
 
   get_colors_by_material(material_id_param integer)
-    Retorna: TABLE(id int, name varchar, hex_code varchar, finish varchar, category varchar)
-    Desc: Devolve as cores disponíveis para um material
+    Retorna: TABLE(id int, name varchar, hex_code varchar, finish varchar, category varchar,
+                   multiplier numeric, sample_image text, gradient text)
+    Desc: Devolve as cores ativas para um material, ordenadas por display_order e name
+    Nota: Existia versão anterior com menos colunas retornadas (DROP necessário antes de recriar)
 
-  update_categories_updated_at()       → trigger (usado em: categories)
-  update_filter_timestamps()           → trigger (usado em: category_filters, filter_tags, filter_translations)
-  update_orders_updated_at()           → trigger (usado em: orders)
+  update_categories_updated_at()         → trigger (usado em: categories)
+  update_colors_updated_at()             → trigger (usado em: colors)       [NOVO]
+  update_filter_timestamps()             → trigger (usado em: category_filters, filter_tags, filter_translations)
+  update_materials_updated_at()          → trigger (usado em: materials)    [NOVO]
+  update_orders_updated_at()             → trigger (usado em: orders)
   update_primary_categories_updated_at() → trigger (usado em: primary_categories)
-  update_updated_at_column()           → trigger (usado em: products)
+  update_updated_at_column()             → trigger (usado em: products)
 
 
 ================================================================================
@@ -679,6 +798,9 @@
 
   orders
     └── order_items         (order_id → orders.id  |  CASCADE)
+
+  materials                                                              [NOVO]
+    └── colors              (material_id → materials.id  |  CASCADE)
 
 ================================================================================
   FIM DO FICHEIRO

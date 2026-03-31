@@ -1,0 +1,372 @@
+/* ============================================================
+   MATERIALS & COLORS — ESTILOS
+   Consistente com dashboard-brutalist.css
+   ============================================================ */
+
+/* ===== LAYOUT DA ABA ===== */
+.materials-tab-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 1000px) {
+  .materials-tab-layout { grid-template-columns: 1fr; }
+}
+
+/* ===== SECÇÃO CARD ===== */
+.mat-section-card {
+  border: 3px solid #000;
+  background: #fff;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.mat-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #000;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 13px;
+  letter-spacing: 1px;
+  gap: 10px;
+}
+.mat-section-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Filtro de material no header das cores */
+.mat-section-header select {
+  padding: 4px 8px;
+  border: 2px solid #555;
+  background: #222;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+}
+.mat-section-header select:focus {
+  border-color: #00FFFF;
+}
+
+/* ===== BADGE DE CONTAGEM ===== */
+.mat-count-badge {
+  background: #fff;
+  color: #000;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border: 2px solid #fff;
+  font-family: 'Courier New', monospace;
+}
+
+/* ===== LINHAS ===== */
+.mat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 2px solid #eee;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  transition: background 0.1s;
+}
+.mat-row:last-child  { border-bottom: none; }
+.mat-row:hover       { background: #f5f5f5; }
+.mat-row-inactive    { opacity: 0.55; }
+.mat-row-inactive:hover { opacity: 0.8; }
+
+/* Separador de grupo de cores por material */
+.color-group-separator {
+  height: 2px;
+  background: #e5e7eb;
+  margin: 4px 0;
+}
+
+/* ===== DOT DE COR / MATERIAL ===== */
+.mat-color-dot,
+.color-dot-preview {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #000;
+  flex-shrink: 0;
+}
+
+/* Efeito de acabamento no dot da cor */
+.color-dot-preview.finish-metallic {
+  border-color: #888;
+  box-shadow: inset 0 0 4px rgba(255,255,255,0.6), 2px 2px 0 #000;
+}
+.color-dot-preview.finish-matte {
+  filter: contrast(0.9) saturate(0.85);
+}
+.color-dot-preview.finish-transparent {
+  opacity: 0.75;
+  border-style: dashed;
+}
+
+/* ===== NOME ===== */
+.mat-name {
+  font-weight: bold;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== BADGES ===== */
+.mat-badge {
+  padding: 2px 7px;
+  border: 2px solid #000;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Badge de categoria de material */
+.cat-pla      { border-color: #4caf50; color: #2e7d32; }
+.cat-abs      { border-color: #2196f3; color: #1565c0; }
+.cat-petg     { border-color: #9c27b0; color: #6a1b9a; }
+.cat-tpu      { border-color: #ff9800; color: #e65100; }
+.cat-specialty{ border-color: #f44336; color: #b71c1c; }
+.cat-flexible { border-color: #00bcd4; color: #006064; }
+.cat-other    { border-color: #9e9e9e; color: #424242; }
+
+/* Badge personalizado (campo Badge do material) */
+.mat-badge-custom {
+  border-style: dashed;
+  border-color: #000;
+  color: #333;
+}
+
+/* Badge de material (na lista de cores) */
+.mat-badge-material {
+  border-color: #555;
+  color: #333;
+  background: #f5f5f5;
+}
+
+/* Badge de acabamento */
+.mat-badge-finish {
+  border-color: #9e9e9e;
+  color: #616161;
+  background: #fafafa;
+}
+
+/* Badge de inativo */
+.mat-badge-off {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: #fff5f5;
+}
+
+/* Badge inactive (estado anterior, mantido) */
+.mat-badge-inactive { border-color: #ccc; color: #aaa; }
+
+/* ===== MULTIPLICADOR E CONTAGEM ===== */
+.mat-multiplier   { color: #555; font-size: 11px; white-space: nowrap; flex-shrink: 0; font-weight: bold; }
+.mat-colors-count { font-size: 10px; color: #888; white-space: nowrap; flex-shrink: 0; }
+
+/* ===== AÇÕES DA LINHA ===== */
+.mat-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+.mat-actions button {
+  padding: 5px 10px;
+  border: 2px solid #000;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.mat-actions button:hover {
+  background: #000;
+  color: #fff;
+  transform: translate(-1px, -1px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* Botão "+ Cor" */
+.mat-btn-add-color {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  font-size: 10px !important;
+}
+.mat-btn-add-color:hover {
+  background: #2563eb !important;
+  color: #fff !important;
+  box-shadow: 1px 1px 0 #2563eb !important;
+}
+
+/* Botão perigo */
+.mat-actions .btn-danger-sm {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+.mat-actions .btn-danger-sm:hover {
+  background: #dc2626 !important;
+  color: #fff !important;
+  box-shadow: 1px 1px 0 #dc2626 !important;
+}
+
+/* ===== ESTADOS VAZIOS E LOADING ===== */
+.mat-empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  color: #999;
+  border: 2px dashed #ddd;
+  margin: 16px;
+}
+.mat-empty-icon {
+  display: block;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+.mat-empty-state p     { font-weight: bold; margin: 0 0 6px 0; color: #666; }
+.mat-empty-state small { font-size: 11px; color: #aaa; }
+
+.mat-loading {
+  padding: 24px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: #888;
+}
+
+.mat-error-state {
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+  background: #fff5f5;
+  margin: 8px;
+}
+
+/* ===== MODAL — PROPRIEDADES TÉCNICAS ===== */
+.props-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .props-row { grid-template-columns: 1fr; }
+}
+
+.prop-slider-group {
+  background: #f9f9f9;
+  border: 2px solid #e5e7eb;
+  padding: 10px;
+}
+.prop-slider-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #555;
+  margin-bottom: 6px;
+}
+.prop-slider-group input[type="range"] {
+  width: 100%;
+  accent-color: #000;
+  cursor: pointer;
+}
+.prop-val {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 28px;
+  text-align: right;
+  color: #000;
+}
+
+/* ===== MODAL — SPECS ===== */
+.specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.spec-item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.spec-item input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 2px solid #000;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.spec-item input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+.spec-item button {
+  padding: 7px 12px;
+  border: 2px solid #dc2626;
+  background: #fff;
+  color: #dc2626;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.spec-item button:hover { background: #dc2626; color: #fff; }
+
+.btn-add-spec {
+  padding: 7px 14px;
+  border: 2px solid #000;
+  background: #f5f5f5;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.15s;
+}
+.btn-add-spec:hover { background: #000; color: #fff; }
+
+/* ===== MODAL — PREVIEW DE GRADIENTE ===== */
+.gradient-preview {
+  height: 36px;
+  border: 2px solid #000;
+  margin-top: 8px;
+  transition: background 0.3s;
+}
+
+/* ===== MODAL — BOTÕES DE AÇÃO ===== */
+/* Reutiliza .btn-primary, .btn-danger de filters.css/dashboard-brutalist.css */
+/* Ajuste para ficar inline-flex (ícones centralizados) */
+#materialSubmitBtn,
+#colorSubmitBtn,
+#deleteMaterialBtn,
+#deleteColorBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

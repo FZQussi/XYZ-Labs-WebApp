@@ -399,6 +399,10 @@
         <span class="nav-icon">🔧</span>
         <span>Filtros</span>
       </button>
+      <button data-tab="materials" class="nav-btn">
+        <span class="nav-icon">🎨</span>
+        <span>Materiais & Cores</span>
+      </button>
       <button data-tab="priceCalculator" class="nav-btn">
         <span class="nav-icon">🧮</span>
         <span>Calculadora Preços</span>
@@ -791,6 +795,52 @@
         </div>
       </div>
     </section>
+
+
+
+  <!-- ============ MATERIAIS & CORES ============ -->
+  <section id="materials" class="tab hidden">
+    <header class="page-header">
+      <h2 class="page-title">MATERIAIS & CORES</h2>
+      <div class="page-actions">
+        <button id="addMaterialBtn" class="btn-primary">➕ NOVO MATERIAL</button>
+        <button id="addColorBtn" class="btn-secondary">🎨 NOVA COR</button>
+      </div>
+    </header>
+
+    <div class="materials-tab-layout">
+
+      <!-- MATERIAIS -->
+      <div class="mat-section-card">
+        <div class="mat-section-header">
+          <div class="header-left">
+            <span>⚙️ MATERIAIS</span>
+            <span class="mat-count-badge" id="materialsCount">0</span>
+          </div>
+        </div>
+        <div id="materialsList">
+          <div class="loading-state" style="padding:24px;text-align:center;font-family:'Courier New',monospace;color:#888">⏳ A carregar...</div>
+        </div>
+      </div>
+
+      <!-- CORES -->
+      <div class="mat-section-card">
+        <div class="mat-section-header">
+          <div class="header-left">
+            <span>🎨 CORES</span>
+            <span class="mat-count-badge" id="colorsCount">0</span>
+          </div>
+          <select id="colorMaterialFilter" style="padding:4px 8px;border:2px solid #fff;background:#333;color:#fff;font-family:'Courier New',monospace;font-size:11px;cursor:pointer;">
+            <option value="">Todos os materiais</option>
+          </select>
+        </div>
+        <div id="colorsList">
+          <div class="loading-state" style="padding:24px;text-align:center;font-family:'Courier New',monospace;color:#888">⏳ A carregar...</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   </main>
 
@@ -1286,6 +1336,414 @@
   </div>
 
   <!-- =========================================================
+       MATERIAIS & CORES — ESTILOS
+       ========================================================= -->
+  <style>
+    /* ===== MATERIALS TAB LAYOUT ===== */
+    .materials-tab-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1000px) { .materials-tab-layout { grid-template-columns: 1fr; } }
+
+    .mat-section-card {
+      border: 3px solid #000;
+      background: #fff;
+      box-shadow: 4px 4px 0 #000;
+    }
+    .mat-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 1px;
+      gap: 10px;
+    }
+    .mat-section-header .header-left { display: flex; align-items: center; gap: 10px; }
+    .mat-count-badge {
+      background: #fff;
+      color: #000;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 7px;
+      border: 2px solid #fff;
+    }
+
+    /* ===== MATERIAL ROWS ===== */
+    .mat-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 2px solid #eee;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      transition: background 0.1s;
+    }
+    .mat-row:last-child { border-bottom: none; }
+    .mat-row:hover { background: #f9f9f9; }
+
+    .mat-color-dot {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #000;
+      flex-shrink: 0;
+    }
+    .mat-name { font-weight: bold; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mat-badge {
+      padding: 2px 7px;
+      border: 2px solid #000;
+      font-size: 10px;
+      font-weight: bold;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .mat-badge-inactive { border-color: #ccc; color: #aaa; }
+    .mat-multiplier { color: #666; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
+    .mat-colors-count { font-size: 10px; color: #888; white-space: nowrap; flex-shrink: 0; }
+    .mat-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .mat-actions button {
+      padding: 4px 10px;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #fff;
+    }
+    .mat-actions button:hover { background: #000; color: #fff; }
+    .mat-actions .btn-danger-sm { border-color: #dc2626; color: #dc2626; }
+    .mat-actions .btn-danger-sm:hover { background: #dc2626; color: #fff; }
+
+    /* ===== COLOR DOT PREVIEW (gradient or solid) ===== */
+    .color-dot-preview {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #000;
+      flex-shrink: 0;
+    }
+
+    /* ===== MATERIAL MODAL ===== */
+    .props-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .prop-slider-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .prop-slider-group input[type="range"] {
+      width: 100%;
+      margin-top: 4px;
+      accent-color: #000;
+    }
+    .prop-val {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 13px;
+      min-width: 30px;
+      text-align: right;
+    }
+    .specs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .spec-item {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .spec-item input {
+      flex: 1;
+      padding: 5px 8px;
+      border: 2px solid #000;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    .spec-item button {
+      padding: 5px 10px;
+      border: 2px solid #dc2626;
+      background: #fff;
+      color: #dc2626;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .spec-item button:hover { background: #dc2626; color: #fff; }
+    .btn-add-spec {
+      padding: 5px 12px;
+      border: 2px solid #000;
+      background: #f5f5f5;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-add-spec:hover { background: #000; color: #fff; }
+    .gradient-preview {
+      height: 32px;
+      border: 2px solid #000;
+      margin-top: 6px;
+    }
+  </style>
+
+
+  <!-- ===== MODAL: MATERIAL ===== -->
+  <div id="materialModal" class="modal hidden">
+    <div class="modal-content" style="max-width:640px">
+      <div class="modal-header">
+        <h3 id="materialModalTitle">NOVO MATERIAL</h3>
+        <button class="modal-close" data-close="material">×</button>
+      </div>
+      <form id="materialForm" class="modal-form">
+        <input type="hidden" id="materialId">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="materialName" placeholder="ex: PLA Standard" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Categoria *</label>
+            <select id="materialCategory">
+              <option value="pla">PLA</option>
+              <option value="abs">ABS</option>
+              <option value="petg">PETG</option>
+              <option value="tpu">TPU</option>
+              <option value="specialty">Especial</option>
+              <option value="flexible">Flexível</option>
+              <option value="other">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Badge <small style="font-weight:normal;color:#888">(ex: Popular, Novo)</small></label>
+            <input type="text" id="materialBadge" placeholder="Popular" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Multiplicador de Preço *</label>
+            <input type="number" id="materialMultiplier" value="1" min="0.01" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preço/kg Mín (€)</label>
+            <input type="number" id="materialPriceMin" min="0" step="0.01" placeholder="ex: 20">
+          </div>
+          <div class="form-group">
+            <label>Preço/kg Máx (€)</label>
+            <input type="number" id="materialPriceMax" min="0" step="0.01" placeholder="ex: 25">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Temp. Mín (°C)</label>
+            <input type="number" id="materialTempMin" placeholder="ex: 190">
+          </div>
+          <div class="form-group">
+            <label>Temp. Máx (°C)</label>
+            <input type="number" id="materialTempMax" placeholder="ex: 220">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="materialDesc" rows="3" placeholder="Descrição do material..." style="width:100%;padding:8px;border:2px solid #000;font-family:'Courier New',monospace;font-size:13px;resize:vertical"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Gradiente CSS <small style="font-weight:normal;color:#888">(ex: linear-gradient(135deg, #81c784, #4caf50))</small></label>
+          <input type="text" id="materialGradient" placeholder="linear-gradient(...)" autocomplete="off"
+                 oninput="document.getElementById('materialGradientPreview').style.background=this.value">
+          <div id="materialGradientPreview" class="gradient-preview"></div>
+        </div>
+
+        <div class="form-group">
+          <label>URL da Imagem</label>
+          <input type="text" id="materialImageUrl" placeholder="images/PLABasic.webp" autocomplete="off">
+        </div>
+
+        <!-- Propriedades técnicas -->
+        <div class="form-group">
+          <label>Propriedades Técnicas (0–100)</label>
+          <div class="props-row">
+            <div class="prop-slider-group">
+              <label>Resistência <span class="prop-val" id="propResistanceVal">0</span></label>
+              <input type="range" id="propResistance" min="0" max="100" value="0"
+                     oninput="document.getElementById('propResistanceVal').textContent=this.value">
+            </div>
+            <div class="prop-slider-group">
+              <label>Flexibilidade <span class="prop-val" id="propFlexibilityVal">0</span></label>
+              <input type="range" id="propFlexibility" min="0" max="100" value="0"
+                     oninput="document.getElementById('propFlexibilityVal').textContent=this.value">
+            </div>
+            <div class="prop-slider-group">
+              <label>Durabilidade <span class="prop-val" id="propDurabilityVal">0</span></label>
+              <input type="range" id="propDurability" min="0" max="100" value="0"
+                     oninput="document.getElementById('propDurabilityVal').textContent=this.value">
+            </div>
+          </div>
+        </div>
+
+        <!-- Specs -->
+        <div class="form-group">
+          <label>Especificações</label>
+          <div class="specs-list" id="specsList"></div>
+          <button type="button" class="btn-add-spec" id="addSpecBtn">+ Adicionar spec</button>
+        </div>
+
+        <div class="form-row" style="align-items:center">
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="materialActive" checked style="width:16px;height:16px">
+              Ativo (visível na loja)
+            </label>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="materialFeatured" style="width:16px;height:16px">
+              Destaque
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Ordem</label>
+            <input type="number" id="materialOrder" value="0" min="0">
+          </div>
+        </div>
+
+        <div id="materialFormError" style="display:none;padding:10px 14px;background:#fff0f0;border:2px solid #f44336;font-family:'Courier New',monospace;font-size:12px;color:#c62828;margin-bottom:8px"></div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" id="materialSubmitBtn">💾 GUARDAR MATERIAL</button>
+          <button type="button" id="deleteMaterialBtn" class="btn-danger" style="display:none">🗑️ ELIMINAR</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: COR ===== -->
+  <div id="colorModal" class="modal hidden">
+    <div class="modal-content" style="max-width:560px">
+      <div class="modal-header">
+        <h3 id="colorModalTitle">NOVA COR</h3>
+        <button class="modal-close" data-close="color">×</button>
+      </div>
+      <form id="colorForm" class="modal-form">
+        <input type="hidden" id="colorId">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="colorName" placeholder="ex: Branco" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Material *</label>
+            <select id="colorMaterialId" required>
+              <option value="">-- Selecionar --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cor Hex *</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="colorHexPicker" value="#000000"
+                     oninput="document.getElementById('colorHex').value=this.value"
+                     style="width:48px;height:40px;border:2px solid #000;padding:2px;cursor:pointer">
+              <input type="text" id="colorHex" value="#000000" required
+                     placeholder="#000000"
+                     oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value))document.getElementById('colorHexPicker').value=this.value"
+                     style="font-family:'Courier New',monospace;flex:1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Multiplicador *</label>
+            <input type="number" id="colorMultiplier" value="1" min="0.01" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Acabamento</label>
+            <select id="colorFinish">
+              <option value="glossy">Brilhante (Glossy)</option>
+              <option value="matte">Mate (Matte)</option>
+              <option value="metallic">Metálico</option>
+              <option value="transparent">Translúcido</option>
+              <option value="satin">Acetinado (Satin)</option>
+              <option value="other">Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="colorCategory">
+              <option value="basic">Básica</option>
+              <option value="vibrant">Vibrante</option>
+              <option value="pastel">Pastel</option>
+              <option value="special">Especial</option>
+              <option value="metallic">Metálica</option>
+              <option value="other">Outra</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Gradiente CSS <small style="font-weight:normal;color:#888">(opcional — sobrepõe a cor hex)</small></label>
+          <input type="text" id="colorGradient" placeholder="linear-gradient(...) ou radial-gradient(...)"
+                 oninput="document.getElementById('colorGradientPreview').style.background=this.value||document.getElementById('colorHex').value" autocomplete="off">
+          <div id="colorGradientPreview" class="gradient-preview" style="background:#000"></div>
+        </div>
+
+        <div class="form-group">
+          <label>URL Imagem de Amostra</label>
+          <input type="text" id="colorSampleImage" placeholder="images/samples/branco_pla.webp" autocomplete="off">
+        </div>
+
+        <div class="form-row" style="align-items:center">
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="colorActive" checked style="width:16px;height:16px">
+              Ativa (visível na loja)
+            </label>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:13px">
+              <input type="checkbox" id="colorFeatured" style="width:16px;height:16px">
+              Destaque
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Ordem</label>
+            <input type="number" id="colorOrder" value="0" min="0">
+          </div>
+        </div>
+
+        <div id="colorFormError" style="display:none;padding:10px 14px;background:#fff0f0;border:2px solid #f44336;font-family:'Courier New',monospace;font-size:12px;color:#c62828;margin-bottom:8px"></div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" id="colorSubmitBtn">💾 GUARDAR COR</button>
+          <button type="button" id="deleteColorBtn" class="btn-danger" style="display:none">🗑️ ELIMINAR</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
        SCRIPTS
        ========================================================= -->
   <script src="/Dashboard/scripts/security.js"></script>
@@ -1302,5 +1760,6 @@
   <script src="/Dashboard/scripts/price-calculator.js"></script>
   <script src="/Dashboard/scripts/orders.js"></script>
   <script src="/Dashboard/scripts/filters.js"></script>
+  <script src="/Dashboard/scripts/materials.js"></script>
 </body>
 </html>

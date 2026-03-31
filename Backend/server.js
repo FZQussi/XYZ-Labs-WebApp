@@ -6,18 +6,22 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 // ===== IMPORTS =====
-const authRoutes       = require('./auth');
-const adminRoutes      = require('./admin');
-const productRoutes    = require('./routes/products.routes');
-const userRoutes       = require('./routes/users.routes');
-const categoriesRoutes = require('./routes/categories.routes');
-const filtersRoutes    = require('./routes/filters.routes');
-const orderRoutes      = require('./routes/orders.routes');
-const contactRoutes    = require('./routes/contact.routes');
-const forgotRoutes     = require('./routes/forgot.routes');
-const resetRoutes      = require('./routes/reset.routes');
-const dashboardRoutes  = require('./routes/Dashboard.routes');
-const materialsColorsRoutes = require('./routes/materialsColors.routes');
+const authRoutes            = require('./auth');
+const adminRoutes           = require('./admin');
+const productRoutes         = require('./routes/products.routes');
+const userRoutes            = require('./routes/users.routes');
+const categoriesRoutes      = require('./routes/categories.routes');
+const filtersRoutes         = require('./routes/filters.routes');
+const orderRoutes           = require('./routes/orders.routes');
+const contactRoutes         = require('./routes/contact.routes');
+const forgotRoutes          = require('./routes/forgot.routes');
+const resetRoutes           = require('./routes/reset.routes');
+const dashboardRoutes       = require('./routes/Dashboard.routes');
+// FIX: dois requires separados para obter duas instâncias distintas do router.
+// Montar o mesmo objeto duas vezes em prefixos diferentes causa comportamento
+// imprevisível no Express — o router fica "preso" ao primeiro prefixo.
+const materialsColorsRoutes     = require('./routes/materialsColors.routes');
+const materialsColorsDataRoutes = require('./routes/materialsColors.routes');
 const { globalLimiter } = require('./middlewares/rateLimiter.middleware');
 
 const app = express();
@@ -59,22 +63,32 @@ app.use('/reset-password', resetRoutes);
 // ===== ROTAS =====
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+
 app.use('/api/categories', categoriesRoutes);
 app.use('/categories', categoriesRoutes);
-app.use('/data', materialsColorsRoutes);  // compatibilidade com fetch('../data/options.json')
-app.use('/api', materialsColorsRoutes);   // rotas admin e públicas da API
-// Filtros montados na raiz — as rotas internas já têm os prefixos completos
-// ex: /api/admin/categories/:id/filters, /api/v1/categories/:id/filters
-app.use('/', filtersRoutes);
 
-app.use('/products', productRoutes);
+// FIX: instâncias separadas — /api inclui as rotas admin e públicas,
+// /data serve apenas a compatibilidade com fetch('../data/options.json')
+app.use('/api',  materialsColorsRoutes);
+app.use('/data', materialsColorsDataRoutes);
+
+app.use('/products',     productRoutes);
 app.use('/api/products', productRoutes);
-app.use('/users', userRoutes);
-app.use('/orders', orderRoutes);
-app.use('/contact', contactRoutes);
+app.use('/users',        userRoutes);
+app.use('/orders',       orderRoutes);
+app.use('/contact',      contactRoutes);
+
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (_, res) => res.send('Backend a funcionar 🚀'));
-app.use('/api/dashboard', dashboardRoutes);
+
+// FIX: filtersRoutes montado por último — estava antes dos routes de products,
+// users, orders e contact, o que impedia esses pedidos de chegarem aos handlers
+// corretos. Como está montado em '/', tem de ficar sempre no fim.
+// As rotas internas já têm os prefixos completos:
+//   /api/admin/categories/:id/filters
+//   /api/v1/categories/:id/filters
+app.use('/', filtersRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Erro:', err.message || err);
@@ -96,4 +110,17 @@ app.listen(port, () => {
   console.log(`   ADMIN   POST /api/admin/filters/:id/tags`);
   console.log(`   ADMIN   PUT  /api/admin/tags/:id`);
   console.log(`   ADMIN   DEL  /api/admin/tags/:id`);
+  console.log(`🎨 Rotas de materiais e cores ativas:`);
+  console.log(`   PUBLIC  GET  /api/materials`);
+  console.log(`   PUBLIC  GET  /api/materials/:id/colors`);
+  console.log(`   PUBLIC  GET  /api/options`);
+  console.log(`   PUBLIC  GET  /data/options.json`);
+  console.log(`   ADMIN   GET  /api/admin/materials`);
+  console.log(`   ADMIN   POST /api/admin/materials`);
+  console.log(`   ADMIN   PUT  /api/admin/materials/:id`);
+  console.log(`   ADMIN   DEL  /api/admin/materials/:id`);
+  console.log(`   ADMIN   GET  /api/admin/colors`);
+  console.log(`   ADMIN   POST /api/admin/colors`);
+  console.log(`   ADMIN   PUT  /api/admin/colors/:id`);
+  console.log(`   ADMIN   DEL  /api/admin/colors/:id`);
 });
