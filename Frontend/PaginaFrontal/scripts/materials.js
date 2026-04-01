@@ -1,112 +1,171 @@
-const materialsGrid = document.querySelector('.materials-grid');
-const filterButtons = document.querySelectorAll('.filter-btn');
+'use strict';
+// PaginaFrontal/scripts/materials.js
+// Consome GET /api/materials  (array de materiais com cores embutidas)
+
+const API_BASE = '';
+
+const materialsGrid  = document.querySelector('.materials-grid');
+const filterButtons  = document.querySelectorAll('.filter-btn');
 
 let allMaterials = [];
 
-// ===== Carregar JSON =====
-fetch('../data/options.json')
-  .then(res => res.json())
-  .then(data => {
-    allMaterials = data.materials;
-    renderMaterialsGrid(allMaterials);
-  })
-  .catch(err => console.error('Erro ao carregar options.json:', err));
+// ─────────────────────────────────────────────────────────────
+// INICIALIZAÇÃO
+// ─────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadMaterials();
+});
 
-// ===== Renderizar Grid de Materiais =====
+// ─────────────────────────────────────────────────────────────
+// CARREGAR MATERIAIS DA API
+// ─────────────────────────────────────────────────────────────
+async function loadMaterials() {
+  try {
+    showLoading();
+    const res = await fetch(`${API_BASE}/api/materials`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    allMaterials = await res.json();
+    renderMaterialsGrid(allMaterials);
+  } catch (err) {
+    console.error('Erro ao carregar materiais:', err);
+    showError();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOADING / ERROR STATES
+// ─────────────────────────────────────────────────────────────
+function showLoading() {
+  materialsGrid.innerHTML = `
+    <div class="loading-state" style="grid-column:1/-1;text-align:center;padding:3rem;color:#666;">
+      <p>A carregar materiais...</p>
+    </div>`;
+}
+
+function showError() {
+  materialsGrid.innerHTML = `
+    <div class="error-state" style="grid-column:1/-1;text-align:center;padding:3rem;color:#e53e3e;">
+      <p>Erro ao carregar materiais. Tente novamente mais tarde.</p>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDERIZAR GRID
+// ─────────────────────────────────────────────────────────────
 function renderMaterialsGrid(materials) {
   materialsGrid.innerHTML = '';
+
+  if (!materials.length) {
+    materialsGrid.innerHTML = `
+      <div class="no-results" style="grid-column:1/-1;">
+        <p>Nenhum material encontrado nesta categoria.</p>
+      </div>`;
+    return;
+  }
 
   materials.forEach(mat => {
     const card = document.createElement('div');
     card.classList.add('material-card');
     card.dataset.category = mat.category;
 
-    // Determinar como mostrar a visualização do material
+    // Visual: imagem > gradiente > fallback cinza
     let visualContent = '';
-    
-    if (mat.image) {
-      // Se tem imagem, mostrar imagem com gradiente de fallback
+    if (mat.image_url) {
       visualContent = `
-        <img src="${mat.image}" 
-             alt="${mat.name}" 
+        <img src="${mat.image_url}"
+             alt="${mat.name}"
              class="material-image-photo"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-        <div class="material-gradient-fallback" 
-             style="background: ${mat.gradient || '#ccc'}; display: none;"></div>
-      `;
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+        <div class="material-gradient-fallback"
+             style="background:${mat.gradient || '#ccc'};display:none;"></div>`;
     } else if (mat.gradient) {
-      // Se não tem imagem mas tem gradiente
       visualContent = `
-        <div class="material-gradient-display" 
-             style="background: ${mat.gradient};"></div>
-      `;
+        <div class="material-gradient-display"
+             style="background:${mat.gradient};"></div>`;
     } else {
-      // Fallback para cor cinza
       visualContent = `
-        <div class="material-gradient-display" 
-             style="background: linear-gradient(135deg, #ccc, #999);"></div>
-      `;
+        <div class="material-gradient-display"
+             style="background:linear-gradient(135deg,#ccc,#999);"></div>`;
     }
 
-    // HTML do cartão
+    // Propriedades (barras de progresso)
+    const properties = {
+      'Resistência':   mat.prop_resistance   || 0,
+      'Flexibilidade': mat.prop_flexibility  || 0,
+      'Durabilidade':  mat.prop_durability   || 0,
+    };
+
+    const propsHTML = Object.entries(properties).map(([label, val]) => `
+      <div class="property">
+        <span class="prop-label">${label}:</span>
+        <div class="prop-bar">
+          <div class="prop-fill" style="width:${val}%;"></div>
+        </div>
+      </div>`).join('');
+
+    // Specs
+    const specs = Array.isArray(mat.specs) ? mat.specs : [];
+    const specsHTML = specs.length
+      ? `<div class="material-specs">
+           <h4>Especificações:</h4>
+           <ul>${specs.map(s => `<li>${s}</li>`).join('')}</ul>
+         </div>`
+      : '';
+
+    // Cores disponíveis (chips de prévia)
+    const colors = Array.isArray(mat.colors) ? mat.colors : [];
+    const colorsHTML = colors.length
+      ? `<div class="material-colors-preview">
+           <span class="colors-label">Cores disponíveis (${colors.length}):</span>
+           <div class="colors-chips">
+             ${colors.slice(0, 12).map(c => `
+               <span class="color-chip"
+                     style="${c.gradient ? `background:${c.gradient}` : `background:${c.hex_code}`}"
+                     title="${c.name}"></span>`).join('')}
+             ${colors.length > 12 ? `<span class="colors-more">+${colors.length - 12}</span>` : ''}
+           </div>
+         </div>`
+      : '';
+
     card.innerHTML = `
       <div class="material-header">
         <h3>${mat.name}</h3>
-        ${mat.badge ? `<span class="material-badge ${mat.badge.toLowerCase().replace(/\s+/g, '-')}">${mat.badge}</span>` : ''}
+        ${mat.badge ? `<span class="material-badge ${mat.badge.toLowerCase().replace(/\s+/g,'-')}">${mat.badge}</span>` : ''}
       </div>
-      
+
       <div class="material-visual">
         ${visualContent}
-        ${mat.gradient ? `<div class="material-texture-overlay"></div>` : ''}
+        ${mat.gradient ? '<div class="material-texture-overlay"></div>' : ''}
       </div>
-      
+
       <div class="material-info">
-        <p class="material-desc">${mat.description}</p>
-        
+        ${mat.description ? `<p class="material-desc">${mat.description}</p>` : ''}
+
         <div class="material-properties">
-          ${Object.entries(mat.properties).map(([prop, value]) => `
-            <div class="property">
-              <span class="prop-label">${prop}:</span>
-              <div class="prop-bar">
-                <div class="prop-fill" style="width: ${value}%;"></div>
-              </div>
-            </div>
-          `).join('')}
+          ${propsHTML}
         </div>
-        
-        <div class="material-specs">
-          <h4>Especificações:</h4>
-          <ul>
-            ${mat.specs.map(spec => `<li>${spec}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
-    `;
+
+        ${specsHTML}
+        ${colorsHTML}
+      </div>`;
 
     materialsGrid.appendChild(card);
   });
-
-  // Se não houver materiais para mostrar
-  if (materials.length === 0) {
-    materialsGrid.innerHTML = `
-      <div class="no-results">
-        <p>Nenhum material encontrado nesta categoria.</p>
-      </div>
-    `;
-  }
 }
 
-// ===== Filtrar Materiais =====
+// ─────────────────────────────────────────────────────────────
+// FILTROS
+// ─────────────────────────────────────────────────────────────
 filterButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    // Atualizar botão ativo
     filterButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     const category = btn.dataset.category;
     const filtered = category === 'all'
       ? allMaterials
-      : allMaterials.filter(mat => mat.category === category);
+      : allMaterials.filter(m => m.category === category);
 
     renderMaterialsGrid(filtered);
   });
