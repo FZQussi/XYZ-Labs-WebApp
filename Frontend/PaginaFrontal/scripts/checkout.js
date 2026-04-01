@@ -15,9 +15,37 @@ const colorsCache = {};
 let materialOptions = [];
 
 // ─────────────────────────────────────────────────────────────
+// GUARD DE AUTENTICAÇÃO
+// Redireciona para home se o utilizador fizer logout enquanto
+// está na página de checkout (evento do header.js ou outro tab)
+// ─────────────────────────────────────────────────────────────
+function redirectUnauthenticated() {
+  window.location.href = '/PaginaFrontal/html/HomePage.html';
+}
+
+// Logout detetado via localStorage (ex: outro tab)
+window.addEventListener('storage', e => {
+  if (e.key === 'token' && !e.newValue) {
+    redirectUnauthenticated();
+  }
+});
+
+// Logout detetado via evento personalizado do header.js (mesmo tab)
+window.addEventListener('userLoggedOut', () => {
+  redirectUnauthenticated();
+});
+
+// ─────────────────────────────────────────────────────────────
 // INICIALIZAÇÃO
 // ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Verificar autenticação — checkout requer login
+  if (!localStorage.getItem('token')) {
+    redirectUnauthenticated();
+    return;
+  }
+
+  // 2. Verificar carrinho não vazio
   if (!cart.items || !cart.items.length) {
     alert('O seu carrinho está vazio!');
     window.location.href = 'products.html';
