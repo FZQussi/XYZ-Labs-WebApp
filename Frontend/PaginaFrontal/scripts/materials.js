@@ -17,6 +17,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─────────────────────────────────────────────────────────────
+// HELPER — extrai array de cores de um material,
+// seja qual for o nome do campo devolvido pela API
+// ─────────────────────────────────────────────────────────────
+function getColors(mat) {
+  const colors =
+    mat.colors           ||
+    mat.available_colors ||
+    mat.color_options    ||
+    mat.filament_colors  ||
+    [];
+
+  if (!Array.isArray(colors)) return [];
+  return colors;
+}
+
+// ─────────────────────────────────────────────────────────────
 // CARREGAR MATERIAIS DA API
 // ─────────────────────────────────────────────────────────────
 async function loadMaterials() {
@@ -26,6 +42,15 @@ async function loadMaterials() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     allMaterials = await res.json();
+
+    // DEBUG — confirmar no console a estrutura da API
+    if (allMaterials.length > 0) {
+      console.log('[materials.js] 1º material:', allMaterials[0]);
+      console.log('[materials.js] Chaves:', Object.keys(allMaterials[0]));
+      const c = getColors(allMaterials[0]);
+      console.log(`[materials.js] Cores encontradas: ${c.length}`, c[0] || '(nenhuma)');
+    }
+
     renderMaterialsGrid(allMaterials);
   } catch (err) {
     console.error('Erro ao carregar materiais:', err);
@@ -113,16 +138,18 @@ function renderMaterialsGrid(materials) {
          </div>`
       : '';
 
-    // Cores disponíveis (chips de prévia)
-    const colors = Array.isArray(mat.colors) ? mat.colors : [];
+    // ── Cores disponíveis ─────────────────────────────────
+    const colors = getColors(mat);
     const colorsHTML = colors.length
       ? `<div class="material-colors-preview">
            <span class="colors-label">Cores disponíveis (${colors.length}):</span>
            <div class="colors-chips">
              ${colors.slice(0, 12).map(c => `
                <span class="color-chip"
-                     style="${c.gradient ? `background:${c.gradient}` : `background:${c.hex_code}`}"
-                     title="${c.name}"></span>`).join('')}
+                     style="${c.gradient
+                       ? `background:${c.gradient}`
+                       : `background:${c.hex_code || c.hex || c.color || '#cccccc'}`}"
+                     title="${c.name || c.label || ''}"></span>`).join('')}
              ${colors.length > 12 ? `<span class="colors-more">+${colors.length - 12}</span>` : ''}
            </div>
          </div>`
