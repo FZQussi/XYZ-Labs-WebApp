@@ -109,8 +109,22 @@ async function getColorsForMaterial(materialId) {
 function loadOrderSummary() {
   const orderItems = document.getElementById('orderItems');
 
-  orderItems.innerHTML = cart.items.map((item, index) => `
-    <div class="summary-item" data-item-index="${index}">
+  orderItems.innerHTML = cart.items.map((item, index) => {
+    const effectivePrice = item.is_on_promotion && item.price_discounted
+      ? item.price_discounted
+      : item.price;
+
+    const priceHTML = item.is_on_promotion && item.price_discounted
+      ? `<p>Preço base: <span style="text-decoration:line-through;color:#9ca3af;">€${Number(item.price).toFixed(2)}</span>
+             <span style="color:#dc2626;font-weight:bold;">€${Number(item.price_discounted).toFixed(2)}</span> × ${item.quantity}</p>`
+      : `<p>Preço base: €${Number(item.price).toFixed(2)} × ${item.quantity}</p>`;
+
+    const promoBadge = item.is_on_promotion && item.discount_percent
+      ? `<div style="display:inline-block;background:#dc2626;color:#fff;font-size:10px;font-weight:bold;padding:3px 8px;margin-bottom:6px;letter-spacing:0.3px;">🏷️ ${item.promotion_label || 'PROMOÇÃO'} -${item.discount_percent}%</div>`
+      : '';
+
+    return `
+    <div class="summary-item" data-item-index="${index}" data-effective-price="${effectivePrice}">
       <div class="summary-item-image">
         ${item.image
           ? `<img src="${item.image}" alt="${item.name}">`
@@ -118,9 +132,10 @@ function loadOrderSummary() {
       </div>
 
       <div class="summary-item-details">
+        ${promoBadge}
         <h4>${item.name}</h4>
         <p>Quantidade: ${item.quantity}</p>
-        <p>Preço base: €${Number(item.price).toFixed(2)} × ${item.quantity}</p>
+        ${priceHTML}
 
         <div class="product-option">
           <label for="material-${index}">Material *</label>
@@ -143,10 +158,11 @@ function loadOrderSummary() {
 
       <div class="summary-item-total">
         <span class="item-total" id="item-total-${index}">
-          €${(item.price * item.quantity).toFixed(2)}
+          €${(effectivePrice * item.quantity).toFixed(2)}
         </span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   setupProductSelects();
   calculateTotals();
@@ -222,7 +238,12 @@ function calculateTotals() {
       ? parseFloat(colSel.options[colSel.selectedIndex].dataset.multiplier) || 1
       : 1;
 
-    const itemTotal = item.price * item.quantity * matMult * colMult;
+    // Usar preço descontado se em promoção
+    const effectivePrice = item.is_on_promotion && item.price_discounted
+      ? item.price_discounted
+      : item.price;
+
+    const itemTotal = effectivePrice * item.quantity * matMult * colMult;
     totalAmount    += itemTotal;
 
     const el = document.getElementById(`item-total-${index}`);
@@ -339,12 +360,20 @@ function setupForm() {
       const matOpt = matSel.options[matSel.selectedIndex];
       const colOpt = colSel.options[colSel.selectedIndex];
 
+      // Usar preço descontado se em promoção
+      const effectivePrice = item.is_on_promotion && item.price_discounted
+        ? item.price_discounted
+        : item.price;
+
       items.push({
         product_id:          item.id,
         product_name:        item.name,
         product_image:       item.image,
         quantity:            item.quantity,
-        price:               item.price,
+        price:               effectivePrice,
+        price_original:      item.price,
+        is_on_promotion:     !!item.is_on_promotion,
+        discount_percent:    item.discount_percent || null,
         material_id:         parseInt(matSel.value, 10),
         material_name:       matOpt.textContent.split('(')[0].trim(),
         material_multiplier: parseFloat(matOpt.dataset.multiplier),

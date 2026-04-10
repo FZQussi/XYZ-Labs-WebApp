@@ -55,12 +55,25 @@ initializeEventListeners() {
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {
+      // Calcular preço com desconto se em promoção
+      const isPromo = !!(product.is_on_promotion && product.discount_percent);
+      const discountedPrice = isPromo
+        ? (product.price_discounted
+            ? Number(product.price_discounted)
+            : +(Number(product.price) * (1 - product.discount_percent / 100)).toFixed(2))
+        : null;
+
       this.items.push({
         id: product.id,
         name: product.name,
         price: product.price,
         image: product.images && product.images[0] ? product.images[0] : null,
-        quantity: quantity
+        quantity: quantity,
+        // Dados de promoção
+        is_on_promotion: isPromo,
+        discount_percent: isPromo ? product.discount_percent : null,
+        promotion_label: isPromo ? (product.promotion_label || 'PROMOÇÃO') : null,
+        price_discounted: discountedPrice,
       });
     }
 
@@ -122,7 +135,12 @@ initializeEventListeners() {
 
   // ===== OBTER TOTAL =====
   getTotal() {
-    return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return this.items.reduce((sum, item) => {
+      const effectivePrice = item.is_on_promotion && item.price_discounted
+        ? item.price_discounted
+        : item.price;
+      return sum + (effectivePrice * item.quantity);
+    }, 0);
   }
 
   // ===== OBTER NÚMERO DE ITEMS =====
@@ -166,7 +184,23 @@ initializeEventListeners() {
     return;
   }
 
-  const itemsHTML = this.items.map(item => `
+  const itemsHTML = this.items.map(item => {
+    const effectivePrice = item.is_on_promotion && item.price_discounted
+      ? item.price_discounted
+      : item.price;
+
+    const priceHTML = item.is_on_promotion && item.price_discounted
+      ? `<p class="cart-item-price">
+           <span style="text-decoration:line-through;color:#9ca3af;font-size:0.8em;">€${Number(item.price).toFixed(2)}</span>
+           <span style="color:#dc2626;font-weight:bold;"> €${Number(item.price_discounted).toFixed(2)}</span>
+         </p>`
+      : `<p class="cart-item-price">€${Number(item.price).toFixed(2)}</p>`;
+
+    const promoBadge = item.is_on_promotion && item.discount_percent
+      ? `<span style="display:inline-block;background:#dc2626;color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;margin-bottom:4px;letter-spacing:0.3px;">🏷️ ${item.promotion_label} -${item.discount_percent}%</span>`
+      : '';
+
+    return `
     <div class="cart-item">
       <div class="cart-item-image">
         ${item.image 
@@ -176,8 +210,9 @@ initializeEventListeners() {
       </div>
 
       <div class="cart-item-info">
+        ${promoBadge}
         <h4>${item.name}</h4>
-        <p class="cart-item-price">€${Number(item.price).toFixed(2)}</p>
+        ${priceHTML}
 
         <div class="cart-item-quantity">
           <button 
@@ -206,7 +241,8 @@ initializeEventListeners() {
         onclick="cart.removeItem(${item.id})"
       >×</button>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   sideContent.innerHTML = `
     <h3>🛒 Meu Carrinho</h3>
