@@ -31,6 +31,38 @@
       font-family: 'Courier New', monospace;
       margin: 1px 0;
     }
+    /* ---- Promoção nos cards ---- */
+    .tag.tag-promo {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      background: #dc2626;
+      color: #fff;
+      border: 1px solid #dc2626;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.3px;
+      margin: 1px 2px 1px 0;
+    }
+    .product-price-promo {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .product-price-original {
+      text-decoration: line-through;
+      color: #9ca3af;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+    .product-price-discounted {
+      color: #dc2626;
+      font-size: 15px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+    }
   `;
   document.head.appendChild(style);
 })();
@@ -248,6 +280,28 @@ function sortProducts() {
 }
 
 // ============================================================
+// PROMO HELPER
+// ============================================================
+function calcDiscountedPrice(product) {
+  if (!product.is_on_promotion || !product.discount_percent) return null;
+  return product.price_discounted
+    ? Number(product.price_discounted)
+    : +(Number(product.price) * (1 - product.discount_percent / 100)).toFixed(2);
+}
+
+function promoPriceHTML(product) {
+  const discounted = calcDiscountedPrice(product);
+  if (!discounted) {
+    return `<span class="product-price">€${Number(product.price || 0).toFixed(2)}</span>`;
+  }
+  return `
+    <div class="product-price-promo">
+      <span class="product-price-original">€${Number(product.price || 0).toFixed(2)}</span>
+      <span class="product-price-discounted">€${discounted.toFixed(2)}</span>
+    </div>`;
+}
+
+// ============================================================
 // RENDER PRODUCTS
 // ============================================================
 function renderProducts() {
@@ -294,7 +348,12 @@ function renderProducts() {
         ? `<span class="tag tag-filter-more">+${extraCount}</span>`
         : '';
 
-      const tagsHTML = primaryTag + visibleTags + extraBadge;
+      // Tag de promoção (no topo das tags)
+      const promoTag = product.is_on_promotion
+        ? `<span class="tag tag-promo">🏷️ ${product.promotion_label || 'PROMOÇÃO'} -${product.discount_percent}%</span>`
+        : '';
+
+      const tagsHTML = promoTag + primaryTag + visibleTags + extraBadge;
 
       return `
         <div class="product-card" data-id="${product.id}">
@@ -306,7 +365,7 @@ function renderProducts() {
             <h3>${product.name}</h3>
             <div class="product-tags">${tagsHTML}</div>
             <div class="product-footer">
-              <span class="product-price">€${Number(product.price || 0).toFixed(2)}</span>
+              ${promoPriceHTML(product)}
               <div class="product-actions">
                 <button class="btn-view" onclick="viewProduct(${product.id})">Ver Detalhes</button>
                 ${product.stock

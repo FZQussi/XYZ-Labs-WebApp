@@ -197,13 +197,49 @@ class ProductRenderer {
   }
 
   static renderBasicInfo() {
-    const nameEl = document.getElementById('productName');
-    const priceEl = document.getElementById('productPrice');
-    const descEl = document.getElementById('productDescription');
+    const nameEl  = document.getElementById('productName');
+    const descEl  = document.getElementById('productDescription');
+    const product = State.currentProduct;
 
-    if (nameEl) nameEl.textContent = State.currentProduct.name;
-    if (priceEl) priceEl.textContent = Number(State.currentProduct.price).toFixed(2);
-    if (descEl) descEl.innerHTML = State.currentProduct.description || 'Sem descrição disponível';
+    if (nameEl) nameEl.textContent = product.name;
+    if (descEl) descEl.innerHTML = product.description || 'Sem descrição disponível';
+
+    // Secção de preço — suporte a promoção
+    const priceSectionEl = document.querySelector('.product-price-section');
+    if (priceSectionEl) {
+      const discounted = product.is_on_promotion && product.discount_percent
+        ? (product.price_discounted
+            ? Number(product.price_discounted)
+            : +(Number(product.price) * (1 - product.discount_percent / 100)).toFixed(2))
+        : null;
+
+      if (discounted) {
+        priceSectionEl.innerHTML = `
+          <div class="price-main price-promo-block">
+            <div class="price-original-row">
+              <span class="currency" style="text-decoration:line-through;color:#9ca3af;">€</span>
+              <span class="price-value price-value--old" style="text-decoration:line-through;color:#9ca3af;">
+                ${Number(product.price).toFixed(2)}
+              </span>
+              <span class="promo-percent-badge">-${product.discount_percent}%</span>
+            </div>
+            <div class="price-discounted-row">
+              <span class="currency" style="color:#dc2626;">€</span>
+              <span class="price-value" id="productPrice" style="color:#dc2626;">
+                ${discounted.toFixed(2)}
+              </span>
+            </div>
+          </div>
+          <p class="price-note">IVA incluído</p>`;
+      } else {
+        priceSectionEl.innerHTML = `
+          <div class="price-main">
+            <span class="currency">€</span>
+            <span class="price-value" id="productPrice">${Number(product.price).toFixed(2)}</span>
+          </div>
+          <p class="price-note">IVA incluído</p>`;
+      }
+    }
   }
 
   static renderTags() {
@@ -212,6 +248,57 @@ class ProductRenderer {
 
     tagsContainer.innerHTML = '';
     const product = State.currentProduct;
+
+    // Injetar estilos de promoção (uma só vez)
+    if (!document.getElementById('promo-detail-styles')) {
+      const s = document.createElement('style');
+      s.id = 'promo-detail-styles';
+      s.textContent = `
+        .product-tag.promo {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 4px 12px;
+          background: #dc2626; color: #fff;
+          border: 2px solid #dc2626;
+          font-size: 12px; font-weight: bold;
+          letter-spacing: 0.5px;
+        }
+        .promo-percent-badge {
+          display: inline-block;
+          padding: 2px 8px;
+          background: #dc2626; color: #fff;
+          font-size: 13px; font-weight: bold;
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+        .price-promo-block { flex-direction: column; gap: 2px; }
+        .price-original-row { display: flex; align-items: center; gap: 2px; }
+        .price-discounted-row { display: flex; align-items: center; gap: 2px; }
+        /* Cards relacionados e homepage */
+        .homepage-promo-badge {
+          position: absolute; top: 8px; left: 8px;
+          background: #dc2626; color: #fff;
+          font-size: 10px; font-weight: bold;
+          padding: 3px 8px; letter-spacing: 0.3px;
+          pointer-events: none; z-index: 2;
+        }
+        .homepage-product-image { position: relative; }
+        .homepage-price-group { display: flex; flex-direction: column; gap: 1px; }
+        .homepage-price-old {
+          text-decoration: line-through;
+          color: #9ca3af !important; font-size: 12px !important;
+        }
+        .homepage-price-new { color: #dc2626 !important; font-weight: bold; }
+      `;
+      document.head.appendChild(s);
+    }
+
+    // Tag de promoção (primeiro)
+    if (product.is_on_promotion && product.discount_percent) {
+      const promoTag = document.createElement('span');
+      promoTag.className = 'product-tag promo';
+      promoTag.textContent = `🏷️ ${product.promotion_label || 'PROMOÇÃO'} — -${product.discount_percent}%`;
+      tagsContainer.appendChild(promoTag);
+    }
 
     // Categoria principal
     if (product.primary_category) {
@@ -226,7 +313,7 @@ class ProductRenderer {
     filterTags.forEach(ft => {
       const tag = document.createElement('span');
       tag.className = 'product-tag filter';
-      tag.title = ft.filter_name; // tooltip com o nome do filtro
+      tag.title = ft.filter_name;
       tag.textContent = ft.tag_name;
       tagsContainer.appendChild(tag);
     });
@@ -919,24 +1006,41 @@ class RelatedProductsRenderer {
   }
 
   static createProductCard(product) {
-const image = product.images && product.images[0] 
-  ? product.images[0]
-  : '/lib/images/placeholder.jpg';
+    const image = product.images && product.images[0]
+      ? product.images[0]
+      : '/lib/images/placeholder.jpg';
 
-    const outOfStock = product.stock <= 0 
-      ? '<div class="homepage-out-of-stock">Esgotado</div>' 
+    const outOfStock = !product.stock
+      ? '<div class="homepage-out-of-stock">Esgotado</div>'
       : '';
+
+    // Promoção
+    const promoBadge = product.is_on_promotion && product.discount_percent
+      ? `<div class="homepage-promo-badge">🏷️ ${product.promotion_label || 'PROMOÇÃO'} -${product.discount_percent}%</div>`
+      : '';
+
+    const discounted = product.is_on_promotion && product.discount_percent
+      ? (product.price_discounted
+          ? Number(product.price_discounted)
+          : +(Number(product.price) * (1 - product.discount_percent / 100)).toFixed(2))
+      : null;
+
+    const priceHTML = discounted
+      ? `<span class="homepage-product-price homepage-price-old">€${Number(product.price).toFixed(2)}</span>
+         <span class="homepage-product-price homepage-price-new">€${discounted.toFixed(2)}</span>`
+      : `<span class="homepage-product-price">€${Number(product.price).toFixed(2)}</span>`;
 
     return `
       <div class="homepage-product-card" data-id="${product.id}">
         <div class="homepage-product-image">
           <img src="${image}" alt="${product.name}" loading="lazy">
           ${outOfStock}
+          ${promoBadge}
         </div>
         <div class="homepage-product-info">
           <h3>${product.name}</h3>
           <div class="homepage-product-footer">
-            <span class="homepage-product-price">€${Number(product.price).toFixed(2)}</span>
+            <div class="homepage-price-group">${priceHTML}</div>
             <div class="homepage-product-actions">
               <button class="homepage-btn-view" onclick="window.location.href='product-details.html?id=${product.id}'">
                 Ver Detalhes

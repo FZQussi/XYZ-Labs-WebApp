@@ -51,25 +51,41 @@ function createInfiniteCarousel(products) {
   const duplicatedProducts = [...products, ...products];
   
   const productsHTML = duplicatedProducts.map(product => {
-    const image = product.images && product.images[0] 
-      ? product.images[0] 
+    const image = product.images && product.images[0]
+      ? product.images[0]
       : '/lib/images/placeholder.jpg';
-    
+
+    const promoBadge = product.is_on_promotion && product.discount_percent
+      ? `<div class="homepage-promo-badge">🏷️ ${product.promotion_label || 'PROMOÇÃO'} -${product.discount_percent}%</div>`
+      : '';
+
+    const discounted = product.is_on_promotion && product.discount_percent
+      ? (product.price_discounted
+          ? Number(product.price_discounted)
+          : +(Number(product.price) * (1 - product.discount_percent / 100)).toFixed(2))
+      : null;
+
+    const priceHTML = discounted
+      ? `<span class="product-price homepage-price-old">€${Number(product.price).toFixed(2)}</span>
+         <span class="product-price homepage-price-new">€${discounted.toFixed(2)}</span>`
+      : `<span class="product-price">€${Number(product.price).toFixed(2)}</span>`;
+
     return `
       <div class="product-card" data-id="${product.id}">
         <div class="product-image">
           <img src="${image}" alt="${product.name}" loading="lazy">
-          ${product.stock <= 0 ? '<div class="out-of-stock">Esgotado</div>' : ''}
+          ${!product.stock ? '<div class="out-of-stock">Esgotado</div>' : ''}
+          ${promoBadge}
         </div>
         <div class="product-info">
           <h3>${product.name}</h3>
           <div class="product-footer">
-            <span class="product-price">€${Number(product.price).toFixed(2)}</span>
+            <div class="homepage-price-group">${priceHTML}</div>
             <div class="product-actions">
               <button class="btn-view" onclick="window.location.href='product-details.html?id=${product.id}'">
                 Ver Detalhes
               </button>
-              ${product.stock > 0 
+              ${product.stock
                 ? `<button class="btn-add-cart" onclick="event.stopPropagation(); addProductToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
                      🛒
                    </button>`
@@ -126,6 +142,35 @@ function truncateText(text, maxLength) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  // Injetar estilos de promoção partilhados
+  if (!document.getElementById('promo-card-styles')) {
+    const s = document.createElement('style');
+    s.id = 'promo-card-styles';
+    s.textContent = `
+      .homepage-promo-badge {
+        position: absolute; top: 8px; left: 8px;
+        background: #dc2626; color: #fff;
+        font-size: 10px; font-weight: bold;
+        padding: 3px 8px;
+        letter-spacing: 0.3px;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .homepage-product-image { position: relative; }
+      .homepage-price-group { display: flex; flex-direction: column; gap: 1px; }
+      .homepage-price-old {
+        text-decoration: line-through;
+        color: #9ca3af !important;
+        font-size: 12px !important;
+      }
+      .homepage-price-new {
+        color: #dc2626 !important;
+        font-weight: bold;
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
   loadFeaturedProducts();
 
   // Newsletter form
