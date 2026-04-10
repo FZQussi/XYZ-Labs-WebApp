@@ -19,6 +19,9 @@ async function deleteCloudinaryImage(url) {
   }
 }
 
+// Campos de promoção permitidos no UPDATE dinâmico
+const PROMO_FIELDS = ['is_on_promotion', 'discount_percent', 'promotion_start', 'promotion_end', 'promotion_label'];
+
 // ─────────────────────────────────────────────
 // GET ALL PRODUCTS
 // ─────────────────────────────────────────────
@@ -27,6 +30,11 @@ exports.getProducts = async (req, res) => {
     const result = await client.query(`
       SELECT
         p.*,
+        CASE
+          WHEN p.is_on_promotion AND p.discount_percent IS NOT NULL
+          THEN ROUND(p.price * (1 - p.discount_percent::numeric / 100), 2)
+          ELSE NULL
+        END AS price_discounted,
         row_to_json(pc_main) AS primary_category,
         COALESCE(
           json_agg(
@@ -83,6 +91,11 @@ exports.getProductById = async (req, res) => {
     const result = await client.query(`
       SELECT
         p.*,
+        CASE
+          WHEN p.is_on_promotion AND p.discount_percent IS NOT NULL
+          THEN ROUND(p.price * (1 - p.discount_percent::numeric / 100), 2)
+          ELSE NULL
+        END AS price_discounted,
         row_to_json(pc_main) AS primary_category,
         COALESCE(
           json_agg(
@@ -136,6 +149,116 @@ exports.getProductById = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
+// GET PRODUCTS ON PROMOTION
+// ─────────────────────────────────────────────
+exports.getPromotions = async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT
+        p.*,
+        ROUND(p.price * (1 - p.discount_percent::numeric / 100), 2) AS price_discounted,
+        row_to_json(pc_main) AS primary_category
+      FROM products p
+      LEFT JOIN primary_categories pc_main ON pc_main.id = p.primary_category_id
+      WHERE p.is_active = true
+        AND p.is_on_promotion = true
+        AND p.discount_percent IS NOT NULL
+      ORDER BY p.discount_percent DESC, p.updated_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Erro ao obter promoções:', err);
+    res.status(500).json({ error: 'Erro ao obter promoções' });
+  }
+};
+
+// ─────────────────────────────────────────────
+// SET / UPDATE PROMOTION ON A PRODUCT
+// ─────────────────────────────────────────────
+exports.setPromotion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      is_on_promotion,
+      discount_percent,
+      promotion_start,
+      promotion_end,
+      promotion_label
+    } = req.body;
+
+    // Validações
+    if (is_on_promotion && (discount_percent == null || discount_percent < 1 || discount_percent > 99)) {
+      return res.status(400).json({ error: 'Desconto deve ser entre 1% e 99%' });
+    }
+
+    if (promotion_end && promotion_start && new Date(promotion_end) <= new Date(promotion_start)) {
+      return res.status(400).json({ error: 'A data de fim deve ser posterior à data de início' });
+    }
+
+    const result = await client.query(
+      `UPDATE products
+       SET
+         is_on_promotion  = $1,
+         discount_percent = $2,
+         promotion_start  = $3,
+         promotion_end    = $4,
+         promotion_label  = $5,
+         updated_at       = NOW()
+       WHERE id = $6
+       RETURNING id, name, price, is_on_promotion, discount_percent,
+                 promotion_start, promotion_end, promotion_label,
+                 CASE WHEN is_on_promotion AND discount_percent IS NOT NULL
+                      THEN ROUND(price * (1 - discount_percent::numeric / 100), 2)
+                      ELSE NULL END AS price_discounted`,
+      [
+        is_on_promotion ?? false,
+        is_on_promotion ? (discount_percent || null) : null,
+        promotion_start || null,
+        promotion_end   || null,
+        is_on_promotion ? (promotion_label || null) : null,
+        id
+      ]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    console.log(`Promoção ${is_on_promotion ? 'ativada' : 'desativada'} no produto ${id}`);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Erro ao definir promoção:', err);
+    res.status(500).json({ error: err.message || 'Erro ao definir promoção' });
+  }
+};
+
+// ─────────────────────────────────────────────
+// REMOVE PROMOTION (atalho — coloca is_on_promotion=false)
+// ─────────────────────────────────────────────
+exports.removePromotion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await client.query(
+      `UPDATE products
+       SET is_on_promotion = false,
+           discount_percent = NULL,
+           promotion_start  = NULL,
+           promotion_end    = NULL,
+           promotion_label  = NULL,
+           updated_at       = NOW()
+       WHERE id = $1
+       RETURNING id, name`,
+      [id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Produto não encontrado' });
+    res.json({ success: true, product: result.rows[0] });
+  } catch (err) {
+    console.error('Erro ao remover promoção:', err);
+    res.status(500).json({ error: 'Erro ao remover promoção' });
+  }
+};
+
+// ─────────────────────────────────────────────
 // CREATE PRODUCT
 // ─────────────────────────────────────────────
 exports.createProduct = async (req, res) => {
@@ -149,7 +272,7 @@ exports.createProduct = async (req, res) => {
       price,
       primary_category_id,
       secondary_category_ids,
-      filter_tag_ids           // opcional — array de IDs de filter_tags
+      filter_tag_ids
     } = req.body;
 
     const model_file = req.file?.filename || null;
@@ -159,7 +282,6 @@ exports.createProduct = async (req, res) => {
       throw new Error('Categoria principal é obrigatória');
     }
 
-    // Inserir produto
     const productResult = await dbClient.query(
       `INSERT INTO products
          (name, description, price, model_file, stock, images, primary_category_id)
@@ -169,7 +291,6 @@ exports.createProduct = async (req, res) => {
     );
     const product = productResult.rows[0];
 
-    // Categorias secundárias (legado)
     if (secondary_category_ids) {
       const secIds = typeof secondary_category_ids === 'string'
         ? JSON.parse(secondary_category_ids)
@@ -185,7 +306,6 @@ exports.createProduct = async (req, res) => {
       }
     }
 
-    // Filter tags (novo sistema)
     if (filter_tag_ids) {
       const tagIds = typeof filter_tag_ids === 'string'
         ? JSON.parse(filter_tag_ids)
@@ -232,19 +352,24 @@ exports.updateProduct = async (req, res) => {
 
     const productId = req.params.id;
 
-    // Normalizar stock
     if ('stock' in req.body) {
       req.body.stock = req.body.stock === 'true' || req.body.stock === true;
     }
 
-    // Buscar modelo atual (para eliminar o antigo se for substituído)
+    // Normalizar campos de promoção
+    if ('is_on_promotion' in req.body) {
+      req.body.is_on_promotion = req.body.is_on_promotion === 'true' || req.body.is_on_promotion === true;
+    }
+    if ('discount_percent' in req.body && req.body.discount_percent !== '') {
+      req.body.discount_percent = parseInt(req.body.discount_percent, 10) || null;
+    }
+
     const current = await dbClient.query(
       'SELECT model_file FROM products WHERE id = $1',
       [productId]
     );
     const oldModelFile = current.rows[0]?.model_file;
 
-    // Construir SET dinâmico — campos com tratamento próprio são ignorados aqui
     const skipFields = ['secondary_category_ids', 'filter_tag_ids', 'images'];
     const fields = [];
     const values = [];
@@ -257,13 +382,12 @@ exports.updateProduct = async (req, res) => {
       }
     }
 
-    // Novo modelo 3D — eliminar o antigo local se existir
     if (req.file) {
       if (oldModelFile) {
         try {
           const p = path.join(__dirname, '../../Frontend/models', oldModelFile);
           if (fs.existsSync(p)) fs.unlinkSync(p);
-        } catch (_) { /* ignorar erros de file system */ }
+        } catch (_) { /* ignorar */ }
       }
       fields.push(`model_file = $${i++}`);
       values.push(req.file.filename);
@@ -277,7 +401,6 @@ exports.updateProduct = async (req, res) => {
       );
     }
 
-    // Atualizar categorias secundárias (legado)
     if (req.body.secondary_category_ids !== undefined) {
       const secIds = typeof req.body.secondary_category_ids === 'string'
         ? JSON.parse(req.body.secondary_category_ids)
@@ -298,20 +421,17 @@ exports.updateProduct = async (req, res) => {
       }
     }
 
-    // Atualizar filter tags (novo sistema) — substitui tudo e mantém contagens
     if (req.body.filter_tag_ids !== undefined) {
       const newTagIds = typeof req.body.filter_tag_ids === 'string'
         ? JSON.parse(req.body.filter_tag_ids)
         : req.body.filter_tag_ids;
 
-      // Tags atuais do produto
       const currentTags = await dbClient.query(
         'SELECT filter_tag_id FROM product_filter_tags WHERE product_id = $1',
         [productId]
       );
       const oldTagIds = currentTags.rows.map(r => Number(r.filter_tag_id));
 
-      // Decrementar contagem das tags que foram removidas
       const removed = oldTagIds.filter(id => !newTagIds.includes(id));
       if (removed.length > 0) {
         await dbClient.query(
@@ -322,7 +442,6 @@ exports.updateProduct = async (req, res) => {
         );
       }
 
-      // Incrementar contagem das tags que foram adicionadas
       const added = newTagIds.filter(id => !oldTagIds.includes(id));
       if (added.length > 0) {
         await dbClient.query(
@@ -333,7 +452,6 @@ exports.updateProduct = async (req, res) => {
         );
       }
 
-      // Substituir todas as tags
       await dbClient.query(
         'DELETE FROM product_filter_tags WHERE product_id = $1',
         [productId]
@@ -367,7 +485,6 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    // product_filter_tags e product_categories apagam em cascade pela FK
     await client.query('DELETE FROM products WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (err) {
@@ -379,7 +496,6 @@ exports.deleteProduct = async (req, res) => {
 // ─────────────────────────────────────────────
 // CATEGORIAS PRIMÁRIAS
 // ─────────────────────────────────────────────
-
 exports.getPrimaryCategories = async (req, res) => {
   try {
     const result = await client.query(
@@ -454,9 +570,8 @@ exports.deletePrimaryCategory = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-// CATEGORIAS SECUNDÁRIAS (sistema legado)
+// CATEGORIAS SECUNDÁRIAS
 // ─────────────────────────────────────────────
-
 exports.getSecondaryCategories = async (req, res) => {
   try {
     const result = await client.query(
@@ -525,7 +640,6 @@ exports.deleteSecondaryCategory = async (req, res) => {
 // ─────────────────────────────────────────────
 // IMAGENS (Cloudinary)
 // ─────────────────────────────────────────────
-
 exports.getProductImages = async (req, res) => {
   try {
     const result = await client.query(

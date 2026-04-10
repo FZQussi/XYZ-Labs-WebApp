@@ -399,9 +399,13 @@
         <span class="nav-icon">🔧</span>
         <span>Filtros</span>
       </button>
-      <button data-tab="materials" class="nav-btn">
+    <button data-tab="materials" class="nav-btn">
         <span class="nav-icon">🎨</span>
         <span>Materiais & Cores</span>
+      </button>
+      <button data-tab="promotions" class="nav-btn">
+        <span class="nav-icon">🔥</span>
+        <span>Promoções</span>
       </button>
       <button data-tab="priceCalculator" class="nav-btn">
         <span class="nav-icon">🧮</span>
@@ -535,7 +539,12 @@
           <option value="true">Disponível</option>
           <option value="false">Indisponível</option>
         </select>
-        <input type="text" id="productFilterCategory" placeholder="Categoria principal..." class="filter-input">
+            <input type="text" id="productFilterCategory" placeholder="Categoria principal..." class="filter-input">
+        <select id="productFilterPromo" class="filter-select">
+          <option value="">Promoção (Todos)</option>
+          <option value="true">Em Promoção</option>
+          <option value="false">Sem Promoção</option>
+        </select>
         <button id="addProductBtn" class="btn-primary"><span>➕</span><span>NOVO PRODUTO</span></button>
       </div>
       <div class="data-table">
@@ -543,7 +552,60 @@
         <div id="productsList" class="table-body"></div>
       </div>
     </section>
-
+     <!-- ============ PROMOÇÕES ============ -->
+    <section id="promotions" class="tab hidden">
+      <header class="page-header">
+        <h2 class="page-title">🔥 GESTÃO DE PROMOÇÕES</h2>
+      </header>
+ 
+      <!-- Stats rápidas -->
+      <div class="stats-bar" id="promoStatsBar" style="margin-bottom:20px;">
+        <div class="stat-item">
+          <span class="stat-icon">🔥</span>
+          <div>
+            <span class="stat-label">Promoções Ativas</span>
+            <span class="stat-value" id="promoCount">—</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💰</span>
+          <div>
+            <span class="stat-label">Desconto Médio</span>
+            <span class="stat-value" id="promoAvgDiscount">—</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">📉</span>
+          <div>
+            <span class="stat-label">Maior Desconto</span>
+            <span class="stat-value" id="promoMaxDiscount">—</span>
+          </div>
+        </div>
+      </div>
+ 
+      <div style="display:flex;align-items:center;justify-content:space-between;
+                  margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <p style="font-family:'Courier New',monospace;font-size:12px;color:#666;">
+          Para adicionar uma promoção, vai à aba
+          <strong>Produtos</strong> e clica em
+          <strong>🏷 DEFINIR</strong> na coluna PROMOÇÃO de qualquer produto.
+        </p>
+        <button id="refreshPromotionsBtn" class="btn-icon" title="Atualizar">🔄 Atualizar</button>
+      </div>
+ 
+      <div class="data-table">
+        <div class="table-header">
+          <span>IMAGEM</span>
+          <span>PRODUTO</span>
+          <span>PREÇO ORIG.</span>
+          <span>DESCONTO</span>
+          <span>PREÇO FINAL</span>
+          <span>PERÍODO / ESTADO</span>
+          <span>AÇÕES</span>
+        </div>
+        <div id="promotionsList" class="table-body"></div>
+      </div>
+    </section>
     <!-- ============ CATEGORIAS ============ -->
     <section id="categories" class="tab hidden">
       <header class="page-header">
@@ -1761,5 +1823,6 @@
   <script src="/Dashboard/scripts/orders.js"></script>
   <script src="/Dashboard/scripts/filters.js"></script>
   <script src="/Dashboard/scripts/materials.js"></script>
+  <script src="/Dashboard/scripts/promotions-stats.js"></script>
 </body>
 </html>

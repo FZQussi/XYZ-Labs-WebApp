@@ -532,6 +532,12 @@
     images               text[]
     stock                boolean       NOT NULL  DEFAULT false
     primary_category_id  integer                 → primary_categories(id) ON DELETE SET NULL
+    is_on_promotion      boolean       NOT NULL  DEFAULT false                              ← NOVO
+    discount_percent     smallint                DEFAULT NULL                               ← NOVO
+                                                  CHECK (discount_percent IS NULL OR (discount_percent >= 1 AND discount_percent <= 99))
+    promotion_start      timestamp               DEFAULT NULL                               ← NOVO
+    promotion_end        timestamp               DEFAULT NULL                               ← NOVO
+    promotion_label      varchar(100)            DEFAULT NULL                               ← NOVO
 
   ÍNDICES:
     products_pkey                  PRIMARY KEY (id)
